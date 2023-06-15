@@ -30,7 +30,7 @@ add_subdirectory("test")
 
 else()
 #
-# if we are a subproject, export as a library
+# if we are a subproject
 # Use target_link_libraries(${EXECUTABLE} bm_common_messages) in parent CMakeLists.txt to use
 # Set target compiler flags with the BM_COMMON_MESSAGES_COMPILER_FLAGS variable
 #
@@ -40,10 +40,6 @@ message(status "BM COMMON MESSAGES DIR ${BM_COMMON_MESSAGES_DIR}")
 set(BM_COMMON_MESSAGES_INCLUDES
     ${BM_COMMON_MESSAGES_DIR}
     )
-
-add_library(bm_common_messages INTERFACE)
-target_compile_options(bm_common_messages PRIVATE ${BM_COMMON_MESSAGES_COMPILER_FLAGS})
-target_include_directories(bm_common_messages PRIVATE ${BM_COMMON_MESSAGES_INCLUDES})
 
 set(BM_COMMON_MESSAGES_INCLUDES ${BM_COMMON_MESSAGES_INCLUDES} PARENT_SCOPE)
 
