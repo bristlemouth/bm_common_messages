@@ -9,6 +9,26 @@ set(CMAKE_C_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
+
+# If we're not a subproject, build the tests
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  add_compile_options(
+    -Wall
+    -Wextra
+    -Werror
+    -O0
+    -g
+    )
+message(STATUS "Native compiling - Building Tests")
+set(SRC_DIR ${CMAKE_SOURCE_DIR})
+set(TEST_DIR ${CMAKE_SOURCE_DIR}/test)
+
+# Setup testing
+include(CTest)
+add_subdirectory("third_party/googletest")
+add_subdirectory("test")
+
+else()
 #
 # if we are a subproject, export as a library
 # Use target_link_libraries(${EXECUTABLE} bm_common_messages) in parent CMakeLists.txt to use
