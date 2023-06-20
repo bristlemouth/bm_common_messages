@@ -127,7 +127,7 @@ typedef struct {
   uint32_t crc32;
   // Data
   uint8_t data[0];
-} __attribute__((packed)) bm_common_system_configuration_header_t;
+} __attribute__((packed)) bm_common_network_crc_t;
 
 typedef struct {
   // Partition id
