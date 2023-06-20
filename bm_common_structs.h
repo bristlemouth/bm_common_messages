@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /////////////////////////////
 /* CONFIGURATION*/
 /////////////////////////////
@@ -104,3 +108,20 @@ typedef struct {
   // Key string
   char key[0];
 } __attribute__((packed)) bm_common_config_delete_key_response_t;
+
+
+typedef enum {
+    BM_COMMON_WIRELESS_NETWORK_TYPE_CELLULAR_IRI_FALLBACK = (1 << 0),
+    BM_COMMON_WIRELESS_NETWORK_TYPE_CELLULAR_ONLY = (1 << 1),
+} bm_common_wireless_network_type_e;
+
+typedef struct {
+    // Wireless network type to send over.
+    bm_common_wireless_network_type_e type;
+    // Data
+    uint8_t data[0];
+} __attribute__((packed)) bm_common_wireless_network_data_header_t;
+
+#ifdef __cplusplus
+}
+#endif
