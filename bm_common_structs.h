@@ -122,6 +122,35 @@ typedef struct {
     uint8_t data[0];
 } __attribute__((packed)) bm_common_wireless_network_data_header_t;
 
+typedef struct {
+  // crc of the data
+  uint32_t crc32;
+  // Data
+  uint8_t data[0];
+} __attribute__((packed)) bm_common_system_configuration_header_t;
+
+typedef struct {
+  // Partition id
+  bm_common_config_partition_e partition;
+  // Partion crc
+  uint32_t crc32;
+} __attribute__((packed)) bm_common_config_crc_t;
+
+typedef struct {
+  // fw version
+  uint8_t major;
+  uint8_t minor;
+  uint8_t revision;
+  uint32_t gitSHA;
+} __attribute__((packed)) bm_common_fw_version_t;
+
+typedef struct {
+  // Number of Nodes in the list
+  uint16_t num_nodes;
+  // List of nodes
+  uint64_t node_list[0];
+} __attribute__((packed)) bm_common_topology_node_list_t;
+
 #ifdef __cplusplus
 }
 #endif
