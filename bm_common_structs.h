@@ -145,7 +145,7 @@ typedef struct {
 } __attribute__((packed)) bm_common_topology_node_list_t;
 
 typedef struct {
-  // crc of the data
+  // crc of the this message (excluding itself)
   uint32_t newtwork_crc32;
   // Config crc
   bm_common_config_crc_t config_crc;
