@@ -141,7 +141,7 @@ typedef struct {
   // Number of Nodes in the list
   uint16_t num_nodes;
   // List of nodes
-  uint64_t node_list[0];
+  uint64_t list[0];
 } __attribute__((packed)) bm_common_topology_node_list_t;
 
 typedef struct {
@@ -152,7 +152,7 @@ typedef struct {
   // fw info
   bm_common_fw_version_t fw_info;
   // topology list
-  bm_common_topology_node_list_t topology_list;
+  bm_common_topology_node_list_t node_list;
 } __attribute__((packed)) bm_common_network_info_t;
 
 #ifdef __cplusplus
