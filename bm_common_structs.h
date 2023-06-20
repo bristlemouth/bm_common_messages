@@ -153,7 +153,7 @@ typedef struct {
   bm_common_fw_version_t fw_info;
   // topology list
   bm_common_topology_node_list_t topology_list;
-} __attribute__((packed)) bm_common_network_crc_t;
+} __attribute__((packed)) bm_common_network_info_t;
 
 #ifdef __cplusplus
 }
