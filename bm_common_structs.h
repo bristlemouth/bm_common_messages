@@ -13,7 +13,6 @@ extern "C" {
 typedef enum {
   BM_COMMON_CFG_PARTITION_USER,
   BM_COMMON_CFG_PARTITION_SYSTEM,
-  BM_COMMON_CFG_PARTITION_HARDWARE
 } bm_common_config_partition_e;
 
 typedef struct {
