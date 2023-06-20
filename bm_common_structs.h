@@ -123,13 +123,6 @@ typedef struct {
 } __attribute__((packed)) bm_common_wireless_network_data_header_t;
 
 typedef struct {
-  // crc of the data
-  uint32_t crc32;
-  // Data
-  uint8_t data[0];
-} __attribute__((packed)) bm_common_network_crc_t;
-
-typedef struct {
   // Partition id
   bm_common_config_partition_e partition;
   // Partion crc
@@ -150,6 +143,17 @@ typedef struct {
   // List of nodes
   uint64_t node_list[0];
 } __attribute__((packed)) bm_common_topology_node_list_t;
+
+typedef struct {
+  // crc of the data
+  uint32_t newtwork_crc32;
+  // Config crc
+  bm_common_config_crc_t config_crc;
+  // fw info
+  bm_common_fw_version_t fw_info;
+  // topology list
+  bm_common_topology_node_list_t topology_list;
+} __attribute__((packed)) bm_common_network_crc_t;
 
 #ifdef __cplusplus
 }
