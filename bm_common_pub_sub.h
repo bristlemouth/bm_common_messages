@@ -5,7 +5,9 @@
 extern "C" {
 #endif
 
+#ifndef BM_COMMON_PUB_SUB_VERSION
 #define BM_COMMON_PUB_SUB_VERSION (1)
+#endif // BM_COMMON_PUB_SUB_VERSION
 
 // Add data structures published through pub sub must have this header. 
 typedef struct {
