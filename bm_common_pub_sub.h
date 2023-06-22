@@ -11,6 +11,7 @@ extern "C" {
 
 // Add data structures published through pub sub must have this header. 
 typedef struct {
+  uint8_t type; // Type of data.
   uint8_t version; // Protocol Version.
   uint8_t payload[0]; // Payload
 } __attribute__ ((packed)) bm_common_pub_sub_header_t;
