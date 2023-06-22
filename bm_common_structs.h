@@ -147,7 +147,7 @@ typedef struct {
 
 typedef struct {
   // crc of the this message (excluding itself)
-  uint32_t newtwork_crc32;
+  uint32_t network_crc32;
   // Config crc
   bm_common_config_crc_t config_crc;
   // fw info
