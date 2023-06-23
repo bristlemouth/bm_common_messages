@@ -18,6 +18,9 @@ typedef struct {
 
 // Add pub sub data structures below
 
+typedef struct {
+    uint64_t utc_us; // UTC in nanoseconds.
+} __attribute__ ((packed)) app_pub_sub_utc_t;
 
 #ifdef __cplusplus
 }
