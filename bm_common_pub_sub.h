@@ -16,6 +16,12 @@ typedef struct {
   uint8_t payload[0]; // Payload
 } __attribute__ ((packed)) bm_common_pub_sub_header_t;
 
+// Add pub sub data structures below
+
+typedef struct {
+    uint64_t utc_us; // UTC in nanoseconds.
+} __attribute__ ((packed)) bm_common_pub_sub_utc_t;
+
 // The payload of for a printf/fprintf publication
 typedef struct {
   uint64_t target_node_id;
@@ -23,12 +29,6 @@ typedef struct {
   uint16_t data_len;
   uint8_t fnameAndData[0];
 } __attribute__((packed)) bm_print_publication_t;
-
-// Add pub sub data structures below
-
-typedef struct {
-    uint64_t utc_us; // UTC in nanoseconds.
-} __attribute__ ((packed)) bm_common_pub_sub_utc_t;
 
 #ifdef __cplusplus
 }
