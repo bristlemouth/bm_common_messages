@@ -22,7 +22,7 @@ typedef struct {
     uint64_t utc_us; // UTC in nanoseconds.
 } __attribute__ ((packed)) bm_common_pub_sub_utc_t;
 
-// The payload of for a printf/fprintf publication
+// This is the payload for a printf/fprintf publication
 typedef struct {
   uint64_t target_node_id;
   uint16_t fname_len;
