@@ -9,7 +9,7 @@ extern "C" {
 #define BM_COMMON_PUB_SUB_VERSION (1)
 #endif // BM_COMMON_PUB_SUB_VERSION
 
-// Add data structures published through pub sub must have this header. 
+// Add data structures published through pub sub must have this header.
 typedef struct {
   uint8_t type; // Type of data.
   uint8_t version; // Protocol Version.
@@ -21,6 +21,14 @@ typedef struct {
 typedef struct {
     uint64_t utc_us; // UTC in nanoseconds.
 } __attribute__ ((packed)) bm_common_pub_sub_utc_t;
+
+// This is the payload for a printf/fprintf publication
+typedef struct {
+  uint64_t target_node_id;
+  uint16_t fname_len;
+  uint16_t data_len;
+  uint8_t fnameAndData[0];
+} __attribute__((packed)) bm_print_publication_t;
 
 #ifdef __cplusplus
 }
