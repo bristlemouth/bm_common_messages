@@ -1,0 +1,5 @@
+float64 abs_speed_mean_cm_s
+float64 abs_speed_stddev_cm_s
+float64 direction_circ_mean_rad
+float64 direction_circ_stddev_rad
+float64 temperature_mean_degC

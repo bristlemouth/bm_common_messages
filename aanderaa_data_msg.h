@@ -1,16 +1,16 @@
 #pragma once
 #include "cbor.h"
 
-namespace SysInfoSvcReplyMsg {
+namespace AanderaaDataMsg {
 
 constexpr size_t NUM_FIELDS = 5;
 
 struct Data {
-  uint64_t node_id;
-  uint32_t git_sha;
-  uint32_t sys_config_crc;
-  uint32_t app_name_strlen;
-  char *app_name;
+    double abs_speed_mean_cm_s;
+    double abs_speed_stddev_cm_s;
+    double direction_circ_mean_rad;
+    double direction_circ_stddev_rad;
+    double temperature_mean_degC;
 };
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
@@ -18,4 +18,4 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
 
 CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size);
 
-} // namespace SysInfoSvcReplyMsg
+} // namespace AanderaaDataMsg
