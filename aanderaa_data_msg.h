@@ -6,11 +6,20 @@ namespace AanderaaDataMsg {
 constexpr size_t NUM_FIELDS = 5;
 
 struct Data {
-    double abs_speed_mean_cm_s;
-    double abs_speed_stddev_cm_s;
-    double direction_circ_mean_rad;
-    double direction_circ_stddev_rad;
-    double temperature_mean_degC;
+    double abs_speed_cm_s;
+    double direction_deg_m;
+    double north_cm_s;
+    double east_cm_s;
+    double heading_deg_m;
+    double tilt_x_deg;
+    double tilt_y_deg;
+    double sp_std_cm_s;
+    double strength_db;
+    double ping_count;
+    double abs_tilt_deg;
+    double max_tilt_deg;
+    double std_tilt_deg;
+    double temperature_deg_c;
 };
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,

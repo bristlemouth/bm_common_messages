@@ -208,7 +208,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // direction_circ_mean_rad
+    // direction_circ_deg
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -218,7 +218,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.direction_circ_mean_rad);
+    err = cbor_value_get_double(&value, &d.direction_circ_deg);
     if (err != CborNoError) {
       break;
     }
@@ -227,7 +227,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // direction_circ_stddev_rad
+    // direction_circ__deg
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
