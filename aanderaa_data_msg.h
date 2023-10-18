@@ -13,8 +13,8 @@ struct Data {
     double heading_deg_m;
     double tilt_x_deg;
     double tilt_y_deg;
-    double sp_std_cm_s;
-    double strength_db;
+    double standard_ping_std_cm_s;
+    double transducer_strength_db;
     double ping_count;
     double abs_tilt_deg;
     double max_tilt_deg;

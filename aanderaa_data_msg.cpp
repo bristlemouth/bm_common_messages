@@ -135,33 +135,33 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
-    // sp_std_cm_s
-    err = cbor_encode_text_stringz(&map_encoder, "sp_std_cm_s");
+    // standard_ping_std_cm_s
+    err = cbor_encode_text_stringz(&map_encoder, "standard_ping_std_cm_s");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for sp_std_cm_s key: %d\n", err);
+      printf("cbor_encode_text_stringz failed for standard_ping_std_cm_s key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.sp_std_cm_s);
+    err = cbor_encode_double(&map_encoder, d.standard_ping_std_cm_s);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for sp_std_cm_s value: %d\n", err);
+      printf("cbor_encode_double failed for standard_ping_std_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
 
-    // strength_db
-    err = cbor_encode_text_stringz(&map_encoder, "strength_db");
+    // transducer_strength_db
+    err = cbor_encode_text_stringz(&map_encoder, "transducer_strength_db");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for strength_db key: %d\n", err);
+      printf("cbor_encode_text_stringz failed for transducer_strength_db key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.strength_db);
+    err = cbor_encode_double(&map_encoder, d.transducer_strength_db);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for strength_db value: %d\n", err);
+      printf("cbor_encode_double failed for transducer_strength_db value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -439,7 +439,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // sp_std_cm_s
+    // standard_ping_std_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -449,7 +449,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.sp_std_cm_s);
+    err = cbor_value_get_double(&value, &d.standard_ping_std_cm_s);
     if (err != CborNoError) {
       break;
     }
@@ -458,7 +458,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // strength_db
+    // transducer_strength_db
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -468,7 +468,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.strength_db);
+    err = cbor_value_get_double(&value, &d.transducer_strength_db);
     if (err != CborNoError) {
       break;
     }
