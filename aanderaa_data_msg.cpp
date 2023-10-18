@@ -16,97 +16,233 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
-    // abs_speed_mean_cm_s
-    err = cbor_encode_text_stringz(&map_encoder, "abs_speed_mean_cm_s");
+    // abs_speed_cm_s
+    err = cbor_encode_text_stringz(&map_encoder, "abs_speed_cm_s");
     if (err != CborNoError) {
-      printf(
-          "cbor_encode_text_stringz failed for abs_speed_mean_cm_s key: %d\n",
-          err);
-      if (err != CborErrorOutOfMemory) {
-        break;
-      }
-    }
-    err = cbor_encode_double(&map_encoder, d.abs_speed_mean_cm_s);
-    if (err != CborNoError) {
-      printf("cbor_encode_double failed for abs_speed_mean_cm_s value: %d\n",
+      printf("cbor_encode_text_stringz failed for abs_speed_cm_s key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-
-    // abs_speed_stddev_cm_s
-    err = cbor_encode_text_stringz(&map_encoder, "abs_speed_stddev_cm_s");
+    err = cbor_encode_double(&map_encoder, d.abs_speed_cm_s);
     if (err != CborNoError) {
-      printf(
-          "cbor_encode_text_stringz failed for abs_speed_stddev_cm_s key: %d\n",
-          err);
+      printf("cbor_encode_double failed for abs_speed_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.abs_speed_stddev_cm_s);
+
+    // direction_deg_m
+    err = cbor_encode_text_stringz(&map_encoder, "direction_deg_m");
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for abs_speed_stddev_cm_s value: %d\n",
+      printf("cbor_encode_text_stringz failed for direction_deg_m key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-
-    // direction_circ_mean_rad
-    err = cbor_encode_text_stringz(&map_encoder, "direction_circ_mean_rad");
+    err = cbor_encode_double(&map_encoder, d.direction_deg_m);
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for direction_circ_mean_rad key: "
+      printf("cbor_encode_double failed for direction_deg_m value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // north_cm_s
+    err = cbor_encode_text_stringz(&map_encoder, "north_cm_s");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for north_cm_s key: "
              "%d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.direction_circ_mean_rad);
+    err = cbor_encode_double(&map_encoder, d.north_cm_s);
     if (err != CborNoError) {
-      printf(
-          "cbor_encode_double failed for direction_circ_mean_rad value: %d\n",
-          err);
+      printf("cbor_encode_double failed for north_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
 
-    // direction_circ_stddev_rad
-    err = cbor_encode_text_stringz(&map_encoder, "direction_circ_stddev_rad");
+    // east_cm_s
+    err = cbor_encode_text_stringz(&map_encoder, "east_cm_s");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for direction_circ_stddev_rad "
+      printf("cbor_encode_text_stringz failed for east_cm_s "
              "key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.direction_circ_stddev_rad);
+    err = cbor_encode_double(&map_encoder, d.east_cm_s);
     if (err != CborNoError) {
-      printf(
-          "cbor_encode_double failed for direction_circ_stddev_rad value: %d\n",
-          err);
+      printf("cbor_encode_double failed for east_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
 
-    // temperature_mean_degC
-    err = cbor_encode_text_stringz(&map_encoder, "temperature_mean_degC");
+    // heading_deg_m
+    err = cbor_encode_text_stringz(&map_encoder, "heading_deg_m");
     if (err != CborNoError) {
-      printf(
-          "cbor_encode_text_stringz failed for temperature_mean_degC key: %d\n",
-          err);
+      printf("cbor_encode_text_stringz failed for heading_deg_m key: %d\n",
+             err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.temperature_mean_degC);
+    err = cbor_encode_double(&map_encoder, d.heading_deg_m);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for temperature_mean_degC value: %d\n",
+      printf("cbor_encode_double failed for heading_deg_m value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // tilt_x_deg
+    err = cbor_encode_text_stringz(&map_encoder, "tilt_x_deg");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for tilt_x_deg key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.tilt_x_deg);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for tilt_x_deg value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // tilt_y_deg
+    err = cbor_encode_text_stringz(&map_encoder, "tilt_y_deg");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for tilt_y_deg key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.tilt_y_deg);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for tilt_y_deg value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // sp_std_cm_s
+    err = cbor_encode_text_stringz(&map_encoder, "sp_std_cm_s");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for sp_std_cm_s key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.sp_std_cm_s);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for sp_std_cm_s value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // strength_db
+    err = cbor_encode_text_stringz(&map_encoder, "strength_db");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for strength_db key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.strength_db);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for strength_db value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // ping_count
+    err = cbor_encode_text_stringz(&map_encoder, "ping_count");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for ping_count key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.ping_count);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for ping_count value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // abs_tilt_deg
+    err = cbor_encode_text_stringz(&map_encoder, "abs_tilt_deg");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for abs_tilt_deg key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.abs_tilt_deg);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for abs_tilt_deg value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // max_tilt_deg
+    err = cbor_encode_text_stringz(&map_encoder, "max_tilt_deg");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for max_tilt_deg key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.max_tilt_deg);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for max_tilt_deg value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // std_tilt_deg
+    err = cbor_encode_text_stringz(&map_encoder, "std_tilt_deg");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for std_tilt_deg key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.std_tilt_deg);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for std_tilt_deg value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // temperature_deg_c
+    err = cbor_encode_text_stringz(&map_encoder, "temperature_deg_c");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for temperature_deg_c key: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.temperature_deg_c);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for temperature_deg_c value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -170,7 +306,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // abs_speed_mean_cm_s
+    // abs_speed_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -180,7 +316,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.abs_speed_mean_cm_s);
+    err = cbor_value_get_double(&value, &d.abs_speed_cm_s);
     if (err != CborNoError) {
       break;
     }
@@ -189,7 +325,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // abs_speed_stddev_cm_s
+    // direction_deg_m
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -199,7 +335,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.abs_speed_stddev_cm_s);
+    err = cbor_value_get_double(&value, &d.direction_deg_m);
     if (err != CborNoError) {
       break;
     }
@@ -208,7 +344,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // direction_circ_deg
+    // north_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -218,7 +354,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.direction_circ_deg);
+    err = cbor_value_get_double(&value, &d.north_cm_s);
     if (err != CborNoError) {
       break;
     }
@@ -227,7 +363,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // direction_circ__deg
+    // east_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -237,7 +373,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.direction_circ_stddev_rad);
+    err = cbor_value_get_double(&value, &d.east_cm_s);
     if (err != CborNoError) {
       break;
     }
@@ -246,7 +382,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // temperature_mean_degC
+    // heading_deg_m
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -256,7 +392,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.temperature_mean_degC);
+    err = cbor_value_get_double(&value, &d.heading_deg_m);
     if (err != CborNoError) {
       break;
     }
@@ -264,6 +400,178 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
+
+    // tilt_x_deg
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.tilt_x_deg);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // tilt_y_deg
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.tilt_y_deg);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // sp_std_cm_s
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.sp_std_cm_s);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // strength_db
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.strength_db);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // ping_count
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.ping_count);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // abs_tilt_deg
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.abs_tilt_deg);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // max_tilt_deg
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.max_tilt_deg);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // std_tilt_deg
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.std_tilt_deg);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // temperature_deg_c
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.temperature_deg_c);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
     if (err == CborNoError) {
       err = cbor_value_leave_container(&map, &value);
       if (err != CborNoError) {
