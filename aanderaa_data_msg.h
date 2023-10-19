@@ -3,7 +3,7 @@
 
 namespace AanderaaDataMsg {
 
-constexpr size_t NUM_FIELDS = 5;
+constexpr size_t NUM_FIELDS = 14;
 
 struct Data {
     double abs_speed_cm_s;
