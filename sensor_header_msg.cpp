@@ -153,7 +153,7 @@ CborError SensorHeaderMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    uint32_t tmp_uint64;
+    uint64_t tmp_uint64;
     err = cbor_value_get_uint64(&value, &tmp_uint64);
     if (err != CborNoError) {
       break;
