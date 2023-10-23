@@ -17,14 +17,7 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     }
 
     // sensor_header_msg
-    err = cbor_encode_text_stringz(&map_encoder, "header");
-    if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for version key: %d\n", err);
-      if (err != CborErrorOutOfMemory) {
-        break;
-      }
-    }
-    err = SensorHeaderMsg::encode(d.header, cbor_buffer, size, encoded_len);
+    err = SensorHeaderMsg::encode(map_encoder, d.header);
     if (err != CborNoError) {
       printf("SensorHeaderMsg::encode failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -273,7 +266,8 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     if (err == CborNoError) {
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
     } else {
-      printf("cbor_encoder_close_container failed: %d\n", err);
+      printf("cbor_encoder_close_container failed o no: %d\n", err);
+
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -323,16 +317,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     }
 
     // header
-    if (!cbor_value_is_text_string(&value)) {
-      err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
-      break;
-    }
-    err = cbor_value_advance(&value);
-    if (err != CborNoError) {
-      break;
-    }
-    err = SensorHeaderMsg::decode(d.header, cbor_buffer, size);
+    err = SensorHeaderMsg::decode(value, d.header);
     if (err != CborNoError) {
       break;
     }

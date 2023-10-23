@@ -5,7 +5,7 @@
 namespace AanderaaDataMsg {
 
 constexpr uint32_t VERSION = 1;
-constexpr size_t NUM_FIELDS = 15;
+constexpr size_t NUM_FIELDS = 14 + SensorHeaderMsg::NUM_FIELDS;
 
 struct Data {
   SensorHeaderMsg::Data header;

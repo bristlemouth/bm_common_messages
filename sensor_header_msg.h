@@ -13,10 +13,9 @@ struct Data {
   uint64_t sensor_reading_time_s;
 };
 
-CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
-                 size_t *encoded_len);
+CborError encode(CborEncoder &map_encoder, Data &d);
 
-CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size);
+CborError decode(CborValue &map, Data &d);
 
 } // namespace SensorHeaderMsg
 
