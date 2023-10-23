@@ -5,13 +5,6 @@ CborError SensorHeaderMsg::encode(CborEncoder &map_encoder, Data &d) {
   CborError err = CborNoError;
 
   do {
-    if (err != CborNoError) {
-      printf("cbor_encoder_create_map failed: %d\n", err);
-      if (err != CborErrorOutOfMemory) {
-        break;
-      }
-    }
-
     // version
     err = cbor_encode_text_stringz(&map_encoder, "version");
     if (err != CborNoError) {
@@ -90,10 +83,6 @@ CborError SensorHeaderMsg::decode(CborValue &map, Data &d) {
   CborError err = CborNoError;
 
   do {
-    if (err != CborNoError) {
-      break;
-    }
-
     // version
     if (!cbor_value_is_text_string(&map)) {
       err = CborErrorIllegalType;
