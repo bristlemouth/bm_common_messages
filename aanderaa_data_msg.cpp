@@ -266,7 +266,7 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     if (err == CborNoError) {
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
     } else {
-      printf("cbor_encoder_close_container failed o no: %d\n", err);
+      printf("cbor_encoder_close_container failed: %d\n", err);
 
       if (err != CborErrorOutOfMemory) {
         break;
