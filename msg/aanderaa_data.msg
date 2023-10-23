@@ -1,3 +1,6 @@
+import sensor_header
+
+sensor_header header
 float_64 abs_speed_cm_s
 float_64 direction_deg_m
 float_64 north_cm_s

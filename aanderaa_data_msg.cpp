@@ -16,6 +16,15 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
+    // sensor_header_msg
+    err = SensorHeaderMsg::encode(map_encoder, d.header);
+    if (err != CborNoError) {
+      printf("SensorHeaderMsg::encode failed: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
     // abs_speed_cm_s
     err = cbor_encode_text_stringz(&map_encoder, "abs_speed_cm_s");
     if (err != CborNoError) {
@@ -258,6 +267,7 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
     } else {
       printf("cbor_encoder_close_container failed: %d\n", err);
+
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -302,6 +312,12 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
 
     CborValue value;
     err = cbor_value_enter_container(&map, &value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // header
+    err = SensorHeaderMsg::decode(value, d.header);
     if (err != CborNoError) {
       break;
     }
