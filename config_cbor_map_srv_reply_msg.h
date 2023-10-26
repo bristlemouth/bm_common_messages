@@ -9,7 +9,7 @@ struct Data {
     uint32_t partition_id;
     bool success;
     uint32_t cbor_encoded_map_len;
-    uint8_t cbor_data[0];
+    uint8_t *cbor_data;
 };
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
