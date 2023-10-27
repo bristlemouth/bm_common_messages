@@ -249,6 +249,7 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
     uint8_t *buf = static_cast<uint8_t *>(pvPortMalloc(buflen));
     configASSERT(buf);
     err = cbor_value_copy_byte_string(&value, buf, &buflen, NULL) ;
+    d.cbor_data = buf;
     if (err != CborNoError) {
       break;
     }
