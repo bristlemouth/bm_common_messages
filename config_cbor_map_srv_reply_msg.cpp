@@ -16,6 +16,22 @@ CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t
       }
     }
 
+    // node_id
+    err = cbor_encode_text_stringz(&map_encoder, "node_id");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for node_id key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_uint(&map_encoder, d.node_id);
+    if (err != CborNoError) {
+      printf("cbor_encode_uint failed for node_id value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
     // partition_id
     err = cbor_encode_text_stringz(&map_encoder, "partition_id");
     if (err != CborNoError) {
@@ -135,6 +151,26 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
 
     CborValue value;
     err = cbor_value_enter_container(&map, &value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // node_id
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_uint64(&value, &tmp_uint64);
+    d.node_id = tmp_uint64;
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
     if (err != CborNoError) {
       break;
     }

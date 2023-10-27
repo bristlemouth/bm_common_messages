@@ -6,6 +6,7 @@ namespace ConfigCborMapSrvReplyMsg {
 constexpr size_t NUM_FIELDS = 4;
 
 struct Data {
+    uint64_t node_id;
     uint32_t partition_id;
     bool success;
     uint32_t cbor_encoded_map_len;
