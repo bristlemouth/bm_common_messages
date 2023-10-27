@@ -3,7 +3,7 @@
 
 namespace ConfigCborMapSrvReplyMsg {
 
-constexpr size_t NUM_FIELDS = 4;
+constexpr size_t NUM_FIELDS = 5;
 
 struct Data {
     uint64_t node_id;
