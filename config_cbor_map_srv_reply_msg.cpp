@@ -245,17 +245,21 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
     if (err != CborNoError) {
       break;
     }
-    size_t buflen = d.cbor_encoded_map_len;
-    uint8_t *buf = static_cast<uint8_t *>(pvPortMalloc(buflen));
-    configASSERT(buf);
-    err = cbor_value_copy_byte_string(&value, buf, &buflen, NULL) ;
-    d.cbor_data = buf;
-    if (err != CborNoError) {
-      break;
-    }
-    if(buflen != d.cbor_encoded_map_len) {
-      err = CborErrorIllegalType;
-      break;
+    if(d.cbor_encoded_map_len && d.success) {
+      size_t buflen = d.cbor_encoded_map_len;
+      uint8_t *buf = static_cast<uint8_t *>(pvPortMalloc(buflen));
+      configASSERT(buf);
+      err = cbor_value_copy_byte_string(&value, buf, &buflen, NULL) ;
+      d.cbor_data = buf;
+      if (err != CborNoError) {
+        break;
+      }
+      if(buflen != d.cbor_encoded_map_len) {
+        err = CborErrorIllegalType;
+        break;
+      }
+    } else {
+      d.cbor_data = NULL;
     }
     err = cbor_value_advance(&value);
     if (err != CborNoError) {
