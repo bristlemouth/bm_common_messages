@@ -146,6 +146,13 @@ typedef struct {
 } __attribute__((packed)) bm_common_topology_node_list_t;
 
 typedef struct {
+  // Size of the map in bytes
+  uint16_t map_size_bytes;
+  // Cbor encoded network configuration map
+  uint8_t map[0];
+} __attribute__((packed)) bm_common_network_configuration_map_t;
+
+typedef struct {
   // crc of the this message (excluding itself)
   uint32_t network_crc32;
   // Config crc
@@ -154,6 +161,8 @@ typedef struct {
   bm_common_fw_version_t fw_info;
   // topology list
   bm_common_topology_node_list_t node_list;
+  // configuration map
+  bm_common_network_configuration_map_t config_map;
 } __attribute__((packed)) bm_common_network_info_t;
 
 #ifdef __cplusplus
