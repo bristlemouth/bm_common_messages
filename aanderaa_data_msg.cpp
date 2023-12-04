@@ -144,17 +144,17 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
-    // standard_ping_std_cm_s
-    err = cbor_encode_text_stringz(&map_encoder, "standard_ping_std_cm_s");
+    // single_ping_std_cm_s
+    err = cbor_encode_text_stringz(&map_encoder, "single_ping_std_cm_s");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for standard_ping_std_cm_s key: %d\n", err);
+      printf("cbor_encode_text_stringz failed for single_ping_std_cm_s key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.standard_ping_std_cm_s);
+    err = cbor_encode_double(&map_encoder, d.single_ping_std_cm_s);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for standard_ping_std_cm_s value: %d\n", err);
+      printf("cbor_encode_double failed for single_ping_std_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -455,7 +455,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       break;
     }
 
-    // standard_ping_std_cm_s
+    // single_ping_std_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -465,7 +465,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.standard_ping_std_cm_s);
+    err = cbor_value_get_double(&value, &d.single_ping_std_cm_s);
     if (err != CborNoError) {
       break;
     }
