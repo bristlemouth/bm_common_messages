@@ -144,7 +144,7 @@ CborError SensorHeaderMsg::decode(CborValue &map, Data &d) {
       break;
     }
 
-    // sensor_reading_time_s
+    // sensor_reading_time_ms
     if (!cbor_value_is_text_string(&map)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -158,7 +158,7 @@ CborError SensorHeaderMsg::decode(CborValue &map, Data &d) {
     if (err != CborNoError) {
       break;
     }
-    d.sensor_reading_time_s = tmp_uint64;
+    d.sensor_reading_time_ms = tmp_uint64;
     err = cbor_value_advance(&map);
     if (err != CborNoError) {
       break;
