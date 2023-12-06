@@ -21,19 +21,19 @@ CborError SensorHeaderMsg::encode(CborEncoder &map_encoder, Data &d) {
       }
     }
 
-    // reading_time_utc_s
-    err = cbor_encode_text_stringz(&map_encoder, "reading_time_utc_s");
+    // reading_time_utc_ms
+    err = cbor_encode_text_stringz(&map_encoder, "reading_time_utc_ms");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for reading_time_utc_s key: "
+      printf("cbor_encode_text_stringz failed for reading_time_utc_ms key: "
              "%d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_uint(&map_encoder, d.reading_time_utc_s);
+    err = cbor_encode_uint(&map_encoder, d.reading_time_utc_ms);
     if (err != CborNoError) {
-      printf("cbor_encode_uint failed for reading_time_utc_s value: %d\n", err);
+      printf("cbor_encode_uint failed for reading_time_utc_ms value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -58,17 +58,17 @@ CborError SensorHeaderMsg::encode(CborEncoder &map_encoder, Data &d) {
       }
     }
 
-    //  sensor_reading_time_s
-    err = cbor_encode_text_stringz(&map_encoder, "sensor_reading_time_s");
+    //  sensor_reading_time_ms
+    err = cbor_encode_text_stringz(&map_encoder, "sensor_reading_time_ms");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for sensor_reading_time_s key: %d\n", err);
+      printf("cbor_encode_text_stringz failed for sensor_reading_time_ms key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_uint(&map_encoder, d.sensor_reading_time_s);
+    err = cbor_encode_uint(&map_encoder, d.sensor_reading_time_ms);
     if (err != CborNoError) {
-      printf("cbor_encode_uint failed for sensor_reading_time_s value: %d\n",
+      printf("cbor_encode_uint failed for sensor_reading_time_ms value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -104,7 +104,7 @@ CborError SensorHeaderMsg::decode(CborValue &map, Data &d) {
       break;
     }
 
-    // reading_time_utc_s
+    // reading_time_utc_ms
     if (!cbor_value_is_text_string(&map)) {
       err = CborErrorIllegalType;
       printf("expected string key but got something else\n");
@@ -118,7 +118,7 @@ CborError SensorHeaderMsg::decode(CborValue &map, Data &d) {
     if (err != CborNoError) {
       break;
     }
-    d.reading_time_utc_s = tmp_uint64;
+    d.reading_time_utc_ms = tmp_uint64;
     err = cbor_value_advance(&map);
     if (err != CborNoError) {
       break;
