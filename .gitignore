@@ -1,3 +1,8 @@
+# Build directories
+/build
+/cmake-build
+/test-build
+
 # Prerequisites
 *.d
 
@@ -30,3 +35,6 @@
 *.exe
 *.out
 *.app
+
+# Misc
+.DS_Store

@@ -1,6 +1,11 @@
-#include "gtest/gtest.h"
+#include "aanderaa_data_msg.h"
 #include "bm_common_pub_sub.h"
 #include "bm_common_structs.h"
+#include "config_cbor_map_srv_reply_msg.h"
+#include "config_cbor_map_srv_request_msg.h"
+#include "sensor_header_msg.h"
+#include "sys_info_svc_reply_msg.h"
+#include "gtest/gtest.h"
 
 #include <string.h>
 
