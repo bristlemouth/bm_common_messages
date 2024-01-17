@@ -42,10 +42,6 @@ CborError BmSoftDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
-    if (err != CborNoError && err != CborErrorOutOfMemory) {
-      break;
-    }
-
     err = cbor_encoder_close_container(&encoder, &map_encoder);
     if (err == CborNoError) {
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
