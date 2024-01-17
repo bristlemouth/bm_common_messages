@@ -1,5 +1,4 @@
 #include "sensor_header_msg.h"
-#include "FreeRTOS.h"
 
 CborError SensorHeaderMsg::encode(CborEncoder &map_encoder, Data &d) {
   CborError err = CborNoError;
