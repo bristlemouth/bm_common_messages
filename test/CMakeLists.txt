@@ -17,6 +17,7 @@ target_sources(bm_common_messages_tests
 
     # msg files for testing
     ${SRC_DIR}/bm_soft_data_msg.cpp
+    ${SRC_DIR}/bm_rbr_data_msg.cpp
     ${SRC_DIR}/sensor_header_msg.cpp
 
     # support files

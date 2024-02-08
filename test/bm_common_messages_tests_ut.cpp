@@ -1,12 +1,15 @@
 #include "aanderaa_data_msg.h"
 #include "bm_common_pub_sub.h"
 #include "bm_common_structs.h"
+#include "bm_rbr_data_msg.h"
 #include "bm_soft_data_msg.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "sensor_header_msg.h"
 #include "sys_info_svc_reply_msg.h"
 #include "gtest/gtest.h"
+#include <cmath>
+#include <math.h>
 
 #include <string.h>
 
@@ -46,7 +49,7 @@ TEST_F(BmCommonTest, HeadersBuildTest) {
 
 TEST_F(BmCommonTest, bmSoftTest) {
   BmSoftDataMsg::Data d;
-  d.header.version = 1;
+  d.header.version = BmSoftDataMsg::VERSION;
   d.header.reading_time_utc_ms = 123456789;
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
@@ -59,9 +62,69 @@ TEST_F(BmCommonTest, bmSoftTest) {
 
   BmSoftDataMsg::Data decode;
   BmSoftDataMsg::decode(decode, cbor_buffer, len);
-  EXPECT_EQ(decode.header.version, 1);
+  EXPECT_EQ(decode.header.version, BmSoftDataMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_EQ(decode.temperature_deg_c, 18.93);
+}
+
+TEST_F(BmCommonTest, bmRbrTestTemp) {
+  BmRbrDataMsg::Data d;
+  d.header.version = BmRbrDataMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+
+  // Temperature
+  d.sensor_type = BmRbrDataMsg::TEMPERATURE;
+  d.temperature_deg_c = 18.93;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  BmRbrDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 157);
+
+  BmRbrDataMsg::Data decode;
+  BmRbrDataMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, BmRbrDataMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.sensor_type, BmRbrDataMsg::TEMPERATURE);
+  EXPECT_EQ(decode.temperature_deg_c, 18.93);
+  EXPECT_TRUE(isnan(d.pressure_deci_bar));
+
+  // Pressure
+  d.sensor_type = BmRbrDataMsg::PRESSURE;
+  d.pressure_deci_bar = 1013.25;
+  len = 0;
+  BmRbrDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 157);
+  BmRbrDataMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.sensor_type, BmRbrDataMsg::PRESSURE);
+  EXPECT_EQ(decode.pressure_deci_bar, 1013.25);
+  EXPECT_TRUE(isnan(d.temperature_deg_c));
+
+  // Pressure and Temperature
+  d.sensor_type = BmRbrDataMsg::PRESSURE_AND_TEMPERATURE;
+  len = 0;
+  d.pressure_deci_bar = 444.25;
+  d.temperature_deg_c = 25.93;
+  BmRbrDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 157);
+  BmRbrDataMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.sensor_type, BmRbrDataMsg::PRESSURE_AND_TEMPERATURE);
+  EXPECT_EQ(decode.pressure_deci_bar, 444.25);
+  EXPECT_EQ(decode.temperature_deg_c, 25.93);
+
+  // Unknown
+  d.sensor_type = BmRbrDataMsg::UNKNOWN;
+  len = 0;
+  BmRbrDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 157);
+  BmRbrDataMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.sensor_type, BmRbrDataMsg::UNKNOWN);
+  EXPECT_TRUE(isnan(decode.pressure_deci_bar));
+  EXPECT_TRUE(isnan(decode.temperature_deg_c));
 }
