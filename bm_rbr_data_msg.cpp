@@ -26,6 +26,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     default: {
       d.temperature_deg_c = NAN;
       d.pressure_deci_bar = NAN;
+      break;
     }
     }
 
