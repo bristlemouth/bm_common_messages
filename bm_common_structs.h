@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +39,7 @@ typedef struct {
   bm_common_config_header_t header;
   // Partition id
   bm_common_config_partition_e partition;
-  // Length of cbor buffer 
+  // Length of cbor buffer
   uint32_t data_length;
   // cbor buffer
   uint8_t data[0];
@@ -110,17 +110,16 @@ typedef struct {
   char key[0];
 } __attribute__((packed)) bm_common_config_delete_key_response_t;
 
-
 typedef enum {
-    BM_COMMON_WIRELESS_NETWORK_TYPE_CELLULAR_IRI_FALLBACK = (1 << 0),
-    BM_COMMON_WIRELESS_NETWORK_TYPE_CELLULAR_ONLY = (1 << 1),
+  BM_COMMON_WIRELESS_NETWORK_TYPE_CELLULAR_IRI_FALLBACK = (1 << 0),
+  BM_COMMON_WIRELESS_NETWORK_TYPE_CELLULAR_ONLY = (1 << 1),
 } bm_common_wireless_network_type_e;
 
 typedef struct {
-    // Wireless network type to send over.
-    bm_common_wireless_network_type_e type;
-    // Data
-    uint8_t data[0];
+  // Wireless network type to send over.
+  bm_common_wireless_network_type_e type;
+  // Data
+  uint8_t data[0];
 } __attribute__((packed)) bm_common_wireless_network_data_header_t;
 
 typedef struct {
@@ -146,12 +145,30 @@ typedef struct {
   // fw info
   bm_common_fw_version_t fw_info;
   // Number of nodes in the topology
-  uint16_t num_nodes; 
+  uint16_t num_nodes;
   // Size of the map in bytes
   uint16_t map_size_bytes;
   // Node list (node size uint64_t) and cbor config map
   uint8_t node_list_and_cbor_config_map[0];
 } __attribute__((packed)) bm_common_network_info_t;
+
+typedef enum {
+  BM_COMMON_LOG_LEVEL_NONE = 0,
+  BM_COMMON_LOG_LEVEL_FATAL = 1,
+  BM_COMMON_LOG_LEVEL_ERROR = 2,
+  BM_COMMON_LOG_LEVEL_WARNING = 3,
+  BM_COMMON_LOG_LEVEL_INFO = 4,
+  BM_COMMON_LOG_LEVEL_DEBUG = 5,
+} bm_common_log_level_e;
+
+typedef struct {
+  // Log level
+  bm_common_log_level_e level;
+  // String length of the message (without terminator)
+  uint32_t message_length;
+  // Message string
+  char message[0];
+} __attribute__((packed)) bm_common_log_t;
 
 #ifdef __cplusplus
 }
