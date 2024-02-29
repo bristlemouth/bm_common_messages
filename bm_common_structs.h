@@ -166,6 +166,10 @@ typedef struct {
   bm_common_log_level_e level;
   // String length of the message (without terminator)
   uint32_t message_length;
+  // print header (true) or not (false)
+  bool print_header;
+  // timestamp UTC
+  uint64_t timestamp_utc_s;
   // Message string
   char message[0];
 } __attribute__((packed)) bm_common_log_t;
