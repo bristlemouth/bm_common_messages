@@ -17,6 +17,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     -Wextra
     -Werror
     -O0
+    -DCI_TEST
     -g
     )
 message(STATUS "Native compiling - Building Tests")

@@ -8,6 +8,7 @@
 #include "sensor_header_msg.h"
 #include "sys_info_svc_reply_msg.h"
 #include "gtest/gtest.h"
+#include "device_test_svc_reply_msg.h"
 #include <cmath>
 #include <math.h>
 
@@ -127,4 +128,49 @@ TEST_F(BmCommonTest, bmRbrTestTemp) {
   EXPECT_EQ(decode.sensor_type, BmRbrDataMsg::UNKNOWN);
   EXPECT_TRUE(isnan(decode.pressure_deci_bar));
   EXPECT_TRUE(isnan(decode.temperature_deg_c));
+}
+
+TEST_F(BmCommonTest, DeviceTestSvcReplyMsgTestData) {
+  DeviceTestSvcReplyMsg::Data d;
+  d.success = true;
+  d.data_len = 4;
+  d.data = (uint8_t *)malloc(d.data_len);
+  d.data[0] = 0x01;
+  d.data[1] = 0x02;
+  d.data[2] = 0x03;
+  d.data[3] = 0x04;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  EXPECT_EQ(DeviceTestSvcReplyMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+  EXPECT_EQ(len, 30);
+
+  DeviceTestSvcReplyMsg::Data decode;
+  EXPECT_EQ(DeviceTestSvcReplyMsg::decode(decode, cbor_buffer, len), CborNoError);
+  EXPECT_EQ(decode.success, true);
+  EXPECT_EQ(decode.data_len, 4);
+  EXPECT_EQ(decode.data[0], 0x01);
+  EXPECT_EQ(decode.data[1], 0x02);
+  EXPECT_EQ(decode.data[2], 0x03);
+  EXPECT_EQ(decode.data[3], 0x04);
+  free(d.data);
+}
+
+TEST_F(BmCommonTest, DeviceTestSvcReplyMsgTestZeroData) {
+  DeviceTestSvcReplyMsg::Data d;
+  d.success = true;
+  d.data_len = 0;
+  d.data = NULL;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  EXPECT_EQ(DeviceTestSvcReplyMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+  EXPECT_EQ(len, 26);
+
+  DeviceTestSvcReplyMsg::Data decode;
+  EXPECT_EQ(DeviceTestSvcReplyMsg::decode(decode, cbor_buffer, len), CborNoError);
+  EXPECT_EQ(decode.success, true);
+  EXPECT_EQ(decode.data_len, 0);
+  EXPECT_TRUE(decode.data == NULL);
+  free(d.data);
 }
