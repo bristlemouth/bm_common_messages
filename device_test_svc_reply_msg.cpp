@@ -1,6 +1,8 @@
 #include "device_test_svc_reply_msg.h"
 #ifndef CI_TEST
 #include "FreeRTOS.h"
+#else // CI_TEST
+#include <cstdlib>
 #endif // CI_TEST
 
 CborError DeviceTestSvcReplyMsg::encode(Data &d, uint8_t *cbor_buffer,
