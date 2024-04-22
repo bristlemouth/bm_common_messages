@@ -18,6 +18,7 @@ target_sources(bm_common_messages_tests
     # msg files for testing
     ${SRC_DIR}/bm_soft_data_msg.cpp
     ${SRC_DIR}/bm_rbr_data_msg.cpp
+    ${SRC_DIR}/bm_turbidity_data_msg.cpp
     ${SRC_DIR}/sensor_header_msg.cpp
     ${SRC_DIR}/device_test_svc_reply_msg.cpp
     ${SRC_DIR}/device_test_svc_request_msg.cpp
