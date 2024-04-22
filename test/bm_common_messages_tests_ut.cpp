@@ -3,6 +3,7 @@
 #include "bm_common_structs.h"
 #include "bm_rbr_data_msg.h"
 #include "bm_soft_data_msg.h"
+#include "bm_turbidity_data_msg.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
