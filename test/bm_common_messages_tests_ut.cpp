@@ -228,3 +228,27 @@ TEST_F(BmCommonTest, DeviceTestSvcRequestMsgTestZeroData) {
   EXPECT_TRUE(decode.data == NULL);
   free(d.data);
 }
+
+TEST_F(BmCommonTest, bmTurbidityTest) {
+  BmTurbidityDataMsg::Data d;
+  d.header.version = BmTurbidityDataMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.s_signal = 0.1234;
+  d.r_signal = 4000.4;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  BmTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 117);
+
+  BmTurbidityDataMsg::Data decode;
+  BmTurbidityDataMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, BmTurbidityDataMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.s_signal, 0.1234);
+  EXPECT_EQ(decode.r_signal, 4000.4);
+}

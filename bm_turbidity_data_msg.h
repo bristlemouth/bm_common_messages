@@ -2,6 +2,8 @@
 #include "cbor.h"
 #include "sensor_header_msg.h"
 
+// For the Seapoint STM-S Turbidity Sensor
+
 namespace BmTurbidityDataMsg {
 
 constexpr uint32_t VERSION = 1;
