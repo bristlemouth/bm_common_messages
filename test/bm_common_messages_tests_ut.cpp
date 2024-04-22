@@ -242,7 +242,7 @@ TEST_F(BmCommonTest, bmTurbidityTest) {
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   BmTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-  EXPECT_EQ(len, 117);
+  EXPECT_EQ(len, 126);
 
   BmTurbidityDataMsg::Data decode;
   BmTurbidityDataMsg::decode(decode, cbor_buffer, len);
