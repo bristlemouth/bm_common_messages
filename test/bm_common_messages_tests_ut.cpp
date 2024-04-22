@@ -241,11 +241,11 @@ TEST_F(BmCommonTest, bmTurbidityTest) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  BmTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(BmTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
   EXPECT_EQ(len, 126);
 
   BmTurbidityDataMsg::Data decode;
-  BmTurbidityDataMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(BmTurbidityDataMsg::decode(decode, cbor_buffer, len), CborNoError);
   EXPECT_EQ(decode.header.version, BmTurbidityDataMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
