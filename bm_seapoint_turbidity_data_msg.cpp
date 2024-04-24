@@ -1,7 +1,7 @@
-#include "bm_turbidity_data_msg.h"
+#include "bm_seapoint_turbidity_data_msg.h"
 #include <math.h>
 
-namespace BmTurbidityDataMsg {
+namespace BmSeapointTurbidityDataMsg {
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
                  size_t *encoded_len) {
@@ -174,4 +174,4 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
   return err;
 }
 
-} // namespace BmTurbidityDataMsg
+} // namespace BmSeapointTurbidityDataMsg

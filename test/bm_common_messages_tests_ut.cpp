@@ -3,7 +3,7 @@
 #include "bm_common_structs.h"
 #include "bm_rbr_data_msg.h"
 #include "bm_soft_data_msg.h"
-#include "bm_turbidity_data_msg.h"
+#include "bm_seapoint_turbidity_data_msg.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
@@ -230,9 +230,9 @@ TEST_F(BmCommonTest, DeviceTestSvcRequestMsgTestZeroData) {
   free(d.data);
 }
 
-TEST_F(BmCommonTest, bmTurbidityTest) {
-  BmTurbidityDataMsg::Data d;
-  d.header.version = BmTurbidityDataMsg::VERSION;
+TEST_F(BmCommonTest, bmSeapointTurbidityTest) {
+  BmSeapointTurbidityDataMsg::Data d;
+  d.header.version = BmSeapointTurbidityDataMsg::VERSION;
   d.header.reading_time_utc_ms = 123456789;
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
@@ -241,12 +241,12 @@ TEST_F(BmCommonTest, bmTurbidityTest) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(BmTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+  EXPECT_EQ(BmSeapointTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
   EXPECT_EQ(len, 126);
 
-  BmTurbidityDataMsg::Data decode;
-  EXPECT_EQ(BmTurbidityDataMsg::decode(decode, cbor_buffer, len), CborNoError);
-  EXPECT_EQ(decode.header.version, BmTurbidityDataMsg::VERSION);
+  BmSeapointTurbidityDataMsg::Data decode;
+  EXPECT_EQ(BmSeapointTurbidityDataMsg::decode(decode, cbor_buffer, len), CborNoError);
+  EXPECT_EQ(decode.header.version, BmSeapointTurbidityDataMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
