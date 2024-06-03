@@ -3,6 +3,17 @@
 
 namespace BmRbrPressureDifferenceSignalMsg {
 
+/*!
+ * \brief Encode the BmRbrPressureDifferenceSignalMsg::Data structure into a
+ * CBOR buffer.
+ *
+ * \param[in] d The BmRbrPressureDifferenceSignalMsg::Data structure to encode.
+ * \param[out] cbor_buffer The buffer to encode the data into.
+ * \param[in] size The size of the buffer.
+ * \param[out] encoded_len The length of the encoded data.
+ *
+ * \return CborError
+ */
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
                  size_t *encoded_len) {
   CborError err;
@@ -10,8 +21,13 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
   cbor_encoder_init(&encoder, cbor_buffer, size, 0);
 
   do {
+    if (!cbor_buffer) {
+      err = CborErrorOutOfMemory;
+      break;
+    }
+
     if (!d.difference_signal) {
-      err = CborErrorImproperValue;
+      err = CborErrorOutOfMemory;
       break;
     }
 
@@ -113,12 +129,29 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
   return err;
 }
 
+/*!
+ * \brief Decode a CBOR buffer into the BmRbrPressureDifferenceSignalMsg::Data
+ * structure.
+ *
+ * \param[in/out] d The BmRbrPressureDifferenceSignalMsg::Data structure to
+ * decode into. d.num_samples must be set to the maximum number of samples that
+ * can be put into the buffer d.difference_signal must be a valid pointer to an
+ * array of doubles of size d.num_samples
+ * \param[in] cbor_buffer The buffer to
+ * decode. 
+ * \param[in] size The size of the buffer.
+ *
+ * \return CborError
+ */
 CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
   CborValue map;
-  CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
-
+  CborError err = CborNoError;
   do {
+    if (!cbor_buffer) {
+      err = CborErrorOutOfMemory;
+      break;
+    }
     if (!d.difference_signal) {
       err = CborErrorOutOfMemory;
       break;
@@ -126,6 +159,11 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     if (err != CborNoError) {
       break;
     }
+    err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
+    if (err != CborNoError) {
+      break;
+    }
+
     err = cbor_value_validate_basic(&map);
     if (err != CborNoError) {
       break;
@@ -215,7 +253,6 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
       printf("Failed to enter the array\n");
       break;
     }
-
     for (size_t i = 0; i < d.num_samples; i++) {
       double sample;
       err = cbor_value_get_double(&array_elem, &sample);
@@ -242,11 +279,6 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
       err = CborNoError;
     } else {
       err = CborErrorGarbageAtEnd;
-    }
-
-    err = cbor_value_advance(&value);
-    if (err != CborNoError) {
-      break;
     }
 
     if (err == CborNoError) {

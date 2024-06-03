@@ -2,8 +2,9 @@
 #include "bm_common_pub_sub.h"
 #include "bm_common_structs.h"
 #include "bm_rbr_data_msg.h"
-#include "bm_soft_data_msg.h"
+#include "bm_rbr_pressure_difference_signal_msg.h"
 #include "bm_seapoint_turbidity_data_msg.h"
+#include "bm_soft_data_msg.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
@@ -241,15 +242,114 @@ TEST_F(BmCommonTest, bmSeapointTurbidityTest) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(BmSeapointTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+  EXPECT_EQ(BmSeapointTurbidityDataMsg::encode(d, cbor_buffer,
+                                               sizeof(cbor_buffer), &len),
+            CborNoError);
   EXPECT_EQ(len, 126);
 
   BmSeapointTurbidityDataMsg::Data decode;
-  EXPECT_EQ(BmSeapointTurbidityDataMsg::decode(decode, cbor_buffer, len), CborNoError);
+  EXPECT_EQ(BmSeapointTurbidityDataMsg::decode(decode, cbor_buffer, len),
+            CborNoError);
   EXPECT_EQ(decode.header.version, BmSeapointTurbidityDataMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_EQ(decode.s_signal, 0.1234);
   EXPECT_EQ(decode.r_signal, 4000.4);
+}
+
+TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTest) {
+  BmRbrPressureDifferenceSignalMsg::Data d;
+  d.header.version = BmRbrPressureDifferenceSignalMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.num_samples = 10;
+  d.difference_signal =
+      static_cast<double *>(malloc(d.num_samples * sizeof(double)));
+  for (size_t i = 0; i < d.num_samples; i++) {
+    d.difference_signal[i] = i * 0.1;
+  }
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
+                                                     sizeof(cbor_buffer), &len),
+            CborNoError);
+  EXPECT_EQ(len, 212);
+
+  BmRbrPressureDifferenceSignalMsg::Data decode;
+  decode.num_samples = 10;
+  decode.difference_signal =
+      static_cast<double *>(malloc(decode.num_samples * sizeof(double)));
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, cbor_buffer, len),
+            CborNoError);
+  EXPECT_EQ(decode.header.version, BmRbrPressureDifferenceSignalMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.num_samples, 10);
+  for (size_t i = 0; i < decode.num_samples; i++) {
+    EXPECT_NEAR(decode.difference_signal[i], i * 0.1, 0.0001);
+  }
+}
+
+TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidEncode) {
+  BmRbrPressureDifferenceSignalMsg::Data d;
+  memset(&d, 0, sizeof(d));
+  d.header.version = BmRbrPressureDifferenceSignalMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.difference_signal = static_cast<double *>(malloc(10 * sizeof(double)));
+  for (size_t i = 0; i < d.num_samples; i++) {
+    d.difference_signal[i] = i * 0.1;
+  }
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
+                                                     sizeof(cbor_buffer), &len),
+            CborErrorImproperValue);
+  d.num_samples = 10;
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, NULL,
+                                                     sizeof(cbor_buffer), &len),
+            CborErrorOutOfMemory);
+  free(d.difference_signal);
+  d.difference_signal = NULL;
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
+                                                     sizeof(cbor_buffer), &len),
+            CborErrorOutOfMemory);
+}
+
+TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
+  BmRbrPressureDifferenceSignalMsg::Data d;
+  d.header.version = BmRbrPressureDifferenceSignalMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.num_samples = 10;
+  d.difference_signal =
+      static_cast<double *>(malloc(d.num_samples * sizeof(double)));
+  for (size_t i = 0; i < d.num_samples; i++) {
+    d.difference_signal[i] = i * 0.1;
+  }
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
+                                                     sizeof(cbor_buffer), &len),
+            CborNoError);
+  EXPECT_EQ(len, 212);
+
+  BmRbrPressureDifferenceSignalMsg::Data decode;
+  decode.num_samples = 10;
+  decode.difference_signal = static_cast<double *>(malloc(10 * sizeof(double)));
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, NULL, len),
+            CborErrorOutOfMemory);
+  decode.num_samples = 0;
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, cbor_buffer, len),
+            CborErrorOutOfMemory);
+  free(decode.difference_signal);
+  decode.difference_signal = NULL;
+  decode.num_samples = 10;
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, cbor_buffer, len),
+            CborErrorOutOfMemory);
 }
