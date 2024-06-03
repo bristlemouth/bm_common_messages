@@ -22,6 +22,7 @@ target_sources(bm_common_messages_tests
     ${SRC_DIR}/sensor_header_msg.cpp
     ${SRC_DIR}/device_test_svc_reply_msg.cpp
     ${SRC_DIR}/device_test_svc_request_msg.cpp
+    ${SRC_DIR}/bm_rbr_pressure_difference_signal_msg.cpp
 
     # support files
     ${SRC_DIR}/third_party/tinycbor/src/cborparser.c
