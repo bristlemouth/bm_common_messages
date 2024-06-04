@@ -69,6 +69,40 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
+    // residual_0
+    err = cbor_encode_text_stringz(&map_encoder, "residual_0");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for residual_0 key: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.residual_0);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for residual_0 value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // residual_1
+    err = cbor_encode_text_stringz(&map_encoder, "residual_1");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for residual_1 key: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, d.residual_1);
+    if (err != CborNoError) {
+      printf("cbor_encode_double failed for residual_1 value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
     // difference_signal
     err = cbor_encode_text_stringz(&map_encoder, "difference_signal");
     if (err != CborNoError) {
@@ -216,6 +250,44 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
       break;
     }
     d.num_samples = num_samples;
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // residual_0
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.residual_0);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // residual_1
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &d.residual_1);
+    if (err != CborNoError) {
+      break;
+    }
     err = cbor_value_advance(&value);
     if (err != CborNoError) {
       break;

@@ -6,11 +6,13 @@ namespace BmRbrPressureDifferenceSignalMsg {
 
 constexpr uint32_t VERSION = 1;
 
-constexpr size_t NUM_FIELDS = SensorHeaderMsg::NUM_FIELDS + 2;
+constexpr size_t NUM_FIELDS = SensorHeaderMsg::NUM_FIELDS + 4;
 
 struct Data {
   SensorHeaderMsg::Data header;
   size_t num_samples;
+  double residual_0;
+  double residual_1;
   double *difference_signal;
 };
 
