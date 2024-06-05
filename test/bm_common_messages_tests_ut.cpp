@@ -332,6 +332,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
   d.header.reading_time_utc_ms = 123456789;
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.sequence_num = 15;
   d.num_samples = 10;
   d.difference_signal =
       static_cast<double *>(malloc(d.num_samples * sizeof(double)));
@@ -343,6 +344,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
   EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
                                                      sizeof(cbor_buffer), &len),
             CborNoError);
+  EXPECT_EQ(len, 266);
 
   BmRbrPressureDifferenceSignalMsg::Data decode;
   decode.num_samples = 10;
