@@ -52,6 +52,22 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
         break;
       }
     }
+    
+    // sequence_num
+    err = cbor_encode_text_stringz(&map_encoder, "sequence_num");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for sequence_num key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_uint(&map_encoder, d.sequence_num);
+    if (err != CborNoError) {
+      printf("cbor_encode_uint failed for sequence_num value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
   
     // total_samples
     err = cbor_encode_text_stringz(&map_encoder, "total_samples");
@@ -240,6 +256,27 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
 
     // header
     err = SensorHeaderMsg::decode(value, d.header);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // sequence_num
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    uint64_t sequence_num;
+    err = cbor_value_get_uint64(&value, &sequence_num);
+    if (err != CborNoError) {
+      break;
+    }
+    d.sequence_num = sequence_num;
+    err = cbor_value_advance(&value);
     if (err != CborNoError) {
       break;
     }
