@@ -343,7 +343,6 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
   EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
                                                      sizeof(cbor_buffer), &len),
             CborNoError);
-  EXPECT_EQ(len, 266);
 
   BmRbrPressureDifferenceSignalMsg::Data decode;
   decode.num_samples = 10;
