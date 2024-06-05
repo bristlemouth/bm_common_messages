@@ -53,6 +53,22 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
+    // sequence_num
+    err = cbor_encode_text_stringz(&map_encoder, "sequence_num");
+    if (err != CborNoError) {
+      printf("cbor_encode_text_stringz failed for sequence_num key: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_uint(&map_encoder, d.sequence_num);
+    if (err != CborNoError) {
+      printf("cbor_encode_uint failed for sequence_num value: %d\n", err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
     // num_samples
     err = cbor_encode_text_stringz(&map_encoder, "num_samples");
     if (err != CborNoError) {
@@ -72,8 +88,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // residual_0
     err = cbor_encode_text_stringz(&map_encoder, "residual_0");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for residual_0 key: %d\n",
-             err);
+      printf("cbor_encode_text_stringz failed for residual_0 key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -89,8 +104,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // residual_1
     err = cbor_encode_text_stringz(&map_encoder, "residual_1");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for residual_1 key: %d\n",
-             err);
+      printf("cbor_encode_text_stringz failed for residual_1 key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -172,7 +186,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
  * can be put into the buffer d.difference_signal must be a valid pointer to an
  * array of doubles of size d.num_samples
  * \param[in] cbor_buffer The buffer to
- * decode. 
+ * decode.
  * \param[in] size The size of the buffer.
  *
  * \return CborError
@@ -226,6 +240,27 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
 
     // header
     err = SensorHeaderMsg::decode(value, d.header);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // sequence_num
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      printf("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    uint64_t sequence_num;
+    err = cbor_value_get_uint64(&value, &sequence_num);
+    if (err != CborNoError) {
+      break;
+    }
+    d.sequence_num = sequence_num;
+    err = cbor_value_advance(&value);
     if (err != CborNoError) {
       break;
     }
