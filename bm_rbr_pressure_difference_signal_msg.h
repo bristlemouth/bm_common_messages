@@ -10,7 +10,7 @@ constexpr size_t NUM_FIELDS = SensorHeaderMsg::NUM_FIELDS + 5;
 
 struct Data {
   SensorHeaderMsg::Data header;
-  uint32_t sequence_num;
+  uint32_t total_samples;
   size_t num_samples;
   double residual_0;
   double residual_1;

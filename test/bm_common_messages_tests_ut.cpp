@@ -264,7 +264,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTest) {
   d.header.reading_time_utc_ms = 123456789;
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
-  d.sequence_num = 15;
+  d.total_samples = 15;
   d.num_samples = 10;
   d.residual_0 = 0.1234;
   d.residual_1 = 0.5678;
@@ -278,7 +278,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTest) {
   EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
                                                      sizeof(cbor_buffer), &len),
             CborNoError);
-  EXPECT_EQ(len, 266);
+  EXPECT_EQ(len, 267);
 
   BmRbrPressureDifferenceSignalMsg::Data decode;
   decode.num_samples = 10;
@@ -290,7 +290,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTest) {
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
-  EXPECT_EQ(decode.sequence_num, 15); 
+  EXPECT_EQ(decode.total_samples, 15); 
   EXPECT_EQ(decode.num_samples, 10);
   EXPECT_NEAR(decode.residual_0, 0.1234, 0.0001);
   EXPECT_NEAR(decode.residual_1, 0.5678, 0.0001);
@@ -332,7 +332,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
   d.header.reading_time_utc_ms = 123456789;
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
-  d.sequence_num = 15;
+  d.total_samples = 15;
   d.num_samples = 10;
   d.difference_signal =
       static_cast<double *>(malloc(d.num_samples * sizeof(double)));
@@ -344,7 +344,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
   EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
                                                      sizeof(cbor_buffer), &len),
             CborNoError);
-  EXPECT_EQ(len, 266);
+  EXPECT_EQ(len, 267);
 
   BmRbrPressureDifferenceSignalMsg::Data decode;
   decode.num_samples = 10;
