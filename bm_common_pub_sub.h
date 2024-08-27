@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #ifndef BM_COMMON_PUB_SUB_VERSION
-#define BM_COMMON_PUB_SUB_VERSION (1)
+#define BM_COMMON_PUB_SUB_VERSION (2)
 #endif // BM_COMMON_PUB_SUB_VERSION
 
 // Add data structures published through pub sub must have this header.
@@ -27,6 +27,7 @@ typedef struct {
   uint64_t target_node_id;
   uint16_t fname_len;
   uint16_t data_len;
+  uint8_t print_time;
   uint8_t fnameAndData[0];
 } __attribute__((packed)) bm_print_publication_t;
 
