@@ -1,14 +1,14 @@
 #include "config_cbor_map_srv_reply_msg.h"
-#include "FreeRTOS.h"
+#include "bm_os.h"
 
-CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
-                                     size_t *encoded_len) {
+CborError config_cbor_map_reply_encode(ConfigCborMapReplyData *d, uint8_t *cbor_buffer,
+                                       size_t size, size_t *encoded_len) {
   CborError err;
   CborEncoder encoder, map_encoder;
   cbor_encoder_init(&encoder, cbor_buffer, size, 0);
 
   do {
-    err = cbor_encoder_create_map(&encoder, &map_encoder, NUM_FIELDS);
+    err = cbor_encoder_create_map(&encoder, &map_encoder, CONFIG_CBOR_MAP_REPLY_NUM_FIELDS);
     if (err != CborNoError) {
       printf("cbor_encoder_create_map failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -24,7 +24,7 @@ CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t
         break;
       }
     }
-    err = cbor_encode_uint(&map_encoder, d.node_id);
+    err = cbor_encode_uint(&map_encoder, d->node_id);
     if (err != CborNoError) {
       printf("cbor_encode_uint failed for node_id value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -40,7 +40,7 @@ CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t
         break;
       }
     }
-    err = cbor_encode_uint(&map_encoder, d.partition_id);
+    err = cbor_encode_uint(&map_encoder, d->partition_id);
     if (err != CborNoError) {
       printf("cbor_encode_uint failed for partition_id value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -56,7 +56,7 @@ CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t
         break;
       }
     }
-    err = cbor_encode_uint(&map_encoder, d.success);
+    err = cbor_encode_uint(&map_encoder, d->success);
     if (err != CborNoError) {
       printf("cbor_encode_uint failed for success value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -72,7 +72,7 @@ CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t
         break;
       }
     }
-    err = cbor_encode_uint(&map_encoder, d.cbor_encoded_map_len);
+    err = cbor_encode_uint(&map_encoder, d->cbor_encoded_map_len);
     if (err != CborNoError) {
       printf("cbor_encode_uint failed for cbor_encoded_map_len value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -88,7 +88,7 @@ CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t
         break;
       }
     }
-    err = cbor_encode_byte_string(&map_encoder, d.cbor_data, d.cbor_encoded_map_len);
+    err = cbor_encode_byte_string(&map_encoder, d->cbor_data, d->cbor_encoded_map_len);
     if (err != CborNoError) {
       printf("cbor_encode_byte_string failed for partition_id value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -117,14 +117,14 @@ CborError ConfigCborMapSrvReplyMsg::encode(Data &d, uint8_t *cbor_buffer, size_t
 }
 
 // allocates memory for d.cbor_data, caller must free.
-CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, const uint8_t *cbor_buffer,
-                                     size_t size) {
+CborError config_cbor_map_reply_decode(ConfigCborMapReplyData *d, const uint8_t *cbor_buffer,
+                                       size_t size) {
   CborParser parser;
   CborValue map;
   CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
   uint64_t tmp_uint64;
-  d.cbor_data = NULL;
-  
+  d->cbor_data = NULL;
+
   do {
     if (err != CborNoError) {
       break;
@@ -143,9 +143,9 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
     if (err != CborNoError) {
       break;
     }
-    if (num_fields != ConfigCborMapSrvReplyMsg::NUM_FIELDS) {
+    if (num_fields != CONFIG_CBOR_MAP_REPLY_NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      printf("expected %zu fields but got %zu\n", ConfigCborMapSrvReplyMsg::NUM_FIELDS, num_fields);
+      printf("expected %zu fields but got %zu\n", CONFIG_CBOR_MAP_REPLY_NUM_FIELDS, num_fields);
       break;
     }
 
@@ -166,7 +166,7 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
       break;
     }
     err = cbor_value_get_uint64(&value, &tmp_uint64);
-    d.node_id = tmp_uint64;
+    d->node_id = tmp_uint64;
     if (err != CborNoError) {
       break;
     }
@@ -186,7 +186,7 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
       break;
     }
     err = cbor_value_get_uint64(&value, &tmp_uint64);
-    d.partition_id = static_cast<uint32_t>(tmp_uint64);
+    d->partition_id = (uint32_t)tmp_uint64;
     if (err != CborNoError) {
       break;
     }
@@ -206,7 +206,7 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
       break;
     }
     err = cbor_value_get_uint64(&value, &tmp_uint64);
-    d.success = static_cast<bool>(tmp_uint64);
+    d->success = (bool)tmp_uint64;
     if (err != CborNoError) {
       break;
     }
@@ -226,7 +226,7 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
       break;
     }
     err = cbor_value_get_uint64(&value, &tmp_uint64);
-    d.cbor_encoded_map_len = static_cast<uint32_t>(tmp_uint64);
+    d->cbor_encoded_map_len = (uint32_t)tmp_uint64;
     if (err != CborNoError) {
       break;
     }
@@ -245,35 +245,36 @@ CborError ConfigCborMapSrvReplyMsg::decode(ConfigCborMapSrvReplyMsg::Data &d, co
     if (err != CborNoError) {
       break;
     }
-    if(d.cbor_encoded_map_len && d.success) {
-      size_t buflen = d.cbor_encoded_map_len;
-      uint8_t *buf = static_cast<uint8_t *>(pvPortMalloc(buflen));
-      configASSERT(buf);
-      err = cbor_value_copy_byte_string(&value, buf, &buflen, NULL) ;
-      d.cbor_data = buf;
+    if (d->cbor_encoded_map_len && d->success) {
+      size_t buflen = d->cbor_encoded_map_len;
+      uint8_t *buf = (uint8_t *)bm_malloc(buflen);
+      if (buf) {
+        err = cbor_value_copy_byte_string(&value, buf, &buflen, NULL);
+        d->cbor_data = buf;
+        if (err != CborNoError) {
+          break;
+        }
+        if (buflen != d->cbor_encoded_map_len) {
+          err = CborErrorIllegalType;
+          break;
+        }
+      } else {
+        d->cbor_data = NULL;
+      }
+      err = cbor_value_advance(&value);
       if (err != CborNoError) {
         break;
       }
-      if(buflen != d.cbor_encoded_map_len) {
-        err = CborErrorIllegalType;
-        break;
-      }
-    } else {
-      d.cbor_data = NULL;
-    }
-    err = cbor_value_advance(&value);
-    if (err != CborNoError) {
-      break;
-    }
 
-    if (err == CborNoError) {
-      err = cbor_value_leave_container(&map, &value);
-      if (err != CborNoError) {
-        break;
-      }
-      if (!cbor_value_at_end(&map)) {
-        err = CborErrorGarbageAtEnd;
-        break;
+      if (err == CborNoError) {
+        err = cbor_value_leave_container(&map, &value);
+        if (err != CborNoError) {
+          break;
+        }
+        if (!cbor_value_at_end(&map)) {
+          err = CborErrorGarbageAtEnd;
+          break;
+        }
       }
     }
   } while (0);

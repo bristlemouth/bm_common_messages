@@ -1,14 +1,13 @@
 #include "config_cbor_map_srv_request_msg.h"
-#include "FreeRTOS.h"
 
-CborError ConfigCborMapSrvRequestMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
-                                     size_t *encoded_len) {
+CborError config_cbor_map_request_encode(ConfigCborMapRequestData *d, uint8_t *cbor_buffer,
+                                         size_t size, size_t *encoded_len) {
   CborError err;
   CborEncoder encoder, map_encoder;
   cbor_encoder_init(&encoder, cbor_buffer, size, 0);
 
   do {
-    err = cbor_encoder_create_map(&encoder, &map_encoder, NUM_FIELDS);
+    err = cbor_encoder_create_map(&encoder, &map_encoder, CONFIG_CBOR_MAP_REQUEST_NUM_FIELDS);
     if (err != CborNoError) {
       printf("cbor_encoder_create_map failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -24,7 +23,7 @@ CborError ConfigCborMapSrvRequestMsg::encode(Data &d, uint8_t *cbor_buffer, size
         break;
       }
     }
-    err = cbor_encode_uint(&map_encoder, d.partition_id);
+    err = cbor_encode_uint(&map_encoder, d->partition_id);
     if (err != CborNoError) {
       printf("cbor_encode_uint failed for partition_id value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -52,8 +51,8 @@ CborError ConfigCborMapSrvRequestMsg::encode(Data &d, uint8_t *cbor_buffer, size
   return err;
 }
 
-CborError ConfigCborMapSrvRequestMsg::decode(ConfigCborMapSrvRequestMsg::Data &d, const uint8_t *cbor_buffer,
-                                     size_t size) {
+CborError config_cbor_map_request_decode(ConfigCborMapRequestData *d,
+                                         const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
   CborValue map;
   CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
@@ -76,9 +75,10 @@ CborError ConfigCborMapSrvRequestMsg::decode(ConfigCborMapSrvRequestMsg::Data &d
     if (err != CborNoError) {
       break;
     }
-    if (num_fields != ConfigCborMapSrvRequestMsg::NUM_FIELDS) {
+    if (num_fields != CONFIG_CBOR_MAP_REQUEST_NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      printf("expected %zu fields but got %zu\n", ConfigCborMapSrvRequestMsg::NUM_FIELDS, num_fields);
+      printf("expected %zu fields but got %zu\n", CONFIG_CBOR_MAP_REQUEST_NUM_FIELDS,
+             num_fields);
       break;
     }
 
@@ -99,7 +99,7 @@ CborError ConfigCborMapSrvRequestMsg::decode(ConfigCborMapSrvRequestMsg::Data &d
       break;
     }
     err = cbor_value_get_uint64(&value, &tmp_uint64);
-    d.partition_id = static_cast<uint32_t>(tmp_uint64);
+    d->partition_id = (uint32_t)tmp_uint64;
     if (err != CborNoError) {
       break;
     }
