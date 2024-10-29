@@ -1,4 +1,5 @@
 #include "device_test_svc_reply_msg.h"
+#include "bm_config.h"
 #ifndef CI_TEST
 #include "FreeRTOS.h"
 #else // CI_TEST
@@ -14,7 +15,7 @@ CborError DeviceTestSvcReplyMsg::encode(Data &d, uint8_t *cbor_buffer,
   do {
     err = cbor_encoder_create_map(&encoder, &map_encoder, NUM_FIELDS);
     if (err != CborNoError) {
-      printf("cbor_encoder_create_map failed: %d\n", err);
+      bm_debug("cbor_encoder_create_map failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -23,14 +24,14 @@ CborError DeviceTestSvcReplyMsg::encode(Data &d, uint8_t *cbor_buffer,
     // success
     err = cbor_encode_text_stringz(&map_encoder, "success");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for success key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for success key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_uint(&map_encoder, d.success);
     if (err != CborNoError) {
-      printf("cbor_encode_uint failed for partition_id value: %d\n", err);
+      bm_debug("cbor_encode_uint failed for partition_id value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -39,14 +40,14 @@ CborError DeviceTestSvcReplyMsg::encode(Data &d, uint8_t *cbor_buffer,
     // data_len
     err = cbor_encode_text_stringz(&map_encoder, "data_len");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for data_len key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for data_len key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_uint(&map_encoder, d.data_len);
     if (err != CborNoError) {
-      printf("cbor_encode_uint failed for data_len value: %d\n", err);
+      bm_debug("cbor_encode_uint failed for data_len value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -55,14 +56,14 @@ CborError DeviceTestSvcReplyMsg::encode(Data &d, uint8_t *cbor_buffer,
     // data
     err = cbor_encode_text_stringz(&map_encoder, "data");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for data key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for data key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_byte_string(&map_encoder, d.data, d.data_len);
     if (err != CborNoError) {
-      printf("cbor_encode_byte_string failed for data value: %d\n", err);
+      bm_debug("cbor_encode_byte_string failed for data value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -76,12 +77,12 @@ CborError DeviceTestSvcReplyMsg::encode(Data &d, uint8_t *cbor_buffer,
     if (err == CborNoError) {
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
     } else {
-      printf("cbor_encoder_close_container failed: %d\n", err);
+      bm_debug("cbor_encoder_close_container failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
       size_t extra_bytes_needed = cbor_encoder_get_extra_bytes_needed(&encoder);
-      printf("extra_bytes_needed: %zu\n", extra_bytes_needed);
+      bm_debug("extra_bytes_needed: %zu\n", extra_bytes_needed);
     }
   } while (0);
 
@@ -114,7 +115,7 @@ CborError DeviceTestSvcReplyMsg::decode(Data &d, const uint8_t *cbor_buffer,
     }
     if (num_fields != NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      printf("expected %zu fields but got %zu\n", NUM_FIELDS, num_fields);
+      bm_debug("expected %zu fields but got %zu\n", NUM_FIELDS, num_fields);
       break;
     }
 
@@ -127,7 +128,7 @@ CborError DeviceTestSvcReplyMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // success
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -147,7 +148,7 @@ CborError DeviceTestSvcReplyMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // data_len
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -167,7 +168,7 @@ CborError DeviceTestSvcReplyMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // data
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
