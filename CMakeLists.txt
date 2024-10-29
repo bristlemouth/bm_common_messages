@@ -28,6 +28,7 @@ set(TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 include(CTest)
 add_subdirectory("third_party/googletest")
 add_subdirectory("test")
+include_directories("test")
 
 else()
 #
