@@ -1,20 +1,12 @@
 #pragma once
 
+#include "configuration.h"
 #include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/////////////////////////////
-/* CONFIGURATION*/
-/////////////////////////////
-typedef enum {
-  BM_COMMON_CFG_PARTITION_USER,
-  BM_COMMON_CFG_PARTITION_SYSTEM,
-  BM_COMMON_CFG_PARTITION_HARDWARE,
-} bm_common_config_partition_e;
 
 typedef struct {
   // Node ID of the target node for which the request is being made.
@@ -28,7 +20,7 @@ typedef struct {
 typedef struct {
   bm_common_config_header_t header;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
   // String length of the key (without terminator)
   uint8_t key_length;
   // Key string
@@ -38,7 +30,7 @@ typedef struct {
 typedef struct {
   bm_common_config_header_t header;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
   // Length of cbor buffer
   uint32_t data_length;
   // cbor buffer
@@ -48,7 +40,7 @@ typedef struct {
 typedef struct {
   bm_common_config_header_t header;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
   // String length of the key (without terminator)
   uint8_t key_length;
   // Length of cbor encoded data buffer
@@ -60,13 +52,13 @@ typedef struct {
 typedef struct {
   bm_common_config_header_t header;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
 } __attribute__((packed)) bm_common_config_commit_t;
 
 typedef struct {
   bm_common_config_header_t header;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
 } __attribute__((packed)) bm_common_config_status_request_t;
 
 typedef struct {
@@ -79,7 +71,7 @@ typedef struct {
 typedef struct {
   bm_common_config_header_t header;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
   // True if there are changes to be committed, false otherwise.
   bool committed;
   // Number of keys
@@ -91,7 +83,7 @@ typedef struct {
 typedef struct {
   bm_common_config_header_t header;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
   // String length of the key (without terminator)
   uint8_t key_length;
   // Key string
@@ -103,7 +95,7 @@ typedef struct {
   // success
   bool success;
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
   // String length of the key (without terminator)
   uint8_t key_length;
   // Key string
@@ -124,7 +116,7 @@ typedef struct {
 
 typedef struct {
   // Partition id
-  bm_common_config_partition_e partition;
+  BmConfigPartition partition;
   // Partion crc
   uint32_t crc32;
 } __attribute__((packed)) bm_common_config_crc_t;
