@@ -37,12 +37,27 @@ else()
 # Set target compiler flags with the BM_COMMON_MESSAGES_COMPILER_FLAGS variable
 #
 set(BM_COMMON_MESSAGES_DIR ${CMAKE_CURRENT_LIST_DIR})
-message(status "BM COMMON MESSAGES DIR ${BM_COMMON_MESSAGES_DIR}")
 
-set(BM_COMMON_MESSAGES_INCLUDES
-    ${BM_COMMON_MESSAGES_DIR}
-    )
+set(SOURCES
+    aanderaa_data_msg.cpp
+    bm_rbr_data_msg.cpp
+    bm_rbr_pressure_difference_signal_msg.cpp
+    bm_seapoint_turbidity_data_msg.cpp
+    bm_soft_data_msg.cpp
+    config_cbor_map_srv_reply_msg.c
+    config_cbor_map_srv_request_msg.c
+    device_test_svc_reply_msg.cpp
+    device_test_svc_request_msg.cpp
+    sensor_header_msg.cpp
+    sys_info_svc_reply_msg.c
+)
 
-set(BM_COMMON_MESSAGES_INCLUDES ${BM_COMMON_MESSAGES_INCLUDES} PARENT_SCOPE)
+add_library(bmmessages ${SOURCES})
+
+target_include_directories(bmmessages PUBLIC
+    .
+)
+
+target_link_libraries(bmmessages PRIVATE bmcommon)
 
 endif()

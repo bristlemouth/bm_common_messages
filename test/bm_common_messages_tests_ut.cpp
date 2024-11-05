@@ -1,6 +1,5 @@
 #include "aanderaa_data_msg.h"
 #include "bm_common_pub_sub.h"
-#include "bm_common_structs.h"
 #include "bm_rbr_data_msg.h"
 #include "bm_rbr_pressure_difference_signal_msg.h"
 #include "bm_seapoint_turbidity_data_msg.h"
@@ -291,7 +290,7 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTest) {
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
-  EXPECT_EQ(decode.total_samples, 15); 
+  EXPECT_EQ(decode.total_samples, 15);
   EXPECT_EQ(decode.sequence_num, 22);
   EXPECT_EQ(decode.num_samples, 10);
   EXPECT_NEAR(decode.residual_0, 0.1234, 0.0001);
