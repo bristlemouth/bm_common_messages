@@ -1,4 +1,5 @@
 #include "bm_rbr_pressure_difference_signal_msg.h"
+#include "bm_config.h"
 #include <math.h>
 
 namespace BmRbrPressureDifferenceSignalMsg {
@@ -38,7 +39,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
 
     err = cbor_encoder_create_map(&encoder, &map_encoder, NUM_FIELDS);
     if (err != CborNoError) {
-      printf("cbor_encoder_create_map failed: %d\n", err);
+      bm_debug("cbor_encoder_create_map failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -47,39 +48,41 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // sensor_header_msg
     err = SensorHeaderMsg::encode(map_encoder, d.header);
     if (err != CborNoError) {
-      printf("SensorHeaderMsg::encode failed: %d\n", err);
+      bm_debug("SensorHeaderMsg::encode failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    
+
     // sequence_num
     err = cbor_encode_text_stringz(&map_encoder, "sequence_num");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for sequence_num key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for sequence_num key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_uint(&map_encoder, d.sequence_num);
     if (err != CborNoError) {
-      printf("cbor_encode_uint failed for sequence_num value: %d\n", err);
+      bm_debug("cbor_encode_uint failed for sequence_num value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-  
+
     // total_samples
     err = cbor_encode_text_stringz(&map_encoder, "total_samples");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for total_samples key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for total_samples key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_uint(&map_encoder, d.total_samples);
     if (err != CborNoError) {
-      printf("cbor_encode_uint failed for total_samples value: %d\n", err);
+      bm_debug("cbor_encode_uint failed for total_samples value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -88,14 +91,15 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // num_samples
     err = cbor_encode_text_stringz(&map_encoder, "num_samples");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for num_samples key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for num_samples key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_uint(&map_encoder, d.num_samples);
     if (err != CborNoError) {
-      printf("cbor_encode_uint failed for num_samples value: %d\n", err);
+      bm_debug("cbor_encode_uint failed for num_samples value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -104,14 +108,14 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // residual_0
     err = cbor_encode_text_stringz(&map_encoder, "residual_0");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for residual_0 key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for residual_0 key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.residual_0);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for residual_0 value: %d\n", err);
+      bm_debug("cbor_encode_double failed for residual_0 value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -120,14 +124,14 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // residual_1
     err = cbor_encode_text_stringz(&map_encoder, "residual_1");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for residual_1 key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for residual_1 key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.residual_1);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for residual_1 value: %d\n", err);
+      bm_debug("cbor_encode_double failed for residual_1 value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -136,8 +140,9 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // difference_signal
     err = cbor_encode_text_stringz(&map_encoder, "difference_signal");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for difference_signal key: %d\n",
-             err);
+      bm_debug(
+          "cbor_encode_text_stringz failed for difference_signal key: %d\n",
+          err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -145,7 +150,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     err =
         cbor_encoder_create_array(&map_encoder, &array_encoder, d.num_samples);
     if (err != CborNoError) {
-      printf(
+      bm_debug(
           "cbor_encoder_create_array failed for difference_signal value: %d\n",
           err);
       if (err != CborErrorOutOfMemory) {
@@ -156,8 +161,8 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     for (size_t i = 0; i < d.num_samples; i++) {
       err = cbor_encode_double(&array_encoder, d.difference_signal[i]);
       if (err != CborNoError) {
-        printf("cbor_encode_double failed for difference_signal value: %d\n",
-               err);
+        bm_debug("cbor_encode_double failed for difference_signal value: %d\n",
+                 err);
         if (err != CborErrorOutOfMemory) {
           break;
         }
@@ -170,7 +175,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
 
     err = cbor_encoder_close_container(&map_encoder, &array_encoder);
     if (err != CborNoError) {
-      printf("cbor_encoder_close_container failed: %d\n", err);
+      bm_debug("cbor_encoder_close_container failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -180,13 +185,13 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     if (err == CborNoError) {
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
     } else {
-      printf("cbor_encoder_close_container failed: %d\n", err);
+      bm_debug("cbor_encoder_close_container failed: %d\n", err);
 
       if (err != CborErrorOutOfMemory) {
         break;
       }
       size_t extra_bytes_needed = cbor_encoder_get_extra_bytes_needed(&encoder);
-      printf("extra_bytes_needed: %zu\n", extra_bytes_needed);
+      bm_debug("extra_bytes_needed: %zu\n", extra_bytes_needed);
     }
   } while (0);
 
@@ -244,7 +249,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     }
     if (num_fields != NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      printf("expected %zu fields but got %zu\n", NUM_FIELDS, num_fields);
+      bm_debug("expected %zu fields but got %zu\n", NUM_FIELDS, num_fields);
       break;
     }
 
@@ -263,7 +268,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // sequence_num
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -284,7 +289,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // total_samples
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -305,7 +310,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // num_samples
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -330,7 +335,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // residual_0
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -349,7 +354,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // residual_1
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -368,7 +373,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // difference_signal
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -377,7 +382,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     }
     if (!cbor_value_is_array(&value)) {
       err = CborErrorIllegalType;
-      printf("expected array key but got something else\n");
+      bm_debug("expected array key but got something else\n");
       break;
     }
     size_t array_num_samples;
@@ -387,14 +392,14 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     }
     if (array_num_samples != d.num_samples) {
       err = CborErrorUnknownLength;
-      printf("expected %zu samples but got %zu\n", d.num_samples,
-             array_num_samples);
+      bm_debug("expected %zu samples but got %zu\n", d.num_samples,
+               array_num_samples);
       break;
     }
 
     CborValue array_elem;
     if (cbor_value_enter_container(&value, &array_elem) != CborNoError) {
-      printf("Failed to enter the array\n");
+      bm_debug("Failed to enter the array\n");
       break;
     }
     for (size_t i = 0; i < d.num_samples; i++) {
@@ -405,7 +410,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
       }
       d.difference_signal[i] = sample;
       if (cbor_value_advance(&array_elem) != CborNoError) {
-        printf("Failed to advance the array\n");
+        bm_debug("Failed to advance the array\n");
         break;
       }
     }

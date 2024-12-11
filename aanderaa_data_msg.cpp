@@ -1,5 +1,6 @@
 #include "aanderaa_data_msg.h"
 #include "FreeRTOS.h"
+#include "bm_config.h"
 
 CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
                                   size_t *encoded_len) {
@@ -10,7 +11,7 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
   do {
     err = cbor_encoder_create_map(&encoder, &map_encoder, NUM_FIELDS);
     if (err != CborNoError) {
-      printf("cbor_encoder_create_map failed: %d\n", err);
+      bm_debug("cbor_encoder_create_map failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -19,7 +20,7 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // sensor_header_msg
     err = SensorHeaderMsg::encode(map_encoder, d.header);
     if (err != CborNoError) {
-      printf("SensorHeaderMsg::encode failed: %d\n", err);
+      bm_debug("SensorHeaderMsg::encode failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -28,15 +29,15 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // abs_speed_cm_s
     err = cbor_encode_text_stringz(&map_encoder, "abs_speed_cm_s");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for abs_speed_cm_s key: %d\n",
-             err);
+      bm_debug("cbor_encode_text_stringz failed for abs_speed_cm_s key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.abs_speed_cm_s);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for abs_speed_cm_s value: %d\n", err);
+      bm_debug("cbor_encode_double failed for abs_speed_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -45,15 +46,16 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // direction_deg_m
     err = cbor_encode_text_stringz(&map_encoder, "direction_deg_m");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for direction_deg_m key: %d\n",
-             err);
+      bm_debug("cbor_encode_text_stringz failed for direction_deg_m key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.direction_deg_m);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for direction_deg_m value: %d\n", err);
+      bm_debug("cbor_encode_double failed for direction_deg_m value: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -62,16 +64,16 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // north_cm_s
     err = cbor_encode_text_stringz(&map_encoder, "north_cm_s");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for north_cm_s key: "
-             "%d\n",
-             err);
+      bm_debug("cbor_encode_text_stringz failed for north_cm_s key: "
+               "%d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.north_cm_s);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for north_cm_s value: %d\n", err);
+      bm_debug("cbor_encode_double failed for north_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -80,16 +82,16 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // east_cm_s
     err = cbor_encode_text_stringz(&map_encoder, "east_cm_s");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for east_cm_s "
-             "key: %d\n",
-             err);
+      bm_debug("cbor_encode_text_stringz failed for east_cm_s "
+               "key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.east_cm_s);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for east_cm_s value: %d\n", err);
+      bm_debug("cbor_encode_double failed for east_cm_s value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -98,15 +100,15 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // heading_deg_m
     err = cbor_encode_text_stringz(&map_encoder, "heading_deg_m");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for heading_deg_m key: %d\n",
-             err);
+      bm_debug("cbor_encode_text_stringz failed for heading_deg_m key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.heading_deg_m);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for heading_deg_m value: %d\n", err);
+      bm_debug("cbor_encode_double failed for heading_deg_m value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -115,14 +117,14 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // tilt_x_deg
     err = cbor_encode_text_stringz(&map_encoder, "tilt_x_deg");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for tilt_x_deg key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for tilt_x_deg key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.tilt_x_deg);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for tilt_x_deg value: %d\n", err);
+      bm_debug("cbor_encode_double failed for tilt_x_deg value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -131,14 +133,14 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // tilt_y_deg
     err = cbor_encode_text_stringz(&map_encoder, "tilt_y_deg");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for tilt_y_deg key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for tilt_y_deg key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.tilt_y_deg);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for tilt_y_deg value: %d\n", err);
+      bm_debug("cbor_encode_double failed for tilt_y_deg value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -147,14 +149,17 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // single_ping_std_cm_s
     err = cbor_encode_text_stringz(&map_encoder, "single_ping_std_cm_s");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for single_ping_std_cm_s key: %d\n", err);
+      bm_debug(
+          "cbor_encode_text_stringz failed for single_ping_std_cm_s key: %d\n",
+          err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.single_ping_std_cm_s);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for single_ping_std_cm_s value: %d\n", err);
+      bm_debug("cbor_encode_double failed for single_ping_std_cm_s value: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -163,14 +168,18 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // transducer_strength_db
     err = cbor_encode_text_stringz(&map_encoder, "transducer_strength_db");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for transducer_strength_db key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for transducer_strength_db "
+               "key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.transducer_strength_db);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for transducer_strength_db value: %d\n", err);
+      bm_debug(
+          "cbor_encode_double failed for transducer_strength_db value: %d\n",
+          err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -179,14 +188,14 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // ping_count
     err = cbor_encode_text_stringz(&map_encoder, "ping_count");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for ping_count key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for ping_count key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.ping_count);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for ping_count value: %d\n", err);
+      bm_debug("cbor_encode_double failed for ping_count value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -195,14 +204,15 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // abs_tilt_deg
     err = cbor_encode_text_stringz(&map_encoder, "abs_tilt_deg");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for abs_tilt_deg key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for abs_tilt_deg key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.abs_tilt_deg);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for abs_tilt_deg value: %d\n", err);
+      bm_debug("cbor_encode_double failed for abs_tilt_deg value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -211,14 +221,15 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // max_tilt_deg
     err = cbor_encode_text_stringz(&map_encoder, "max_tilt_deg");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for max_tilt_deg key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for max_tilt_deg key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.max_tilt_deg);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for max_tilt_deg value: %d\n", err);
+      bm_debug("cbor_encode_double failed for max_tilt_deg value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -227,14 +238,15 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // std_tilt_deg
     err = cbor_encode_text_stringz(&map_encoder, "std_tilt_deg");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for std_tilt_deg key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for std_tilt_deg key: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.std_tilt_deg);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for std_tilt_deg value: %d\n", err);
+      bm_debug("cbor_encode_double failed for std_tilt_deg value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -243,16 +255,17 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // temperature_deg_c
     err = cbor_encode_text_stringz(&map_encoder, "temperature_deg_c");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for temperature_deg_c key: %d\n",
-             err);
+      bm_debug(
+          "cbor_encode_text_stringz failed for temperature_deg_c key: %d\n",
+          err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.temperature_deg_c);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for temperature_deg_c value: %d\n",
-             err);
+      bm_debug("cbor_encode_double failed for temperature_deg_c value: %d\n",
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -266,13 +279,13 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
     if (err == CborNoError) {
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
     } else {
-      printf("cbor_encoder_close_container failed: %d\n", err);
+      bm_debug("cbor_encoder_close_container failed: %d\n", err);
 
       if (err != CborErrorOutOfMemory) {
         break;
       }
       size_t extra_bytes_needed = cbor_encoder_get_extra_bytes_needed(&encoder);
-      printf("extra_bytes_needed: %zu\n", extra_bytes_needed);
+      bm_debug("extra_bytes_needed: %zu\n", extra_bytes_needed);
     }
   } while (0);
 
@@ -305,8 +318,8 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     }
     if (num_fields != AanderaaDataMsg::NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      printf("expected %zu fields but got %zu\n", AanderaaDataMsg::NUM_FIELDS,
-             num_fields);
+      bm_debug("expected %zu fields but got %zu\n", AanderaaDataMsg::NUM_FIELDS,
+               num_fields);
       break;
     }
 
@@ -325,7 +338,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // abs_speed_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -344,7 +357,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // direction_deg_m
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -363,7 +376,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // north_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -382,7 +395,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // east_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -401,7 +414,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // heading_deg_m
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -420,7 +433,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // tilt_x_deg
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -439,7 +452,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // tilt_y_deg
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -458,7 +471,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // single_ping_std_cm_s
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -477,7 +490,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // transducer_strength_db
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -496,7 +509,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // ping_count
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -515,7 +528,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // abs_tilt_deg
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -534,7 +547,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // max_tilt_deg
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -553,7 +566,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // std_tilt_deg
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -572,7 +585,7 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     // temperature_deg_c
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
