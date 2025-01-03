@@ -48,7 +48,7 @@ set(SOURCES
     config_cbor_map_srv_request_msg.c
     device_test_svc_reply_msg.cpp
     device_test_svc_request_msg.cpp
-    pme_dissolved_oxygen_data_msg.cpp
+    pme_dissolved_oxygen_msg.cpp
     pme_wipe_msg.cpp
     sensor_header_msg.cpp
     sys_info_svc_reply_msg.c
