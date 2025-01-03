@@ -1,4 +1,5 @@
 #include "pme_dissolved_oxygen_msg.h"
+#include "bm_config.h"
 #include <math.h>
 
 namespace PmeDissolvedOxygenMsg {
@@ -12,7 +13,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
   do {
     err = cbor_encoder_create_map(&encoder, &map_encoder, NUM_FIELDS);
     if (err != CborNoError) {
-      printf("cbor_encoder_create_map failed: %d\n", err);
+      bm_debug("cbor_encoder_create_map failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -21,7 +22,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // sensor_header_msg
     err = SensorHeaderMsg::encode(map_encoder, d.header);
     if (err != CborNoError) {
-      printf("SensorHeaderMsg::encode failed: %d\n", err);
+      bm_debug("SensorHeaderMsg::encode failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -30,7 +31,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // temperature_deg_c
     err = cbor_encode_text_stringz(&map_encoder, "temperature_deg_c");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for temperature_deg_c key: %d\n",
+      bm_debug("cbor_encode_text_stringz failed for temperature_deg_c key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -38,7 +39,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     }
     err = cbor_encode_double(&map_encoder, d.temperature_deg_c);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for temperature_deg_c value: %d\n",
+      bm_debug("cbor_encode_double failed for temperature_deg_c value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -48,7 +49,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // do_mg_per_l
     err = cbor_encode_text_stringz(&map_encoder, "do_mg_per_l");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for do_mg_per_l key: %d\n",
+      bm_debug("cbor_encode_text_stringz failed for do_mg_per_l key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -56,7 +57,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     }
     err = cbor_encode_double(&map_encoder, d.do_mg_per_l);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for do_mg_per_l value: %d\n",
+      bm_debug("cbor_encode_double failed for do_mg_per_l value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -66,7 +67,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // quality
     err = cbor_encode_text_stringz(&map_encoder, "quality");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for quality key: %d\n",
+      bm_debug("cbor_encode_text_stringz failed for quality key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -74,7 +75,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     }
     err = cbor_encode_double(&map_encoder, d.quality);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for quality value: %d\n",
+      bm_debug("cbor_encode_double failed for quality value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -84,7 +85,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // do_saturation_pct
     err = cbor_encode_text_stringz(&map_encoder, "do_saturation_pct");
     if (err != CborNoError) {
-      printf("cbor_encode_text_stringz failed for do_saturation_pct key: %d\n",
+      bm_debug("cbor_encode_text_stringz failed for do_saturation_pct key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -92,7 +93,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     }
     err = cbor_encode_double(&map_encoder, d.do_saturation_pct);
     if (err != CborNoError) {
-      printf("cbor_encode_double failed for do_saturation_pct value: %d\n",
+      bm_debug("cbor_encode_double failed for do_saturation_pct value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -103,13 +104,13 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     if (err == CborNoError) {
       *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
     } else {
-      printf("cbor_encoder_close_container failed: %d\n", err);
+      bm_debug("cbor_encoder_close_container failed: %d\n", err);
 
       if (err != CborErrorOutOfMemory) {
         break;
       }
       size_t extra_bytes_needed = cbor_encoder_get_extra_bytes_needed(&encoder);
-      printf("extra_bytes_needed: %zu\n", extra_bytes_needed);
+      bm_debug("extra_bytes_needed: %zu\n", extra_bytes_needed);
     }
   } while (0);
 
@@ -141,7 +142,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     }
     if (num_fields != NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      printf("expected %zu fields but got %zu\n", NUM_FIELDS, num_fields);
+      bm_debug("expected %zu fields but got %zu\n", NUM_FIELDS, num_fields);
       break;
     }
 
@@ -160,7 +161,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // temperature_deg_c
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -179,7 +180,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // do_mg_per_l
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -198,7 +199,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // quality
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
@@ -217,7 +218,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     // do_saturation_pct
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
-      printf("expected string key but got something else\n");
+      bm_debug("expected string key but got something else\n");
       break;
     }
     err = cbor_value_advance(&value);
