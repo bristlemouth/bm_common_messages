@@ -23,6 +23,8 @@ target_sources(bm_common_messages_tests
     ${SRC_DIR}/device_test_svc_reply_msg.cpp
     ${SRC_DIR}/device_test_svc_request_msg.cpp
     ${SRC_DIR}/bm_rbr_pressure_difference_signal_msg.cpp
+    ${SRC_DIR}/pme_dissolved_oxygen_msg.cpp
+    ${SRC_DIR}/pme_wipe_msg.cpp
 
     # support files
     ${SRC_DIR}/third_party/tinycbor/src/cborparser.c

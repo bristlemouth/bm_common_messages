@@ -8,6 +8,8 @@
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
 #include "device_test_svc_request_msg.h"
+#include "pme_dissolved_oxygen_msg.h"
+#include "pme_wipe_msg.h"
 #include "sensor_header_msg.h"
 #include "sys_info_svc_reply_msg.h"
 #include "gtest/gtest.h"
@@ -361,4 +363,56 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
   decode.num_samples = 10;
   EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, cbor_buffer, len),
             CborErrorOutOfMemory);
+}
+
+TEST_F(BmCommonTest, PmeDissolvedOxygenMsgTest) {
+  PmeDissolvedOxygenMsg::Data d;
+  d.header.version = PmeDissolvedOxygenMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.temperature_deg_c = 18.93;
+  d.do_mg_per_l = 7.891;
+  d.quality = 0.987;
+  d.do_saturation_pct = 100.0;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  PmeDissolvedOxygenMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 182);
+
+  PmeDissolvedOxygenMsg::Data decode;
+  PmeDissolvedOxygenMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, BmSoftDataMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.temperature_deg_c, 18.93);
+  EXPECT_EQ(decode.do_mg_per_l, 7.891);
+  EXPECT_EQ(decode.quality, 0.987);
+  EXPECT_EQ(decode.do_saturation_pct, 100.0);
+}
+
+TEST_F(BmCommonTest, PmeWipeMsgTest) {
+  PmeWipeMsg::Data d;
+  d.header.version = PmeWipeMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.wipe_current_mean_ma = 90;
+  d.wipe_duration_s = 5.8;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  PmeWipeMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 145);
+
+  PmeWipeMsg::Data decode;
+  PmeWipeMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, PmeWipeMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.wipe_current_mean_ma, 90);
+  EXPECT_EQ(decode.wipe_duration_s, 5.8);
 }
