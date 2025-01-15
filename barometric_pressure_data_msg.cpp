@@ -158,4 +158,6 @@ CborError BarometricPressureDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
       }
     }
   } while (0);
+
+  return err;
 }

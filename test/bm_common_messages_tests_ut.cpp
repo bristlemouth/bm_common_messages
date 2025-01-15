@@ -1,4 +1,5 @@
 #include "aanderaa_data_msg.h"
+#include "barometric_pressure_data_msg.h"
 #include "bm_common_pub_sub.h"
 #include "bm_rbr_data_msg.h"
 #include "bm_rbr_pressure_difference_signal_msg.h"
@@ -383,7 +384,7 @@ TEST_F(BmCommonTest, PmeDissolvedOxygenMsgTest) {
 
   PmeDissolvedOxygenMsg::Data decode;
   PmeDissolvedOxygenMsg::decode(decode, cbor_buffer, len);
-  EXPECT_EQ(decode.header.version, BmSoftDataMsg::VERSION);
+  EXPECT_EQ(decode.header.version, PmeDissolvedOxygenMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
@@ -415,4 +416,26 @@ TEST_F(BmCommonTest, PmeWipeMsgTest) {
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_EQ(decode.wipe_current_mean_ma, 90);
   EXPECT_EQ(decode.wipe_duration_s, 5.8);
+}
+
+TEST_F(BmCommonTest, barometricPressureMsgTest) {
+  BarometricPressureDataMsg::Data d;
+  d.header.version = BarometricPressureDataMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.barometric_pressure_mbar = 1010.93;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  BarometricPressureDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 125);
+
+  BarometricPressureDataMsg::Data decode;
+  BarometricPressureDataMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, BarometricPressureDataMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.barometric_pressure_mbar, 1010.93);
 }
