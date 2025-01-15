@@ -82,7 +82,7 @@ CborError config_cbor_map_request_decode(ConfigCborMapRequestData *d,
     }
     if (num_fields != CONFIG_CBOR_MAP_REQUEST_NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      bm_debug("expected %zu fields but got %zu\n",
+      bm_debug("expected %d fields but got %zu\n",
                CONFIG_CBOR_MAP_REQUEST_NUM_FIELDS, num_fields);
       break;
     }
