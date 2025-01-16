@@ -7,17 +7,21 @@
 namespace PmeWipeMsg {
 
 constexpr uint32_t VERSION = 1;
-constexpr size_t NUM_FIELDS = 2 + SensorHeaderMsg::NUM_FIELDS;
+constexpr size_t NUM_FIELDS = 6 + SensorHeaderMsg::NUM_FIELDS;
 
 struct Data {
   SensorHeaderMsg::Data header;
-  double wipe_current_mean_ma;
-  double wipe_duration_s;
+  double wipe_time_sec;
+  double start1_mA;
+  double avg1_mA;
+  double start2_mA;
+  double avg2_mA;
+  double rsource;
 };
 
-CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
+CborError encode(Data &w, uint8_t *cbor_buffer, size_t size,
                  size_t *encoded_len);
 
-CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size);
+CborError decode(Data &w, const uint8_t *cbor_buffer, size_t size);
 
 } // namespace PmeWipeMsg
