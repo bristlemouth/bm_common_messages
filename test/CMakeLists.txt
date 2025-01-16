@@ -16,6 +16,7 @@ target_sources(bm_common_messages_tests
     bm_common_messages_tests_ut.cpp
 
     # msg files for testing
+    ${SRC_DIR}/barometric_pressure_data_msg.cpp
     ${SRC_DIR}/bm_soft_data_msg.cpp
     ${SRC_DIR}/bm_rbr_data_msg.cpp
     ${SRC_DIR}/bm_seapoint_turbidity_data_msg.cpp

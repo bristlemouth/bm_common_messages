@@ -149,7 +149,7 @@ CborError sys_info_reply_decode(SysInfoReplyData *d, const uint8_t *cbor_buffer,
     }
     if (num_fields != SYS_INFO_REPLY_NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      bm_debug("expected %zu fields but got %zu\n", SYS_INFO_REPLY_NUM_FIELDS,
+      bm_debug("expected %d fields but got %zu\n", SYS_INFO_REPLY_NUM_FIELDS,
                num_fields);
       break;
     }
