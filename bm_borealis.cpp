@@ -1,6 +1,8 @@
 #include "bm_borealis.h"
 #include "bm_config.h"
+#ifndef CI_TEST
 #include "bm_os.h"
+#endif
 
 #if __has_include ("debug.h")
 #include "debug.h"
@@ -199,7 +201,11 @@ static int get_key_value_string(char ** out, size_t * len, CborValue * value, co
     if ((err = cbor_value_calculate_string_length(value, &len_without_zeroterm)) != CborNoError) return -1;
 
     size_t allocation_size = len_without_zeroterm + 1;
+#ifndef CI_TEST
     *out = (char *)bm_malloc(allocation_size);
+#else
+    *out = (char *)malloc(allocation_size);
+#endif
     if (!(*out)) return -1;
 
     if ((err = cbor_value_copy_text_string(value, *out, &allocation_size, NULL)) != CborNoError) return -1;
