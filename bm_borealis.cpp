@@ -268,7 +268,11 @@ CborError borealis_spectrum_data_decode(struct borealis_spectrum_data * d, uint8
     } while (0);
 
     /* we get here only on error. free the allocation if there was one */
+#ifndef CI_TEST
+    bm_free(d->spectrum_as_base64);
+#else
     free(d->spectrum_as_base64);
+#endif
     d->spectrum_as_base64 = NULL;
 
     return err;
@@ -323,7 +327,11 @@ CborError borealis_levels_decode(struct borealis_levels * d, uint8_t *cbor_buffe
     } while (0);
 
     /* we get here only on error. free the allocation if there was one */
+#ifndef CI_TEST
+    bm_free(d->levels_as_base64);
+#else
     free(d->levels_as_base64);
+#endif
     d->levels_as_base64 = NULL;
 
     return err;
@@ -378,7 +386,11 @@ CborError borealis_recording_status_decode(struct borealis_recording_status * d,
     } while (0);
 
     /* we get here only on error. free the allocation if there was one */
+#ifndef CI_TEST
+    bm_free(d->filename);
+#else
     free(d->filename);
+#endif
     d->filename = NULL;
 
     return err;
