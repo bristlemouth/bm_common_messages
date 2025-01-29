@@ -26,7 +26,6 @@ set(TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 
 # Setup testing
 include(CTest)
-add_subdirectory("third_party/googletest")
 add_subdirectory("test")
 include_directories("test")
 
@@ -40,6 +39,7 @@ set(BM_COMMON_MESSAGES_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 set(SOURCES
     aanderaa_data_msg.cpp
+    bm_borealis.cpp
     barometric_pressure_data_msg.cpp
     bm_rbr_data_msg.cpp
     bm_rbr_pressure_difference_signal_msg.cpp
