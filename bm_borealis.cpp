@@ -31,7 +31,7 @@ static CborError send_key_value_float(CborEncoder * map_encoder, const char * na
     return err;
 }
 
-static CborError send_key_value_uint8(CborEncoder * map_encoder, const char * name, const float value) {
+static CborError send_key_value_uint8(CborEncoder * map_encoder, const char * name, const uint8_t value) {
     CborError err;
     if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
         debug_printf("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n", __func__, name, err);
