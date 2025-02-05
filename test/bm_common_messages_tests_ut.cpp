@@ -400,13 +400,17 @@ TEST_F(BmCommonTest, PmeWipeMsgTest) {
   d.header.reading_time_utc_ms = 123456789;
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
-  d.wipe_current_mean_ma = 90;
-  d.wipe_duration_s = 5.8;
+  d.wipe_time_sec = 5.8;
+  d.start1_mA = 90.3;
+  d.avg_mA = 90.1;
+  d.start2_mA = 95.6;
+  d.final_mA = 95.3;
+  d.rsource = 90;
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   PmeWipeMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-  EXPECT_EQ(len, 145);
+  EXPECT_EQ(len, 202);
 
   PmeWipeMsg::Data decode;
   PmeWipeMsg::decode(decode, cbor_buffer, len);
@@ -414,8 +418,12 @@ TEST_F(BmCommonTest, PmeWipeMsgTest) {
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
-  EXPECT_EQ(decode.wipe_current_mean_ma, 90);
-  EXPECT_EQ(decode.wipe_duration_s, 5.8);
+  EXPECT_EQ(decode.wipe_time_sec, 5.8);
+  EXPECT_EQ(decode.start1_mA, 90.3);
+  EXPECT_EQ(decode.avg_mA, 90.1);
+  EXPECT_EQ(decode.start2_mA, 95.6);
+  EXPECT_EQ(decode.final_mA, 95.3);
+  EXPECT_EQ(decode.rsource, 90);
 }
 
 TEST_F(BmCommonTest, barometricPressureMsgTest) {
