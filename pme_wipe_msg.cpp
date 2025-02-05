@@ -4,7 +4,7 @@
 
 namespace PmeWipeMsg {
 
-CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
+CborError encode(Data &w, uint8_t *cbor_buffer, size_t size,
                  size_t *encoded_len) {
   CborError err;
   CborEncoder encoder, map_encoder;
@@ -20,7 +20,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     }
 
     // sensor_header_msg
-    err = SensorHeaderMsg::encode(map_encoder, d.header);
+    err = SensorHeaderMsg::encode(map_encoder, w.header);
     if (err != CborNoError) {
       bm_debug("SensorHeaderMsg::encode failed: %d\n", err);
       if (err != CborErrorOutOfMemory) {
@@ -28,36 +28,108 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
-    // wipe_current_mean_ma
-    err = cbor_encode_text_stringz(&map_encoder, "wipe_current_mean_ma");
+    // wipe_time_sec
+    err = cbor_encode_text_stringz(&map_encoder, "wipe_time_sec");
     if (err != CborNoError) {
-      bm_debug("cbor_encode_text_stringz failed for wipe_current_mean_ma key: %d\n",
+      bm_debug("cbor_encode_text_stringz failed for wipe_time_sec key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.wipe_current_mean_ma);
+    err = cbor_encode_double(&map_encoder, w.wipe_time_sec);
     if (err != CborNoError) {
-      bm_debug("cbor_encode_double failed for wipe_current_mean_ma value: %d\n",
+      bm_debug("cbor_encode_double failed for wipe_time_sec value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
 
-    // wipe_duration_s
-    err = cbor_encode_text_stringz(&map_encoder, "wipe_duration_s");
+    // start1_mA
+    err = cbor_encode_text_stringz(&map_encoder, "start1_mA");
     if (err != CborNoError) {
-      bm_debug("cbor_encode_text_stringz failed for wipe_duration_s key: %d\n",
+      bm_debug("cbor_encode_text_stringz failed for start1_mA key: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
-    err = cbor_encode_double(&map_encoder, d.wipe_duration_s);
+    err = cbor_encode_double(&map_encoder, w.start1_mA);
     if (err != CborNoError) {
-      bm_debug("cbor_encode_double failed for wipe_duration_s value: %d\n",
+      bm_debug("cbor_encode_double failed for start1_mA value: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // avg_mA
+    err = cbor_encode_text_stringz(&map_encoder, "avg_mA");
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_text_stringz failed for avg_mA key: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, w.avg_mA);
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_double failed for avg_mA value: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // start2_mA
+    err = cbor_encode_text_stringz(&map_encoder, "start2_mA");
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_text_stringz failed for start2_mA key: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, w.start2_mA);
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_double failed for start2_mA value: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // final_mA
+    err = cbor_encode_text_stringz(&map_encoder, "final_mA");
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_text_stringz failed for final_mA key: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, w.final_mA);
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_double failed for final_mA value: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // rsource
+    err = cbor_encode_text_stringz(&map_encoder, "rsource");
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_text_stringz failed for rsource key: %d\n",
+             err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_double(&map_encoder, w.rsource);
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_double failed for rsource value: %d\n",
              err);
       if (err != CborErrorOutOfMemory) {
         break;
@@ -81,7 +153,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
   return err;
 }
 
-CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
+CborError decode(Data &w, const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
   CborValue map;
   CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
@@ -117,12 +189,12 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     }
 
     // header
-    err = SensorHeaderMsg::decode(value, d.header);
+    err = SensorHeaderMsg::decode(value, w.header);
     if (err != CborNoError) {
       break;
     }
 
-    // wipe_current_mean_ma
+    // wipe_time_sec
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       bm_debug("expected string key but got something else\n");
@@ -132,7 +204,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.wipe_current_mean_ma);
+    err = cbor_value_get_double(&value, &w.wipe_time_sec);
     if (err != CborNoError) {
       break;
     }
@@ -141,7 +213,7 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
       break;
     }
 
-    // wipe_duration_s
+    // start1_mA
     if (!cbor_value_is_text_string(&value)) {
       err = CborErrorIllegalType;
       bm_debug("expected string key but got something else\n");
@@ -151,7 +223,83 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
     if (err != CborNoError) {
       break;
     }
-    err = cbor_value_get_double(&value, &d.wipe_duration_s);
+    err = cbor_value_get_double(&value, &w.start1_mA);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // avg_mA
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      bm_debug("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &w.avg_mA);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // start2_mA
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      bm_debug("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &w.start2_mA);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // final_mA
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      bm_debug("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &w.final_mA);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // rsource
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      bm_debug("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_double(&value, &w.rsource);
     if (err != CborNoError) {
       break;
     }
