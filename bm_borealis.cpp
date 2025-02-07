@@ -33,13 +33,15 @@ static CborError send_key_value_float(CborEncoder * map_encoder, const char * na
 
 static CborError send_key_value_uint8(CborEncoder * map_encoder, const char * name, const uint8_t value) {
     CborError err;
+    uint64_t tmp = (uint64_t)value;
+
     if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
         debug_printf("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n", __func__, name, err);
         if (err != CborErrorOutOfMemory) return err;
     }
 
-    if ((err = cbor_encode_simple_value(map_encoder, value)) != CborNoError)
-        debug_printf("error: %s(%s): cbor_encode_simple_value() failed: %d\r\n", __func__, name, err);
+    if ((err = cbor_encode_uint(map_encoder, tmp)) != CborNoError)
+        debug_printf("error: %s(%s): cbor_encode_uint() failed: %d\r\n", __func__, name, err);
     return err;
 }
 
@@ -173,6 +175,7 @@ static int get_key_value_float(float * out, CborValue * value, const char * key_
 
 static int get_key_value_uint8(uint8_t * out, CborValue * value, const char * key_expected) {
     CborError err;
+    uint64_t tmp = 0;
 
     if (!cbor_value_is_text_string(value)) {
         err = CborErrorIllegalType;
@@ -181,8 +184,10 @@ static int get_key_value_uint8(uint8_t * out, CborValue * value, const char * ke
     }
 
     if ((err = cbor_value_advance(value)) != CborNoError) return -1;
-    if ((err = cbor_value_get_simple_type(value, out)) != CborNoError) return -1;
+    if ((err = cbor_value_get_uint64(value, &tmp)) != CborNoError) return -1;
     if ((err = cbor_value_advance(value)) != CborNoError) return -1;
+
+    *out = (uint8_t)tmp;
 
     return 0;
 }
