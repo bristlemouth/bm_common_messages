@@ -49,6 +49,7 @@ set(BM_COMMON_MESSAGES_SRCS
     bm_common_messages_tests_ut.cpp
 
     # msg files for testing
+    ${SRC_DIR}/bm_messages_helper.c
     ${SRC_DIR}/barometric_pressure_data_msg.cpp
     ${SRC_DIR}/bm_soft_data_msg.cpp
     ${SRC_DIR}/bm_rbr_data_msg.cpp
@@ -72,6 +73,7 @@ set(BM_BOREALIS_SRCS
     bm_borealis_ut.cpp
 
     # msg files for testing
+    ${SRC_DIR}/bm_messages_helper.c
     ${SRC_DIR}/bm_borealis.cpp
     ${SRC_DIR}/sensor_header_msg.cpp
 
