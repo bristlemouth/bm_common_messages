@@ -83,3 +83,18 @@ set(BM_BOREALIS_SRCS
 )
 
 create_gtest("bm_borealis" "${BM_BOREALIS_SRCS}")
+
+set(POWER_INFO_SRCS
+    # Unit test wrapper for test
+    power_info_ut.cpp
+
+    # msg files for testing
+    ${SRC_DIR}/bm_messages_helper.c
+    ${SRC_DIR}/power_info_reply_msg.c
+
+    # support files
+    ${SRC_DIR}/third_party/tinycbor/src/cborparser.c
+    ${SRC_DIR}/third_party/tinycbor/src/cborencoder.c
+)
+
+create_gtest("power_info" "${POWER_INFO_SRCS}")

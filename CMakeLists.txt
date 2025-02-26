@@ -39,8 +39,9 @@ set(BM_COMMON_MESSAGES_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 set(SOURCES
     aanderaa_data_msg.cpp
-    bm_borealis.cpp
     barometric_pressure_data_msg.cpp
+    bm_borealis.cpp
+    bm_messages_helper.c
     bm_rbr_data_msg.cpp
     bm_rbr_pressure_difference_signal_msg.cpp
     bm_seapoint_turbidity_data_msg.cpp
@@ -51,6 +52,7 @@ set(SOURCES
     device_test_svc_request_msg.cpp
     pme_dissolved_oxygen_msg.cpp
     pme_wipe_msg.cpp
+    power_info_reply_msg.c
     sensor_header_msg.cpp
     sys_info_svc_reply_msg.c
 )
