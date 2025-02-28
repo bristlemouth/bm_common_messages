@@ -1,5 +1,6 @@
 #include "bm_borealis.h"
 #include "bm_config.h"
+#include "bm_messages_helper.h"
 #ifndef CI_TEST
 #include "bm_os.h"
 #endif
@@ -18,45 +19,6 @@
 #pragma GCC diagnostic warning "-Wshadow"
 #pragma GCC diagnostic warning "-Wformat"
 
-static CborError send_key_value_float(CborEncoder * map_encoder, const char * name, const float value) {
-    CborError err;
-    if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
-        debug_printf("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n", __func__, name, err);
-        if (err != CborErrorOutOfMemory) return err;
-    }
-
-    if ((err = cbor_encode_float(map_encoder, value)) != CborNoError)
-        debug_printf("error: %s(%s): cbor_encode_float() failed: %d\r\n", __func__, name, err);
-
-    return err;
-}
-
-static CborError send_key_value_uint8(CborEncoder * map_encoder, const char * name, const uint8_t value) {
-    CborError err;
-    uint64_t tmp = (uint64_t)value;
-
-    if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
-        debug_printf("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n", __func__, name, err);
-        if (err != CborErrorOutOfMemory) return err;
-    }
-
-    if ((err = cbor_encode_uint(map_encoder, tmp)) != CborNoError)
-        debug_printf("error: %s(%s): cbor_encode_uint() failed: %d\r\n", __func__, name, err);
-    return err;
-}
-
-static CborError send_key_value_string(CborEncoder * map_encoder, const char * name, const char * value, const size_t len) {
-    CborError err;
-    if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
-        debug_printf("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n", __func__, name, err);
-        if (err != CborErrorOutOfMemory) return err;
-    }
-
-    if ((err = cbor_encode_text_string(map_encoder, value, len)) != CborNoError)
-        debug_printf("error: %s(%s): cbor_encode_byte_string() failed: %d\r\n", __func__, name, err);
-    return err;
-}
-
 static CborError create_map_and_send_header(CborEncoder * encoder, CborEncoder * map_encoder, SensorHeaderMsg::Data header, const size_t num_fields) {
     CborError err;
     if ((err = cbor_encoder_create_map(encoder, map_encoder, num_fields)) != CborNoError) {
@@ -69,13 +31,6 @@ static CborError create_map_and_send_header(CborEncoder * encoder, CborEncoder *
     return err;
 }
 
-static CborError finish_message(CborEncoder * encoder, CborEncoder * map_encoder) {
-    const CborError err = cbor_encoder_close_container(encoder, map_encoder);
-    if (err != CborNoError)
-        debug_printf("error: %s: cbor_encoder_close_container failed: %d\r\n", __func__, err);
-    return err;
-}
-
 CborError borealis_spectrum_data_encode(struct borealis_spectrum_data * d, uint8_t * cbor_buffer, size_t size, size_t * encoded_len) {
     CborError err;
     CborEncoder encoder, map_encoder;
@@ -83,11 +38,11 @@ CborError borealis_spectrum_data_encode(struct borealis_spectrum_data * d, uint8
 
     do {
         if ((err = create_map_and_send_header(&encoder, &map_encoder, d->header, BOREALIS_SPECTRUM_MSG_NUM_FIELDS)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_float(&map_encoder, "dt", d->dt)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_float(&map_encoder, "df", d->df)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_uint8(&map_encoder, "bands_per_octave", d->bands_per_octave)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_string(&map_encoder, "spectrum", d->spectrum_as_base64, d->spectrum_length)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = finish_message(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "dt", d->dt)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "df", d->df)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_uint8(&map_encoder, "bands_per_octave", d->bands_per_octave)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_string(&map_encoder, "spectrum", d->spectrum_as_base64, d->spectrum_length)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encoder_message_finish(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
 
         if (err != CborNoError) break;
 
@@ -96,9 +51,7 @@ CborError borealis_spectrum_data_encode(struct borealis_spectrum_data * d, uint8
         return CborNoError;
     } while (0);
 
-    /* we get here due to any error */
-    if (CborErrorOutOfMemory == err)
-        debug_printf("error: %s: extra_bytes_needed: %zu\r\n", __func__, cbor_encoder_get_extra_bytes_needed(&encoder));
+    encoder_message_check_memory(&encoder, err);
 
     return err;
 }
@@ -110,11 +63,11 @@ CborError borealis_levels_encode(struct borealis_levels * d, uint8_t * cbor_buff
 
     do {
         if ((err = create_map_and_send_header(&encoder, &map_encoder, d->header, BOREALIS_LEVELS_MSG_NUM_FIELDS)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_float(&map_encoder, "dt", d->dt)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_float(&map_encoder, "dt_report", d->dt_report)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_uint8(&map_encoder, "first_band_index", d->first_band_index)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_string(&map_encoder, "levels", d->levels_as_base64, d->levels_length)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = finish_message(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "dt", d->dt)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "dt_report", d->dt_report)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_uint8(&map_encoder, "first_band_index", d->first_band_index)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_string(&map_encoder, "levels", d->levels_as_base64, d->levels_length)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encoder_message_finish(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
 
         if (err != CborNoError) break;
 
@@ -123,9 +76,7 @@ CborError borealis_levels_encode(struct borealis_levels * d, uint8_t * cbor_buff
         return CborNoError;
     } while (0);
 
-    /* we get here due to any error */
-    if (CborErrorOutOfMemory == err)
-        debug_printf("error: %s: extra_bytes_needed: %zu\r\n", __func__, cbor_encoder_get_extra_bytes_needed(&encoder));
+    encoder_message_check_memory(&encoder, err);
 
     return err;
 }
@@ -137,11 +88,11 @@ CborError borealis_recording_status_encode(struct borealis_recording_status * d,
 
     do {
         if ((err = create_map_and_send_header(&encoder, &map_encoder, d->header, BOREALIS_RECORDING_STATUS_MSG_NUM_FIELDS)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_uint8(&map_encoder, "flags", d->flags)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_string(&map_encoder, "filename", d->filename, d->filename_length)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_float(&map_encoder, "seconds_written", d->seconds_written)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = send_key_value_float(&map_encoder, "seconds_free", d->seconds_free)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = finish_message(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_uint8(&map_encoder, "flags", d->flags)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_string(&map_encoder, "filename", d->filename, d->filename_length)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "seconds_written", d->seconds_written)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "seconds_free", d->seconds_free)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encoder_message_finish(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
 
         if (err != CborNoError) break;
 
@@ -150,126 +101,34 @@ CborError borealis_recording_status_encode(struct borealis_recording_status * d,
         return CborNoError;
     } while (0);
 
-    /* we get here due to any error */
-    if (CborErrorOutOfMemory == err)
-        debug_printf("error: %s: extra_bytes_needed: %zu\r\n", __func__, cbor_encoder_get_extra_bytes_needed(&encoder));
+    encoder_message_check_memory(&encoder, err);
 
     return err;
 }
 
-static int get_key_value_float(float * out, CborValue * value, const char * key_expected) {
-    CborError err;
-
-    if (!cbor_value_is_text_string(value)) {
-        err = CborErrorIllegalType;
-        debug_printf("error: %s(%s): expected string key but got something else\r\n", __func__, key_expected);
-        return -1;
-    }
-
-    if ((err = cbor_value_advance(value)) != CborNoError) return -1;
-    if ((err = cbor_value_get_float(value, out)) != CborNoError) return -1;
-    if ((err = cbor_value_advance(value)) != CborNoError) return -1;
-
-    return 0;
-}
-
-static int get_key_value_uint8(uint8_t * out, CborValue * value, const char * key_expected) {
-    CborError err;
-    uint64_t tmp = 0;
-
-    if (!cbor_value_is_text_string(value)) {
-        err = CborErrorIllegalType;
-        debug_printf("error: %s(%s): expected string key but got something else\r\n", __func__, key_expected);
-        return -1;
-    }
-
-    if ((err = cbor_value_advance(value)) != CborNoError) return -1;
-    if ((err = cbor_value_get_uint64(value, &tmp)) != CborNoError) return -1;
-    if ((err = cbor_value_advance(value)) != CborNoError) return -1;
-
-    *out = (uint8_t)tmp;
-
-    return 0;
-}
-
-static int get_key_value_string(char ** out, size_t * len, CborValue * value, const char * key_expected) {
-    CborError err;
-    if (!cbor_value_is_text_string(value)) {
-        err = CborErrorIllegalType;
-        debug_printf("error: %s(%s): expected string key but got something else\r\n", __func__, key_expected);
-        return -1;
-    }
-
-    if ((err = cbor_value_advance(value)) != CborNoError) return -1;
-
-    size_t len_without_zeroterm = 0;
-    if ((err = cbor_value_calculate_string_length(value, &len_without_zeroterm)) != CborNoError) return -1;
-
-    size_t allocation_size = len_without_zeroterm + 1;
-#ifndef CI_TEST
-    *out = (char *)bm_malloc(allocation_size);
-#else
-    *out = (char *)malloc(allocation_size);
-#endif
-    if (!(*out)) return -1;
-
-    if ((err = cbor_value_copy_text_string(value, *out, &allocation_size, NULL)) != CborNoError) return -1;
-
-    /* explicitly zero terminate the allocation */
-    (*out)[len_without_zeroterm] = '\0';
-    *len = len_without_zeroterm;
-
-    if ((err = cbor_value_advance(value)) != CborNoError) return -1;
-
-    return 0;
-}
-
 CborError borealis_spectrum_data_decode(struct borealis_spectrum_data * d, uint8_t *cbor_buffer, size_t size) {
-    CborParser parser;
     CborValue map;
+    CborParser parser;
+    CborValue value;
 
     d->spectrum_as_base64 = NULL;
 
     CborError err;
     do {
-        if ((err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map)) != CborNoError) break;
-
-        if ((err = cbor_value_validate_basic(&map)) != CborNoError) break;
-
-        if (!cbor_value_is_map(&map)) {
-            err = CborErrorIllegalType;
-            break;
-        }
-
-        size_t num_fields;
-        if ((err = cbor_value_get_map_length(&map, &num_fields)) != CborNoError) break;
-
-        if (num_fields != BOREALIS_SPECTRUM_MSG_NUM_FIELDS) {
-            err = CborErrorUnknownLength;
-            debug_printf("error: %s: expected %zu fields but got %zu\r\n", __func__, BOREALIS_SPECTRUM_MSG_NUM_FIELDS, num_fields);
-            break;
-        }
-
-        CborValue value;
-        if ((err = cbor_value_enter_container(&map, &value)) != CborNoError) break;
+        err = decoder_message_enter(&map, &value, &parser, cbor_buffer, size, BOREALIS_SPECTRUM_MSG_NUM_FIELDS);
 
         if ((err = SensorHeaderMsg::decode(value, d->header)) != CborNoError) break;
 
-        if (-1 == get_key_value_float(&d->dt, &value, "dt")) break;
-        if (-1 == get_key_value_float(&d->df, &value, "df")) break;
-        if (-1 == get_key_value_uint8(&d->bands_per_octave, &value, "df")) break;
-        if (-1 == get_key_value_string(&d->spectrum_as_base64, &d->spectrum_length, &value, "spectrum_as_base64")) break;
+        if (CborNoError != decode_key_value_float(&d->dt, &value, "dt")) break;
+        if (CborNoError != decode_key_value_float(&d->df, &value, "df")) break;
+        if (CborNoError != decode_key_value_uint8(&d->bands_per_octave, &value, "df")) break;
+        if (CborNoError != decode_key_value_string(&d->spectrum_as_base64, &d->spectrum_length, &value, "spectrum_as_base64")) break;
 
         if (err != CborNoError) break;
 
-        if ((err = cbor_value_leave_container(&map, &value)) != CborNoError) break;
+        err = decoder_message_leave(&value, &map);
 
-        if (!cbor_value_at_end(&map)) {
-            err = CborErrorGarbageAtEnd;
-            break;
-        }
-
-        return CborNoError;
+        return err;
     } while (0);
 
     /* we get here only on error. free the allocation if there was one */
@@ -284,51 +143,29 @@ CborError borealis_spectrum_data_decode(struct borealis_spectrum_data * d, uint8
 }
 
 CborError borealis_levels_decode(struct borealis_levels * d, uint8_t *cbor_buffer, size_t size) {
-    CborParser parser;
     CborValue map;
+    CborParser parser;
+    CborValue value;
 
     d->levels_as_base64 = NULL;
 
     CborError err;
     do {
-        if ((err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map)) != CborNoError) break;
-        if ((err = cbor_value_validate_basic(&map)) != CborNoError) break;
-
-        if (!cbor_value_is_map(&map)) {
-            err = CborErrorIllegalType;
-            break;
-        }
-
-        size_t num_fields;
-        if ((err = cbor_value_get_map_length(&map, &num_fields)) != CborNoError) break;
-
-        if (num_fields != BOREALIS_LEVELS_MSG_NUM_FIELDS) {
-            err = CborErrorUnknownLength;
-            debug_printf("error: %s: expected %zu fields but got %zu\r\n", __func__, BOREALIS_LEVELS_MSG_NUM_FIELDS, num_fields);
-            break;
-        }
-
-        CborValue value;
-        if ((err = cbor_value_enter_container(&map, &value)) != CborNoError) break;
+        err = decoder_message_enter(&map, &value, &parser, cbor_buffer, size, BOREALIS_LEVELS_MSG_NUM_FIELDS);
 
         // header
         if ((err = SensorHeaderMsg::decode(value, d->header)) != CborNoError) break;
 
-        if (-1 == get_key_value_float(&d->dt, &value, "dt")) break;
-        if (-1 == get_key_value_float(&d->dt_report, &value, "dt_report")) break;
-        if (-1 == get_key_value_uint8(&d->first_band_index, &value, "first_band_index")) break;
-        if (-1 == get_key_value_string(&d->levels_as_base64, &d->levels_length, &value, "spectrum_as_base64")) break;
+        if (CborNoError != decode_key_value_float(&d->dt, &value, "dt")) break;
+        if (CborNoError != decode_key_value_float(&d->dt_report, &value, "dt_report")) break;
+        if (CborNoError != decode_key_value_uint8(&d->first_band_index, &value, "first_band_index")) break;
+        if (CborNoError != decode_key_value_string(&d->levels_as_base64, &d->levels_length, &value, "spectrum_as_base64")) break;
 
         if (err != CborNoError) break;
 
-        if ((err = cbor_value_leave_container(&map, &value)) != CborNoError) break;
+        err = decoder_message_leave(&value, &map);
 
-        if (!cbor_value_at_end(&map)) {
-            err = CborErrorGarbageAtEnd;
-            break;
-        }
-
-        return CborNoError;
+        return err;
     } while (0);
 
     /* we get here only on error. free the allocation if there was one */
@@ -343,51 +180,28 @@ CborError borealis_levels_decode(struct borealis_levels * d, uint8_t *cbor_buffe
 }
 
 CborError borealis_recording_status_decode(struct borealis_recording_status * d, uint8_t *cbor_buffer, size_t size) {
-    CborParser parser;
     CborValue map;
+    CborParser parser;
+    CborValue value;
 
     d->filename = NULL;
 
     CborError err;
     do {
-        if ((err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map)) != CborNoError) break;
-
-        if ((err = cbor_value_validate_basic(&map)) != CborNoError) break;
-
-        if (!cbor_value_is_map(&map)) {
-            err = CborErrorIllegalType;
-            break;
-        }
-
-        size_t num_fields;
-        if ((err = cbor_value_get_map_length(&map, &num_fields)) != CborNoError) break;
-
-        if (num_fields != BOREALIS_LEVELS_MSG_NUM_FIELDS) {
-            err = CborErrorUnknownLength;
-            debug_printf("error: %s: expected %zu fields but got %zu\r\n", __func__, BOREALIS_RECORDING_STATUS_MSG_NUM_FIELDS, num_fields);
-            break;
-        }
-
-        CborValue value;
-        if ((err = cbor_value_enter_container(&map, &value)) != CborNoError) break;
+        err = decoder_message_enter(&map, &value, &parser, cbor_buffer, size, BOREALIS_RECORDING_STATUS_MSG_NUM_FIELDS);
 
         if ((err = SensorHeaderMsg::decode(value, d->header)) != CborNoError) break;
 
-        if (-1 == get_key_value_uint8(&d->flags, &value, "flags")) break;
-        if (-1 == get_key_value_string(&d->filename, &d->filename_length, &value, "filename")) break;
-        if (-1 == get_key_value_float(&d->seconds_written, &value, "seconds_written")) break;
-        if (-1 == get_key_value_float(&d->seconds_free, &value, "seconds_free")) break;
+        if (CborNoError != decode_key_value_uint8(&d->flags, &value, "flags")) break;
+        if (CborNoError != decode_key_value_string(&d->filename, &d->filename_length, &value, "filename")) break;
+        if (CborNoError != decode_key_value_float(&d->seconds_written, &value, "seconds_written")) break;
+        if (CborNoError != decode_key_value_float(&d->seconds_free, &value, "seconds_free")) break;
 
         if (err != CborNoError) break;
 
-        if ((err = cbor_value_leave_container(&map, &value)) != CborNoError) break;
+        err = decoder_message_leave(&value, &map);
 
-        if (!cbor_value_at_end(&map)) {
-            err = CborErrorGarbageAtEnd;
-            break;
-        }
-
-        return CborNoError;
+        return err;
     } while (0);
 
     /* we get here only on error. free the allocation if there was one */

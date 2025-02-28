@@ -49,6 +49,7 @@ set(BM_COMMON_MESSAGES_SRCS
     bm_common_messages_tests_ut.cpp
 
     # msg files for testing
+    ${SRC_DIR}/bm_messages_helper.c
     ${SRC_DIR}/barometric_pressure_data_msg.cpp
     ${SRC_DIR}/bm_soft_data_msg.cpp
     ${SRC_DIR}/bm_rbr_data_msg.cpp
@@ -72,6 +73,7 @@ set(BM_BOREALIS_SRCS
     bm_borealis_ut.cpp
 
     # msg files for testing
+    ${SRC_DIR}/bm_messages_helper.c
     ${SRC_DIR}/bm_borealis.cpp
     ${SRC_DIR}/sensor_header_msg.cpp
 
@@ -81,3 +83,18 @@ set(BM_BOREALIS_SRCS
 )
 
 create_gtest("bm_borealis" "${BM_BOREALIS_SRCS}")
+
+set(POWER_INFO_SRCS
+    # Unit test wrapper for test
+    power_info_ut.cpp
+
+    # msg files for testing
+    ${SRC_DIR}/bm_messages_helper.c
+    ${SRC_DIR}/power_info_reply_msg.c
+
+    # support files
+    ${SRC_DIR}/third_party/tinycbor/src/cborparser.c
+    ${SRC_DIR}/third_party/tinycbor/src/cborencoder.c
+)
+
+create_gtest("power_info" "${POWER_INFO_SRCS}")

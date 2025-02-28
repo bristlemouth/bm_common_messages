@@ -2,21 +2,21 @@
 #include "gtest/gtest.h"
 #include <string.h>
 
-// The fixture for testing class Foo.
-class BmCommonTest : public ::testing::Test {
+// The fixture for testing class
+class BorealisMessages : public ::testing::Test {
 protected:
   const char *spectrum_str = "2IicZBVtr9RhxENWIpHQSdhi9WDxey0/"
                              "YaQWg+mcK6SAp6Cg5YS695A7UApJL96XPsC6XYb+w4seJ2u+"
                              "YJbCTA==";
   const char *levels_str = "13f8IqBke95LXw04xEj2ETXehe4iYatNw/Pnp2FdMiY=";
-  BmCommonTest() {}
-  ~BmCommonTest() override {}
+  BorealisMessages() {}
+  ~BorealisMessages() override {}
   void SetUp() override {}
 
   void TearDown() override {}
 };
 
-TEST_F(BmCommonTest, BorealisSpectrumMessage) {
+TEST_F(BorealisMessages, BorealisSpectrumMessage) {
   struct borealis_spectrum_data d;
   d.header.version = BOREALIS_SPECTRUM_MSG_VERSION;
   d.header.reading_time_utc_ms = 123456789;
@@ -31,7 +31,6 @@ TEST_F(BmCommonTest, BorealisSpectrumMessage) {
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   borealis_spectrum_data_encode(&d, cbor_buffer, sizeof(cbor_buffer), &len);
-  // EXPECT_EQ(len, 182);
 
   struct borealis_spectrum_data decode = {};
   borealis_spectrum_data_decode(&decode, cbor_buffer, len);
@@ -45,7 +44,7 @@ TEST_F(BmCommonTest, BorealisSpectrumMessage) {
   free(decode.spectrum_as_base64);
 }
 
-TEST_F(BmCommonTest, BorealisLevelsMessage) {
+TEST_F(BorealisMessages, BorealisLevelsMessage) {
   struct borealis_levels d;
   d.header.version = BOREALIS_LEVELS_MSG_VERSION;
   d.header.reading_time_utc_ms = 123456789;
@@ -60,7 +59,6 @@ TEST_F(BmCommonTest, BorealisLevelsMessage) {
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   borealis_levels_encode(&d, cbor_buffer, sizeof(cbor_buffer), &len);
-  // EXPECT_EQ(len, 182);
 
   struct borealis_levels decode = {};
   borealis_levels_decode(&decode, cbor_buffer, len);
