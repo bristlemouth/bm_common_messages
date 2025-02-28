@@ -10,13 +10,13 @@ CborError power_info_reply_encode(PowerInfoReplyData *d, uint8_t *cbor_buffer,
                        power_info_reply_msg_num_fields);
 
   check_and_encode_key(
-      err, send_key_value_uint32(&map_encoder, "total_on_s", d->total_on_s));
+      err, encode_key_value_uint32(&map_encoder, "total_on_s", d->total_on_s));
   check_and_encode_key(
       err,
-      send_key_value_uint32(&map_encoder, "remaining_on_s", d->remaining_on_s));
+      encode_key_value_uint32(&map_encoder, "remaining_on_s", d->remaining_on_s));
   check_and_encode_key(
       err,
-      send_key_value_uint32(&map_encoder, "upcoming_off_s", d->upcoming_off_s));
+      encode_key_value_uint32(&map_encoder, "upcoming_off_s", d->upcoming_off_s));
   if (check_acceptable_encode_errors(err)) {
     err = encoder_message_finish(&encoder, &map_encoder);
     *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
@@ -37,11 +37,11 @@ CborError power_info_reply_decode(PowerInfoReplyData *d,
                       power_info_reply_msg_num_fields);
 
   check_and_decode_key(
-      err, get_key_value_uint32(&d->total_on_s, &value, "total_on_s"));
+      err, decode_key_value_uint32(&d->total_on_s, &value, "total_on_s"));
   check_and_decode_key(
-      err, get_key_value_uint32(&d->remaining_on_s, &value, "remaining_on_s"));
+      err, decode_key_value_uint32(&d->remaining_on_s, &value, "remaining_on_s"));
   check_and_decode_key(
-      err, get_key_value_uint32(&d->upcoming_off_s, &value, "upcoming_off_s"));
+      err, decode_key_value_uint32(&d->upcoming_off_s, &value, "upcoming_off_s"));
 
   if (check_acceptable_decode_errors(err)) {
     err = decoder_message_leave(&value, &map);

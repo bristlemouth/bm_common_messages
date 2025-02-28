@@ -22,14 +22,14 @@ extern "C" {
 CborError encoder_message_create(CborEncoder *encoder, CborEncoder *map_encoder,
                                  uint8_t *cbor_buffer, size_t size,
                                  size_t num_fields);
-CborError send_key_value_float(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_float(CborEncoder *map_encoder, const char *name,
                                const float value);
 
-CborError send_key_value_uint8(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_uint8(CborEncoder *map_encoder, const char *name,
                                const uint8_t value);
-CborError send_key_value_uint32(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_uint32(CborEncoder *map_encoder, const char *name,
                                 const uint32_t value);
-CborError send_key_value_string(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_string(CborEncoder *map_encoder, const char *name,
                                 const char *value, const size_t len);
 CborError encoder_message_finish(CborEncoder *encoder,
                                  CborEncoder *map_encoder);
@@ -38,13 +38,13 @@ void encoder_message_check_memory(CborEncoder *encoder, CborError err);
 CborError decoder_message_enter(CborValue *map, CborValue *decode_value,
                                 CborParser *parser, uint8_t *cbor_buffer,
                                 size_t size, size_t num_fields);
-CborError get_key_value_float(float *out, CborValue *value,
+CborError decode_key_value_float(float *out, CborValue *value,
                               const char *key_expected);
-CborError get_key_value_uint8(uint8_t *out, CborValue *value,
+CborError decode_key_value_uint8(uint8_t *out, CborValue *value,
                               const char *key_expected);
-CborError get_key_value_uint32(uint32_t *out, CborValue *value,
+CborError decode_key_value_uint32(uint32_t *out, CborValue *value,
                                const char *key_expected);
-CborError get_key_value_string(char **out, size_t *len, CborValue *value,
+CborError decode_key_value_string(char **out, size_t *len, CborValue *value,
                                const char *key_expected);
 CborError decoder_message_leave(CborValue *value, CborValue *map);
 

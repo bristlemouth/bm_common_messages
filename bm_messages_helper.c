@@ -29,7 +29,7 @@ CborError encoder_message_create(CborEncoder *encoder, CborEncoder *map_encoder,
   return err;
 }
 
-CborError send_key_value_float(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_float(CborEncoder *map_encoder, const char *name,
                                const float value) {
   CborError err;
   if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
@@ -46,7 +46,7 @@ CborError send_key_value_float(CborEncoder *map_encoder, const char *name,
   return err;
 }
 
-CborError send_key_value_uint8(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_uint8(CborEncoder *map_encoder, const char *name,
                                const uint8_t value) {
   CborError err;
   uint64_t tmp = (uint64_t)value;
@@ -64,7 +64,7 @@ CborError send_key_value_uint8(CborEncoder *map_encoder, const char *name,
   return err;
 }
 
-CborError send_key_value_uint32(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_uint32(CborEncoder *map_encoder, const char *name,
                                 const uint32_t value) {
   CborError err;
   uint64_t tmp = (uint64_t)value;
@@ -82,7 +82,7 @@ CborError send_key_value_uint32(CborEncoder *map_encoder, const char *name,
   return err;
 }
 
-CborError send_key_value_string(CborEncoder *map_encoder, const char *name,
+CborError encode_key_value_string(CborEncoder *map_encoder, const char *name,
                                 const char *value, const size_t len) {
   CborError err;
   if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
@@ -143,7 +143,7 @@ CborError decoder_message_enter(CborValue *map, CborValue *decode_value,
   return err;
 }
 
-CborError get_key_value_float(float *out, CborValue *value,
+CborError decode_key_value_float(float *out, CborValue *value,
                               const char *key_expected) {
   CborError err;
 
@@ -164,7 +164,7 @@ CborError get_key_value_float(float *out, CborValue *value,
   return err;
 }
 
-CborError get_key_value_uint8(uint8_t *out, CborValue *value,
+CborError decode_key_value_uint8(uint8_t *out, CborValue *value,
                               const char *key_expected) {
   CborError err;
   uint64_t tmp = 0;
@@ -188,7 +188,7 @@ CborError get_key_value_uint8(uint8_t *out, CborValue *value,
   return err;
 }
 
-CborError get_key_value_uint32(uint32_t *out, CborValue *value,
+CborError decode_key_value_uint32(uint32_t *out, CborValue *value,
                                const char *key_expected) {
   CborError err;
   uint64_t tmp = 0;
@@ -212,7 +212,7 @@ CborError get_key_value_uint32(uint32_t *out, CborValue *value,
   return err;
 }
 
-CborError get_key_value_string(char **out, size_t *len, CborValue *value,
+CborError decode_key_value_string(char **out, size_t *len, CborValue *value,
                                const char *key_expected) {
   CborError err;
   if (!cbor_value_is_text_string(value)) {
