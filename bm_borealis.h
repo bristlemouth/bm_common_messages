@@ -1,6 +1,8 @@
 #pragma once
 #include "cbor.h"
+#ifdef __cplusplus
 #include "sensor_header_msg.h"
+#endif
 
 // For Applied Ocean Sciences Acoustic Recorder: BOREALIS
 // Bristlemouth Open Recorder & Edge-processor Acoustic Low-power Information System
@@ -8,8 +10,31 @@
 #define BOREALIS_SPECTRUM_MSG_VERSION 1
 #define BOREALIS_SPECTRUM_MSG_NUM_FIELDS (4 + SensorHeaderMsg::NUM_FIELDS)
 
+/* hopefully temporary c-accessible shim for things defined in a vestigial c++ namespaced struct */
+struct sensor_header_msg_data {
+    uint32_t version;
+    uint64_t reading_time_utc_ms;
+    uint64_t reading_uptime_millis;
+    uint64_t sensor_reading_time_ms;
+};
+
+#ifdef __cplusplus
+/* validate that the c accessible and c++ namespace definitions of these struct members are compatible */
+static_assert(offsetof(struct sensor_header_msg_data, version) == offsetof(SensorHeaderMsg::Data, version) &&
+              offsetof(struct sensor_header_msg_data, reading_time_utc_ms) == offsetof(SensorHeaderMsg::Data, reading_time_utc_ms) &&
+              offsetof(struct sensor_header_msg_data, reading_uptime_millis) == offsetof(SensorHeaderMsg::Data, reading_uptime_millis) &&
+              offsetof(struct sensor_header_msg_data, sensor_reading_time_ms) == offsetof(SensorHeaderMsg::Data, sensor_reading_time_ms) &&
+              sizeof(struct sensor_header_msg_data) == sizeof(SensorHeaderMsg::Data),
+              "struct definition disagreement");
+#endif
+
 struct borealis_spectrum_data {
+#ifdef __cplusplus
     SensorHeaderMsg::Data header;
+#else
+    struct sensor_header_msg_data header;
+#endif
+
     float dt;
     float df;
     uint8_t bands_per_octave;
@@ -23,7 +48,11 @@ struct borealis_spectrum_data {
 #define BOREALIS_LEVELS_MSG_NUM_FIELDS (4 + SensorHeaderMsg::NUM_FIELDS)
 
 struct borealis_levels {
+#ifdef __cplusplus
     SensorHeaderMsg::Data header;
+#else
+    struct sensor_header_msg_data header;
+#endif
     float dt;
     float dt_report;
     uint8_t first_band_index;
@@ -37,7 +66,11 @@ struct borealis_levels {
 #define BOREALIS_RECORDING_STATUS_MSG_NUM_FIELDS (4 + SensorHeaderMsg::NUM_FIELDS)
 
 struct borealis_recording_status {
+#ifdef __cplusplus
     SensorHeaderMsg::Data header;
+#else
+    struct sensor_header_msg_data header;
+#endif
 
     uint8_t flags; /* least significant bit indicates whether recording or not */
     char * filename;
