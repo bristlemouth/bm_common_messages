@@ -1,5 +1,6 @@
 #include "bm_borealis.h"
 #include "gtest/gtest.h"
+#include <cbor.h>
 #include <string.h>
 
 // The fixture for testing class
@@ -51,9 +52,8 @@ TEST_F(BorealisMessages, BorealisLevelsMessage) {
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
   d.dt = 1234.9875;
-  d.dt_report = 24012.99887766;
   d.first_band_index = 128;
-  d.levels_as_base64 = (char *)levels_str;
+  d.levels = (char *)levels_str;
   d.levels_length = strlen(levels_str);
 
   uint8_t cbor_buffer[1024];
@@ -67,7 +67,41 @@ TEST_F(BorealisMessages, BorealisLevelsMessage) {
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_FLOAT_EQ(decode.dt, 1234.9875);
-  EXPECT_FLOAT_EQ(decode.dt_report, 24012.99887766);
   EXPECT_EQ(decode.first_band_index, 128);
-  free(decode.levels_as_base64);
+  EXPECT_EQ(strncmp(d.levels, levels_str, strlen(levels_str)), 0);
+  free(decode.levels);
+}
+
+TEST_F(BorealisMessages, BorealisLevelStatisticsMessage) {
+  struct borealis_level_statistics d;
+  d.header.version = BOREALIS_LEVELS_MSG_VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.dt = 1234.9875;
+  d.dt_report = 111.1111;
+  d.first_band_index = 128;
+  d.levels = (char *)levels_str;
+  d.levels_length = strlen(levels_str);
+  d.max_iqr = 0.12345;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  EXPECT_EQ(borealis_levels_statistics_encode(&d, cbor_buffer,
+                                              sizeof(cbor_buffer), &len),
+            CborNoError);
+
+  struct borealis_level_statistics decode = {};
+  EXPECT_EQ(borealis_levels_statistics_decode(&decode, cbor_buffer, len),
+            CborNoError);
+  EXPECT_EQ(decode.header.version, BOREALIS_LEVELS_MSG_VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_FLOAT_EQ(decode.dt, 1234.9875);
+  EXPECT_FLOAT_EQ(decode.dt_report, 111.1111);
+  EXPECT_EQ(decode.first_band_index, 128);
+  EXPECT_EQ(strncmp(d.levels, levels_str, strlen(levels_str)), 0);
+  EXPECT_FLOAT_EQ(decode.max_iqr, 0.12345);
+  free(decode.levels);
 }

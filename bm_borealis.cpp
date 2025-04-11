@@ -64,9 +64,34 @@ CborError borealis_levels_encode(struct borealis_levels * d, uint8_t * cbor_buff
     do {
         if ((err = create_map_and_send_header(&encoder, &map_encoder, d->header, BOREALIS_LEVELS_MSG_NUM_FIELDS)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encode_key_value_float(&map_encoder, "dt", d->dt)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_uint8(&map_encoder, "first_band_index", d->first_band_index)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_string(&map_encoder, "levels", d->levels, d->levels_length)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encoder_message_finish(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
+
+        if (err != CborNoError) break;
+
+        /* no errors have occurred, return normally */
+        *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
+        return CborNoError;
+    } while (0);
+
+    encoder_message_check_memory(&encoder, err);
+
+    return err;
+}
+
+CborError borealis_levels_statistics_encode(struct borealis_level_statistics * d, uint8_t * cbor_buffer, size_t size, size_t * encoded_len) {
+    CborError err;
+    CborEncoder encoder, map_encoder;
+    cbor_encoder_init(&encoder, cbor_buffer, size, 0);
+
+    do {
+        if ((err = create_map_and_send_header(&encoder, &map_encoder, d->header, BOREALIS_LEVEL_STATISTICS_MSG_NUM_FIELDS)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "dt", d->dt)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encode_key_value_float(&map_encoder, "dt_report", d->dt_report)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encode_key_value_uint8(&map_encoder, "first_band_index", d->first_band_index)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = encode_key_value_string(&map_encoder, "levels", d->levels_as_base64, d->levels_length)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_string(&map_encoder, "levels", d->levels, d->levels_length)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "max_iqr", d->max_iqr)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encoder_message_finish(&encoder, &map_encoder)) != CborNoError && err != CborErrorOutOfMemory) break;
 
         if (err != CborNoError) break;
@@ -119,10 +144,10 @@ CborError borealis_spectrum_data_decode(struct borealis_spectrum_data * d, uint8
 
         if ((err = SensorHeaderMsg::decode(value, d->header)) != CborNoError) break;
 
-        if (CborNoError != decode_key_value_float(&d->dt, &value, "dt")) break;
-        if (CborNoError != decode_key_value_float(&d->df, &value, "df")) break;
-        if (CborNoError != decode_key_value_uint8(&d->bands_per_octave, &value, "df")) break;
-        if (CborNoError != decode_key_value_string(&d->spectrum_as_base64, &d->spectrum_length, &value, "spectrum_as_base64")) break;
+        if (CborNoError != (err = decode_key_value_float(&d->dt, &value, "dt"))) break;
+        if (CborNoError != (err = decode_key_value_float(&d->df, &value, "df"))) break;
+        if (CborNoError != (err = decode_key_value_uint8(&d->bands_per_octave, &value, "bands_per_octave"))) break;
+        if (CborNoError != (err = decode_key_value_string(&d->spectrum_as_base64, &d->spectrum_length, &value, "spectrum"))) break;
 
         if (err != CborNoError) break;
 
@@ -147,7 +172,7 @@ CborError borealis_levels_decode(struct borealis_levels * d, uint8_t *cbor_buffe
     CborParser parser;
     CborValue value;
 
-    d->levels_as_base64 = NULL;
+    d->levels = NULL;
 
     CborError err;
     do {
@@ -156,10 +181,9 @@ CborError borealis_levels_decode(struct borealis_levels * d, uint8_t *cbor_buffe
         // header
         if ((err = SensorHeaderMsg::decode(value, d->header)) != CborNoError) break;
 
-        if (CborNoError != decode_key_value_float(&d->dt, &value, "dt")) break;
-        if (CborNoError != decode_key_value_float(&d->dt_report, &value, "dt_report")) break;
-        if (CborNoError != decode_key_value_uint8(&d->first_band_index, &value, "first_band_index")) break;
-        if (CborNoError != decode_key_value_string(&d->levels_as_base64, &d->levels_length, &value, "spectrum_as_base64")) break;
+        if (CborNoError != (err = decode_key_value_float(&d->dt, &value, "dt"))) break;
+        if (CborNoError != (err = decode_key_value_uint8(&d->first_band_index, &value, "first_band_index"))) break;
+        if (CborNoError != (err = decode_key_value_string(&d->levels, &d->levels_length, &value, "levels"))) break;
 
         if (err != CborNoError) break;
 
@@ -170,11 +194,11 @@ CborError borealis_levels_decode(struct borealis_levels * d, uint8_t *cbor_buffe
 
     /* we get here only on error. free the allocation if there was one */
 #ifndef CI_TEST
-    bm_free(d->levels_as_base64);
+    bm_free(d->levels);
 #else
-    free(d->levels_as_base64);
+    free(d->levels);
 #endif
-    d->levels_as_base64 = NULL;
+    d->levels = NULL;
 
     return err;
 }
@@ -192,10 +216,10 @@ CborError borealis_recording_status_decode(struct borealis_recording_status * d,
 
         if ((err = SensorHeaderMsg::decode(value, d->header)) != CborNoError) break;
 
-        if (CborNoError != decode_key_value_uint8(&d->flags, &value, "flags")) break;
-        if (CborNoError != decode_key_value_string(&d->filename, &d->filename_length, &value, "filename")) break;
-        if (CborNoError != decode_key_value_float(&d->seconds_written, &value, "seconds_written")) break;
-        if (CborNoError != decode_key_value_float(&d->seconds_free, &value, "seconds_free")) break;
+        if (CborNoError != (err = decode_key_value_uint8(&d->flags, &value, "flags"))) break;
+        if (CborNoError != (err = decode_key_value_string(&d->filename, &d->filename_length, &value, "filename"))) break;
+        if (CborNoError != (err = decode_key_value_float(&d->seconds_written, &value, "seconds_written"))) break;
+        if (CborNoError != (err = decode_key_value_float(&d->seconds_free, &value, "seconds_free"))) break;
 
         if (err != CborNoError) break;
 
@@ -211,6 +235,44 @@ CborError borealis_recording_status_decode(struct borealis_recording_status * d,
     free(d->filename);
 #endif
     d->filename = NULL;
+
+    return err;
+}
+
+CborError borealis_levels_statistics_decode(struct borealis_level_statistics * d, uint8_t * cbor_buffer, size_t size) {
+    CborValue map;
+    CborParser parser;
+    CborValue value;
+
+    d->levels = NULL;
+
+    CborError err;
+    do {
+        err = decoder_message_enter(&map, &value, &parser, cbor_buffer, size, BOREALIS_LEVEL_STATISTICS_MSG_NUM_FIELDS);
+
+        // header
+        if ((err = SensorHeaderMsg::decode(value, d->header)) != CborNoError) break;
+
+        if (CborNoError != (err = decode_key_value_float(&d->dt, &value, "dt"))) break;
+        if (CborNoError != (err = decode_key_value_float(&d->dt_report, &value, "dt_report"))) break;
+        if (CborNoError != (err = decode_key_value_uint8(&d->first_band_index, &value, "first_band_index"))) break;
+        if (CborNoError != (err = decode_key_value_string(&d->levels, &d->levels_length, &value, "levels"))) break;
+        if (CborNoError != (err = decode_key_value_float(&d->max_iqr, &value, "max_iqr"))) break;
+
+        if (err != CborNoError) break;
+
+        err = decoder_message_leave(&value, &map);
+
+        return err;
+    } while (0);
+
+    /* we get here only on error. free the allocation if there was one */
+#ifndef CI_TEST
+    bm_free(d->levels);
+#else
+    free(d->levels);
+#endif
+    d->levels = NULL;
 
     return err;
 }
