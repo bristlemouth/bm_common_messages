@@ -88,7 +88,7 @@ CborError borealis_levels_statistics_encode(struct borealis_level_statistics * d
     do {
         if ((err = create_map_and_send_header(&encoder, &map_encoder, d->header, BOREALIS_LEVEL_STATISTICS_MSG_NUM_FIELDS)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encode_key_value_float(&map_encoder, "dt", d->dt)) != CborNoError && err != CborErrorOutOfMemory) break;
-        if ((err = encode_key_value_float(&map_encoder, "dt", d->dt_report)) != CborNoError && err != CborErrorOutOfMemory) break;
+        if ((err = encode_key_value_float(&map_encoder, "dt_report", d->dt_report)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encode_key_value_uint8(&map_encoder, "first_band_index", d->first_band_index)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encode_key_value_string(&map_encoder, "levels", d->levels, d->levels_length)) != CborNoError && err != CborErrorOutOfMemory) break;
         if ((err = encode_key_value_float(&map_encoder, "max_iqr", d->max_iqr)) != CborNoError && err != CborErrorOutOfMemory) break;
