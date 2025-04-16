@@ -1,4 +1,4 @@
-#include "sensor_header.h"
+#include "sensor_header_msg.h"
 #include "bm_config.h"
 
 CborError sensor_header_encode(CborEncoder * const map_encoder,

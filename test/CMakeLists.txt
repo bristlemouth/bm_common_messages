@@ -55,7 +55,7 @@ set(BM_COMMON_MESSAGES_SRCS
     ${SRC_DIR}/bm_rbr_data_msg.cpp
     ${SRC_DIR}/bm_seapoint_turbidity_data_msg.cpp
     ${SRC_DIR}/sensor_header_msg.cpp
-    ${SRC_DIR}/sensor_header.c
+    ${SRC_DIR}/sensor_header_msg.c
     ${SRC_DIR}/device_test_svc_reply_msg.cpp
     ${SRC_DIR}/device_test_svc_request_msg.cpp
     ${SRC_DIR}/bm_rbr_pressure_difference_signal_msg.cpp
@@ -77,7 +77,7 @@ set(BM_BOREALIS_SRCS
     ${SRC_DIR}/bm_messages_helper.c
     ${SRC_DIR}/bm_borealis.cpp
     ${SRC_DIR}/sensor_header_msg.cpp
-    ${SRC_DIR}/sensor_header.c
+    ${SRC_DIR}/sensor_header_msg.c
 
     # support files
     ${SRC_DIR}/third_party/tinycbor/src/cborparser.c

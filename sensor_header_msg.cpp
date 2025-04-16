@@ -1,5 +1,4 @@
 #include "sensor_header_msg.h"
-#include "sensor_header.h"
 #include "bm_config.h"
 
 CborError SensorHeaderMsg::encode(CborEncoder &map_encoder, Data &d) {
