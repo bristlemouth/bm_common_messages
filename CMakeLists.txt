@@ -54,6 +54,7 @@ set(SOURCES
     pme_wipe_msg.cpp
     power_info_reply_msg.c
     sensor_header_msg.cpp
+    sensor_header_msg.c
     sys_info_svc_reply_msg.c
 )
 
