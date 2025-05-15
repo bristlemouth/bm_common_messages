@@ -7,7 +7,7 @@
 namespace PmeDissolvedOxygenMsg {
 
 constexpr uint32_t VERSION = 1;
-constexpr size_t NUM_FIELDS = 4 + SensorHeaderMsg::NUM_FIELDS;
+constexpr size_t NUM_FIELDS = 5 + SensorHeaderMsg::NUM_FIELDS;
 
 struct Data {
   SensorHeaderMsg::Data header;
@@ -15,6 +15,7 @@ struct Data {
   double do_mg_per_l;
   double quality;
   double do_saturation_pct;
+  float salinity_ppt;
 };
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
