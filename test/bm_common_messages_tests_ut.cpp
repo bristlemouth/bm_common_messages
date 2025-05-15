@@ -376,11 +376,12 @@ TEST_F(BmCommonTest, PmeDissolvedOxygenMsgTest) {
   d.do_mg_per_l = 7.891;
   d.quality = 0.987;
   d.do_saturation_pct = 100.0;
+  d.salinity_ppt = 32.0;
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   PmeDissolvedOxygenMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-  EXPECT_EQ(len, 182);
+  EXPECT_EQ(len, 200);
 
   PmeDissolvedOxygenMsg::Data decode;
   PmeDissolvedOxygenMsg::decode(decode, cbor_buffer, len);
@@ -392,6 +393,7 @@ TEST_F(BmCommonTest, PmeDissolvedOxygenMsgTest) {
   EXPECT_EQ(decode.do_mg_per_l, 7.891);
   EXPECT_EQ(decode.quality, 0.987);
   EXPECT_EQ(decode.do_saturation_pct, 100.0);
+  EXPECT_EQ(decode.salinity_ppt, 32.0);
 }
 
 TEST_F(BmCommonTest, PmeWipeMsgTest) {

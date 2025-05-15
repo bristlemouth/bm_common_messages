@@ -31,8 +31,9 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // temperature_deg_c
     err = cbor_encode_text_stringz(&map_encoder, "temperature_deg_c");
     if (err != CborNoError) {
-      bm_debug("cbor_encode_text_stringz failed for temperature_deg_c key: %d\n",
-             err);
+      bm_debug(
+          "cbor_encode_text_stringz failed for temperature_deg_c key: %d\n",
+          err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -40,7 +41,7 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     err = cbor_encode_double(&map_encoder, d.temperature_deg_c);
     if (err != CborNoError) {
       bm_debug("cbor_encode_double failed for temperature_deg_c value: %d\n",
-             err);
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -50,15 +51,14 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     err = cbor_encode_text_stringz(&map_encoder, "do_mg_per_l");
     if (err != CborNoError) {
       bm_debug("cbor_encode_text_stringz failed for do_mg_per_l key: %d\n",
-             err);
+               err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.do_mg_per_l);
     if (err != CborNoError) {
-      bm_debug("cbor_encode_double failed for do_mg_per_l value: %d\n",
-             err);
+      bm_debug("cbor_encode_double failed for do_mg_per_l value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -67,16 +67,14 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // quality
     err = cbor_encode_text_stringz(&map_encoder, "quality");
     if (err != CborNoError) {
-      bm_debug("cbor_encode_text_stringz failed for quality key: %d\n",
-             err);
+      bm_debug("cbor_encode_text_stringz failed for quality key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
     err = cbor_encode_double(&map_encoder, d.quality);
     if (err != CborNoError) {
-      bm_debug("cbor_encode_double failed for quality value: %d\n",
-             err);
+      bm_debug("cbor_encode_double failed for quality value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -85,8 +83,9 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     // do_saturation_pct
     err = cbor_encode_text_stringz(&map_encoder, "do_saturation_pct");
     if (err != CborNoError) {
-      bm_debug("cbor_encode_text_stringz failed for do_saturation_pct key: %d\n",
-             err);
+      bm_debug(
+          "cbor_encode_text_stringz failed for do_saturation_pct key: %d\n",
+          err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -94,7 +93,24 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,
     err = cbor_encode_double(&map_encoder, d.do_saturation_pct);
     if (err != CborNoError) {
       bm_debug("cbor_encode_double failed for do_saturation_pct value: %d\n",
-             err);
+               err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // salinity_ppt
+    err = cbor_encode_text_stringz(&map_encoder, "salinity_ppt");
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_text_stringz failed for salinity_ppt key: %d\n",
+               err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+    err = cbor_encode_float(&map_encoder, d.salinity_ppt);
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_float failed for salinity_ppt value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -226,6 +242,25 @@ CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
       break;
     }
     err = cbor_value_get_double(&value, &d.do_saturation_pct);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+
+    // salinity_ppt
+    if (!cbor_value_is_text_string(&value)) {
+      err = CborErrorIllegalType;
+      bm_debug("expected string key but got something else\n");
+      break;
+    }
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_get_float(&value, &d.salinity_ppt);
     if (err != CborNoError) {
       break;
     }
