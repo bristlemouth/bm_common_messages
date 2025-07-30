@@ -38,6 +38,7 @@ else()
 set(BM_COMMON_MESSAGES_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 set(SOURCES
+    aanderaa_conductivity_msg.cpp
     aanderaa_data_msg.cpp
     barometric_pressure_data_msg.cpp
     bm_borealis.cpp
