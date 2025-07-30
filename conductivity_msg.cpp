@@ -1,4 +1,4 @@
-#include "aanderaa_conductivity_msg.h"
+#include "conductivity_msg.h"
 #include "bm_config.h"
 #include <math.h>
 
