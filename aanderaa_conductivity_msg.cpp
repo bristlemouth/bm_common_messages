@@ -276,7 +276,6 @@ namespace AanderaaConductivityMsg {
                 }
             }
         } while(0);
-
         return err;
     }
 } // namespace AanderaaConductivityMsg
