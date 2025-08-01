@@ -5,6 +5,7 @@
 #include "bm_rbr_pressure_difference_signal_msg.h"
 #include "bm_seapoint_turbidity_data_msg.h"
 #include "bm_soft_data_msg.h"
+#include "conductivity_msg.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
@@ -448,4 +449,34 @@ TEST_F(BmCommonTest, barometricPressureMsgTest) {
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_EQ(decode.barometric_pressure_mbar, 1010.93);
+}
+
+TEST_F(BmCommonTest, AanderaaConductivityTest) {
+    AanderaaConductivityMsg::Data d;
+    d.header.version = AanderaaConductivityMsg::VERSION;
+    d.header.reading_time_utc_ms = 123456789;
+    d.header.reading_uptime_millis = 987654321;
+    d.header.sensor_reading_time_ms = 0xdeadc0de;
+    d.conductivity_ms_cm = 50.0;
+    d.temperature_deg_c = 23.0;
+    d.salinity_psu = 35.123;
+    d.water_density_kg_m3 = 1025.83;
+    d.sound_speed_m_s = 1498.15;
+
+    uint8_t cbor_buffer[1024];
+    size_t len = 0;
+    AanderaaConductivityMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+    EXPECT_EQ(len, 213);
+
+    AanderaaConductivityMsg::Data decode;
+    AanderaaConductivityMsg::decode(decode, cbor_buffer, len);
+    EXPECT_EQ(decode.header.version, AanderaaConductivityMsg::VERSION);
+    EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+    EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+    EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+    EXPECT_EQ(decode.conductivity_ms_cm, 50.0);
+    EXPECT_EQ(decode.temperature_deg_c, 23.0);
+    EXPECT_EQ(decode.salinity_psu, 35.123);
+    EXPECT_EQ(decode.water_density_kg_m3, 1025.83);
+    EXPECT_EQ(decode.sound_speed_m_s, 1498.15);
 }

@@ -40,7 +40,7 @@ namespace AanderaaConductivityMsg {
             }
             err = cbor_encode_float(&map_encoder, d.conductivity_ms_cm);
             if (err != CborNoError) {
-                bm_Debug("cbor_encode_float failed for conductivity_ms_cm value: %d\n",
+                bm_debug("cbor_encode_float failed for conductivity_ms_cm value: %d\n",
                          err);
                 if (err != CborErrorOutOfMemory) {
                     break;
@@ -58,7 +58,7 @@ namespace AanderaaConductivityMsg {
             }
             err = cbor_encode_float(&map_encoder, d.temperature_deg_c);
             if (err != CborNoError) {
-                bm_Debug("cbor_encode_float failed for temperature_deg_c value: %d\n", err);
+                bm_debug("cbor_encode_float failed for temperature_deg_c value: %d\n", err);
                 if (err != CborErrorOutOfMemory) {
                     break;
                 }
@@ -74,7 +74,7 @@ namespace AanderaaConductivityMsg {
             }
             err = cbor_encode_double(&map_encoder, d.salinity_psu);
             if (err != CborNoError) {
-                bm_Debug("cbor_encode_float failed for salinity_psu value: %d\n", err);
+                bm_debug("cbor_encode_float failed for salinity_psu value: %d\n", err);
                 if (err != CborErrorOutOfMemory) {
                     break;
                 }
@@ -90,7 +90,7 @@ namespace AanderaaConductivityMsg {
             }
             err = cbor_encode_double(&map_encoder, d.water_density_kg_m3);
             if (err != CborNoError) {
-                bm_Debug("cbor_encode_float failed for water_density_kg_m3 value: %d\n", err);
+                bm_debug("cbor_encode_float failed for water_density_kg_m3 value: %d\n", err);
                 if (err != CborErrorOutOfMemory) {
                     break;
                 }
@@ -106,7 +106,7 @@ namespace AanderaaConductivityMsg {
             }
             err = cbor_encode_double(&map_encoder, d.sound_speed_m_s);
             if (err != CborNoError) {
-                bm_Debug("cbor_encode_float failed for sound_speed_m_s value: %d\n", err);
+                bm_debug("cbor_encode_float failed for sound_speed_m_s value: %d\n", err);
                 if (err != CborErrorOutOfMemory) {
                     break;
                 }
@@ -116,12 +116,12 @@ namespace AanderaaConductivityMsg {
             if (err == CborNoError) {
                 *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
             } else {
-                bm_Debug("cbor_encoder_clos_container failed: %d\n", err);
+                bm_debug("cbor_encoder_clos_container failed: %d\n", err);
                 if (err != CborErrorOutOfMemory) {
                     break;
                 }
 
-                size_t  extra_bytes_needed = cbor_encoder_get_Extra_bytes_needed(&encoder);
+                size_t  extra_bytes_needed = cbor_encoder_get_extra_bytes_needed(&encoder);
                 bm_debug("extra_bytes_needed: %zu\n", extra_bytes_needed);
             }
         } while (0);
@@ -149,7 +149,7 @@ namespace AanderaaConductivityMsg {
 
             size_t  num_fields;
             err = cbor_value_get_map_length(&map, &num_fields);
-            if (err !- CborNoError) {
+            if (err != CborNoError) {
                 break;
             }
             if (num_fields != NUM_FIELDS) {
