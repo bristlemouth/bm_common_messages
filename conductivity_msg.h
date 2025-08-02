@@ -11,8 +11,8 @@ namespace AanderaaConductivityMsg {
 
     struct Data {
         SensorHeaderMsg::Data header;
-        float conductivity_ms_cm;
-        float temperature_deg_c;
+        double conductivity_ms_cm;
+        double temperature_deg_c;
         double salinity_psu;
         double water_density_kg_m3;
         double sound_speed_m_s;

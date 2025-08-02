@@ -457,8 +457,8 @@ TEST_F(BmCommonTest, AanderaaConductivityTest) {
     d.header.reading_time_utc_ms = 123456789;
     d.header.reading_uptime_millis = 987654321;
     d.header.sensor_reading_time_ms = 0xdeadc0de;
-    d.conductivity_ms_cm = 50.0;
-    d.temperature_deg_c = 23.0;
+    d.conductivity_ms_cm = 50.123;
+    d.temperature_deg_c = 23.456;
     d.salinity_psu = 35.123;
     d.water_density_kg_m3 = 1025.83;
     d.sound_speed_m_s = 1498.15;
@@ -466,7 +466,7 @@ TEST_F(BmCommonTest, AanderaaConductivityTest) {
     uint8_t cbor_buffer[1024];
     size_t len = 0;
     AanderaaConductivityMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-    EXPECT_EQ(len, 213);
+    EXPECT_EQ(len, 221);
 
     AanderaaConductivityMsg::Data decode;
     AanderaaConductivityMsg::decode(decode, cbor_buffer, len);
@@ -474,8 +474,8 @@ TEST_F(BmCommonTest, AanderaaConductivityTest) {
     EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
     EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
     EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
-    EXPECT_EQ(decode.conductivity_ms_cm, 50.0);
-    EXPECT_EQ(decode.temperature_deg_c, 23.0);
+    EXPECT_EQ(decode.conductivity_ms_cm, 50.123);
+    EXPECT_EQ(decode.temperature_deg_c, 23.456);
     EXPECT_EQ(decode.salinity_psu, 35.123);
     EXPECT_EQ(decode.water_density_kg_m3, 1025.83);
     EXPECT_EQ(decode.sound_speed_m_s, 1498.15);
