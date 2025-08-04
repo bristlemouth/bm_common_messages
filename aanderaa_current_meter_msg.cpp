@@ -1,5 +1,4 @@
 #include "aanderaa_current_meter_msg.h"
-//#include "FreeRTOS.h"
 #include "bm_config.h"
 
 CborError AanderaaCurrentMeterMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
