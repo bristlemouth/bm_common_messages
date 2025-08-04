@@ -1,4 +1,4 @@
-#include "aanderaa_data_msg.h"
+#include "aanderaa_current_meter_msg.h"
 #include "FreeRTOS.h"
 #include "bm_config.h"
 

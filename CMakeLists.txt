@@ -38,7 +38,7 @@ else()
 set(BM_COMMON_MESSAGES_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 set(SOURCES
-    aanderaa_data_msg.cpp
+    aanderaa_current_meter_msg.cpp
     barometric_pressure_data_msg.cpp
     bm_borealis.cpp
     bm_messages_helper.c
@@ -46,7 +46,7 @@ set(SOURCES
     bm_rbr_pressure_difference_signal_msg.cpp
     bm_seapoint_turbidity_data_msg.cpp
     bm_soft_data_msg.cpp
-    conductivity_msg.cpp
+        aanderaa_conductivity_msg.cpp
     config_cbor_map_srv_reply_msg.c
     config_cbor_map_srv_request_msg.c
     device_test_svc_reply_msg.cpp
