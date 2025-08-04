@@ -62,6 +62,7 @@ set(BM_COMMON_MESSAGES_SRCS
     ${SRC_DIR}/pme_dissolved_oxygen_msg.cpp
     ${SRC_DIR}/pme_wipe_msg.cpp
     ${SRC_DIR}/aanderaa_conductivity_msg.cpp
+    ${SRC_DIR}/aanderaa_current_meter_msg.cpp
 
     # support files
     ${SRC_DIR}/third_party/tinycbor/src/cborparser.c
