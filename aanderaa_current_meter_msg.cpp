@@ -1,8 +1,7 @@
-#include "aanderaa_data_msg.h"
-#include "FreeRTOS.h"
+#include "aanderaa_current_meter_msg.h"
 #include "bm_config.h"
 
-CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
+CborError AanderaaCurrentMeterMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
                                   size_t *encoded_len) {
   CborError err;
   CborEncoder encoder, map_encoder;
@@ -292,7 +291,7 @@ CborError AanderaaDataMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
   return err;
 }
 
-CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
+CborError AanderaaCurrentMeterMsg::decode(Data &d, const uint8_t *cbor_buffer,
                                   size_t size) {
   CborParser parser;
   CborValue map;
@@ -316,9 +315,9 @@ CborError AanderaaDataMsg::decode(Data &d, const uint8_t *cbor_buffer,
     if (err != CborNoError) {
       break;
     }
-    if (num_fields != AanderaaDataMsg::NUM_FIELDS) {
+    if (num_fields != AanderaaCurrentMeterMsg::NUM_FIELDS) {
       err = CborErrorUnknownLength;
-      bm_debug("expected %zu fields but got %zu\n", AanderaaDataMsg::NUM_FIELDS,
+      bm_debug("expected %zu fields but got %zu\n", AanderaaCurrentMeterMsg::NUM_FIELDS,
                num_fields);
       break;
     }

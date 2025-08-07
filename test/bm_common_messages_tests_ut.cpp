@@ -1,10 +1,11 @@
-#include "aanderaa_data_msg.h"
+#include "aanderaa_current_meter_msg.h"
 #include "barometric_pressure_data_msg.h"
 #include "bm_common_pub_sub.h"
 #include "bm_rbr_data_msg.h"
 #include "bm_rbr_pressure_difference_signal_msg.h"
 #include "bm_seapoint_turbidity_data_msg.h"
 #include "bm_soft_data_msg.h"
+#include "aanderaa_conductivity_msg.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
@@ -448,4 +449,82 @@ TEST_F(BmCommonTest, barometricPressureMsgTest) {
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_EQ(decode.barometric_pressure_mbar, 1010.93);
+}
+
+TEST_F(BmCommonTest, AanderaaConductivityTest) {
+    AanderaaConductivityMsg::Data d;
+    d.header.version = AanderaaConductivityMsg::VERSION;
+    d.header.reading_time_utc_ms = 123456789;
+    d.header.reading_uptime_millis = 987654321;
+    d.header.sensor_reading_time_ms = 0xdeadc0de;
+    d.conductivity_ms_cm = 50.123;
+    d.temperature_deg_c = 23.456;
+    d.salinity_psu = 35.123;
+    d.water_density_kg_m3 = 1025.83;
+    d.sound_speed_m_s = 1498.15;
+
+    uint8_t cbor_buffer[1024];
+    size_t len = 0;
+    AanderaaConductivityMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+    EXPECT_EQ(len, 221);
+
+    AanderaaConductivityMsg::Data decode;
+    AanderaaConductivityMsg::decode(decode, cbor_buffer, len);
+    EXPECT_EQ(decode.header.version, AanderaaConductivityMsg::VERSION);
+    EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+    EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+    EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+    EXPECT_EQ(decode.conductivity_ms_cm, 50.123);
+    EXPECT_EQ(decode.temperature_deg_c, 23.456);
+    EXPECT_EQ(decode.salinity_psu, 35.123);
+    EXPECT_EQ(decode.water_density_kg_m3, 1025.83);
+    EXPECT_EQ(decode.sound_speed_m_s, 1498.15);
+}
+
+TEST_F(BmCommonTest, AanderaaCurrentMeterTest) {
+    AanderaaCurrentMeterMsg::Data d;
+    d.header.version = AanderaaCurrentMeterMsg::VERSION;
+    d.header.reading_time_utc_ms = 123456789;
+    d.header.reading_uptime_millis = 987654321;
+    d.header.sensor_reading_time_ms = 0xdeadc0de;
+    d.abs_speed_cm_s = 10.54;
+    d.direction_deg_m = 109.67;
+    d.north_cm_s = 67.89;
+    d.east_cm_s = 67.88;
+    d.heading_deg_m = 12.34;
+    d.tilt_x_deg = 23.45;
+    d.tilt_y_deg = 34.56;
+    d.single_ping_std_cm_s = 45.67;
+    d.transducer_strength_db = 56.78;
+    d.ping_count = 67.76;
+    d.abs_tilt_deg = 78.87;
+    d.max_tilt_deg = 89.98;
+    d.std_tilt_deg = 90.09;
+    d.temperature_deg_c = 23.456;
+
+    uint8_t cbor_buffer[1024];
+    size_t len = 0;
+    AanderaaCurrentMeterMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+    EXPECT_EQ(len, 416);
+
+    AanderaaCurrentMeterMsg::Data decode;
+    AanderaaCurrentMeterMsg::decode(decode, cbor_buffer, len);
+    EXPECT_EQ(decode.header.version, AanderaaConductivityMsg::VERSION);
+    EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+    EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+    EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+    EXPECT_EQ(decode.abs_speed_cm_s, 10.54);
+    EXPECT_EQ(decode.direction_deg_m, 109.67);
+    EXPECT_EQ(decode.north_cm_s, 67.89);
+    EXPECT_EQ(decode.east_cm_s, 67.88);
+    EXPECT_EQ(decode.heading_deg_m, 12.34);
+    EXPECT_EQ(decode.tilt_x_deg, 23.45);
+    EXPECT_EQ(decode.tilt_y_deg, 34.56);
+    EXPECT_EQ(decode.single_ping_std_cm_s, 45.67);
+    EXPECT_EQ(decode.transducer_strength_db, 56.78);
+    EXPECT_EQ(decode.ping_count, 67.76);
+    EXPECT_EQ(decode.abs_tilt_deg, 78.87);
+    EXPECT_EQ(decode.max_tilt_deg, 89.98);
+    EXPECT_EQ(decode.std_tilt_deg, 90.09);
+    EXPECT_EQ(decode.temperature_deg_c, 23.456);
 }

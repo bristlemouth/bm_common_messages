@@ -1,0 +1,8 @@
+import sensor_header
+
+sensor_header header
+float64 conductivity_ms_cm
+float64 temperature_deg_c
+float64 salinity_psu
+float64 water_density_kg_m3
+float64 sound_speed_m_s
