@@ -7,7 +7,7 @@
 namespace AanderaaConductivityMsg {
 
     constexpr uint32_t VERSION = 1;
-    constexpr size_t NUM_FIELDS = 5 + SensorHeaderMsg::NUM_FIELDS;
+    constexpr size_t NUM_FIELDS = 6 + SensorHeaderMsg::NUM_FIELDS;
 
     struct Data {
         SensorHeaderMsg::Data header;
@@ -16,6 +16,7 @@ namespace AanderaaConductivityMsg {
         double salinity_psu;
         double water_density_kg_m3;
         double sound_speed_m_s;
+        float depth_m;
     };
 
     CborError encode(Data &d, uint8_t *cbor_buffer, size_t size,

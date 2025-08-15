@@ -112,6 +112,22 @@ namespace AanderaaConductivityMsg {
                 }
             }
 
+            // depth_m
+            err = cbor_encode_text_stringz(&map_encoder, "depth_m");
+            if (err != CborNoError) {
+                bm_debug("cbor_encode_text_stingz failed for depth_m key: %d\n", err);
+                if (err != CborErrorOutOfMemory) {
+                    break;
+                }
+            }
+            err = cbor_encode_float(&map_encoder, d.depth_m);
+            if (err != CborNoError) {
+                bm_debug("cbor_encode_float failed for depth_m value: %d\n", err);
+                if (err != CborErrorOutOfMemory) {
+                    break;
+                }
+            }
+
             err = cbor_encoder_close_container(&encoder, &map_encoder);
             if (err == CborNoError) {
                 *encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
@@ -257,6 +273,25 @@ namespace AanderaaConductivityMsg {
                 break;
             }
             err = cbor_value_get_double(&value, &d.sound_speed_m_s);
+            if (err != CborNoError) {
+                break;
+            }
+            err = cbor_value_advance(&value);
+            if (err != CborNoError) {
+                break;
+            }
+
+            // depth_m
+            if (!cbor_value_is_text_string(&value)) {
+                err = CborErrorIllegalType;
+                bm_debug("expected string key but got something else\n");
+                break;
+            }
+            err = cbor_value_advance(&value);
+            if (err != CborNoError) {
+                break;
+            }
+            err = cbor_value_get_float(&value, &d.depth_m);
             if (err != CborNoError) {
                 break;
             }
