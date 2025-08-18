@@ -6,3 +6,4 @@ float64 temperature_deg_c
 float64 salinity_psu
 float64 water_density_kg_m3
 float64 sound_speed_m_s
+float32 depth_m

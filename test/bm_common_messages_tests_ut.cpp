@@ -462,11 +462,12 @@ TEST_F(BmCommonTest, AanderaaConductivityTest) {
     d.salinity_psu = 35.123;
     d.water_density_kg_m3 = 1025.83;
     d.sound_speed_m_s = 1498.15;
+    d.depth_m = 10.0;
 
     uint8_t cbor_buffer[1024];
     size_t len = 0;
     AanderaaConductivityMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-    EXPECT_EQ(len, 221);
+    EXPECT_EQ(len, 234);
 
     AanderaaConductivityMsg::Data decode;
     AanderaaConductivityMsg::decode(decode, cbor_buffer, len);
@@ -479,6 +480,7 @@ TEST_F(BmCommonTest, AanderaaConductivityTest) {
     EXPECT_EQ(decode.salinity_psu, 35.123);
     EXPECT_EQ(decode.water_density_kg_m3, 1025.83);
     EXPECT_EQ(decode.sound_speed_m_s, 1498.15);
+    EXPECT_EQ(decode.depth_m, 10.0);
 }
 
 TEST_F(BmCommonTest, AanderaaCurrentMeterTest) {
