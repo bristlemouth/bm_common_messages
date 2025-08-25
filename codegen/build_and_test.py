@@ -510,36 +510,9 @@ int main() {
         if created_files:
             return created_files[0]  # Return first file for compatibility
 
-        # Fallback wrapper approach if files don't exist
-        wrapper_content = '''
-// Wrapper for generated functions to avoid naming conflicts
-// This is a fallback - normally we rename the generated functions directly
-#include "../generated/sensor_header_msg.h"
-
-// Rename the generated functions
-CborError sensor_header_encode_generated(CborEncoder * const map_encoder,
-                                        const uint32_t version,
-                                        const uint64_t reading_time_utc_ms,
-                                        const uint64_t reading_uptime_millis,
-                                        const uint64_t sensor_reading_time_ms) {
-    return sensor_header_encode(map_encoder, version, reading_time_utc_ms,
-                              reading_uptime_millis, sensor_reading_time_ms);
-}
-
-CborError sensor_header_decode_generated(uint32_t * const version_p,
-                                        uint64_t * const reading_time_utc_ms_p,
-                                        uint64_t * const reading_uptime_millis_p,
-                                        uint64_t * const sensor_reading_time_ms_p,
-                                        CborValue * const map) {
-    return sensor_header_decode(version_p, reading_time_utc_ms_p,
-                               reading_uptime_millis_p, sensor_reading_time_ms_p, map);
-}
-'''
-        wrapper_file = self.comparison_dir / "generated_wrapper.c"
-        with open(wrapper_file, 'w') as f:
-            f.write(wrapper_content)
-        return wrapper_file
-
+        # If no wrapper files were created, raise an error to avoid brittle fallback logic
+        raise RuntimeError("Failed to create generated wrapper: expected files not found. "
+                           "Please ensure the code generator produces uniquely named functions to avoid conflicts.")
     def build_and_run_test(self):
         """Build and run the comparison test."""
         print("Building and running comparison test...")
