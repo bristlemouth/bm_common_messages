@@ -39,3 +39,5 @@
 # Misc
 .DS_Store
 .vscode
+__pycache__
+/codegen/preview

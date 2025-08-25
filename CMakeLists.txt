@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.18)
 project(bm_common_messages
 	LANGUAGES C CXX ASM)
 
+# Optional code generation target (never runs automatically)
+include(${CMAKE_CURRENT_SOURCE_DIR}/codegen/GenerateMessages.cmake)
+add_cbor_message_generation_target()
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
