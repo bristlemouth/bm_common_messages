@@ -1,4 +1,4 @@
 import sensor_header
 
 sensor_header header
-float_64 barometric_pressure_mbar
+float64 barometric_pressure_mbar
