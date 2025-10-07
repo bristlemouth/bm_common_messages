@@ -1,4 +1,4 @@
 uint32 version
-uint64 reading_time_utc_s
+uint64 reading_time_utc_ms
 uint64 reading_uptime_millis
-uint64 sensor_reading_time_s
+uint64 sensor_reading_time_ms
