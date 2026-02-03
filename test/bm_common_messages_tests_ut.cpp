@@ -539,45 +539,46 @@ TEST_F(BmCommonTest, PowerReadingTest) {
   EXPECT_EQ(decode.current_ma, 258.36);
   EXPECT_EQ(decode.status, 0);
 
-  printf("second test\n");
-
   // Test Parsing an incorrect message
-  AanderaaCurrentMeterMsg::Data d2;
-  d2.header.version = AanderaaCurrentMeterMsg::VERSION;
-  d2.header.reading_time_utc_ms = 123456789;
-  d2.header.reading_uptime_millis = 987654321;
-  d2.header.sensor_reading_time_ms = 0xdeadc0de;
-  d2.abs_speed_cm_s = 10.54;
-  d2.direction_deg_m = 109.67;
-  d2.north_cm_s = 67.89;
-  d2.east_cm_s = 67.88;
-  d2.heading_deg_m = 12.34;
-  d2.tilt_x_deg = 23.45;
-  d2.tilt_y_deg = 34.56;
-  d2.single_ping_std_cm_s = 45.67;
-  d2.transducer_strength_db = 56.78;
-  d2.ping_count = 67.76;
-  d2.abs_tilt_deg = 78.87;
-  d2.max_tilt_deg = 89.98;
-  d2.std_tilt_deg = 90.09;
-  d2.temperature_deg_c = 23.456;
+  // We should parse the header correctly
+  // and return no error
+  AanderaaCurrentMeterMsg::Data bad_data;
+  bad_data.header.version = AanderaaCurrentMeterMsg::VERSION;
+  bad_data.header.reading_time_utc_ms = 123456789;
+  bad_data.header.reading_uptime_millis = 987654321;
+  bad_data.header.sensor_reading_time_ms = 0xdeadc0de;
+  bad_data.abs_speed_cm_s = 10.54;
+  bad_data.direction_deg_m = 109.67;
+  bad_data.north_cm_s = 67.89;
+  bad_data.east_cm_s = 67.88;
+  bad_data.heading_deg_m = 12.34;
+  bad_data.tilt_x_deg = 23.45;
+  bad_data.tilt_y_deg = 34.56;
+  bad_data.single_ping_std_cm_s = 45.67;
+  bad_data.transducer_strength_db = 56.78;
+  bad_data.ping_count = 67.76;
+  bad_data.abs_tilt_deg = 78.87;
+  bad_data.max_tilt_deg = 89.98;
+  bad_data.std_tilt_deg = 90.09;
+  bad_data.temperature_deg_c = 23.456;
 
-  uint8_t cbor_buffer2[1024];
-  size_t len2 = 0;
-  AanderaaCurrentMeterMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
-  EXPECT_EQ(len2, 416);
+  uint8_t bad_cbor_buffer[1024];
+  size_t bad_len = 0;
+  AanderaaCurrentMeterMsg::encode(bad_data, bad_cbor_buffer, sizeof(bad_cbor_buffer), &bad_len);
+  EXPECT_EQ(bad_len, 416);
 
-  PowerReadingMsg::Data decode2 = {.power_reading_type = PowerReadingMsg::SOURCE,
-                                   .voltage_v = 0,
-                                   .current_ma = 0,
-                                   .status = 0};
-  PowerReadingMsg::decode(decode2, cbor_buffer2, len2);
-  EXPECT_EQ(decode2.header.version, PowerReadingMsg::VERSION);
-  EXPECT_EQ(decode2.header.reading_time_utc_ms, 123456789);
-  EXPECT_EQ(decode2.header.reading_uptime_millis, 987654321);
-  EXPECT_EQ(decode2.header.sensor_reading_time_ms, 0xdeadc0de);
-  EXPECT_EQ(decode2.power_reading_type, PowerReadingMsg::SOURCE);
-  EXPECT_EQ(decode2.voltage_v, 0);
-  EXPECT_EQ(decode2.current_ma, 0);
-  EXPECT_EQ(decode2.status, 0);
+  PowerReadingMsg::Data bad_decode = {.power_reading_type = PowerReadingMsg::SOURCE,
+                                      .voltage_v = 0,
+                                      .current_ma = 0,
+                                      .status = 0};
+  CborError err = PowerReadingMsg::decode(bad_decode, bad_cbor_buffer, bad_len);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(bad_decode.header.version, PowerReadingMsg::VERSION);
+  EXPECT_EQ(bad_decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(bad_decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(bad_decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(bad_decode.power_reading_type, PowerReadingMsg::SOURCE);
+  EXPECT_EQ(bad_decode.voltage_v, 0);
+  EXPECT_EQ(bad_decode.current_ma, 0);
+  EXPECT_EQ(bad_decode.status, 0);
 }
