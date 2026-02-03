@@ -111,8 +111,6 @@ CborError PowerReadingMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
 }
 
 CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
-
-  // TODO - we will want this to be the more flexible approach!
   CborParser parser;
   CborValue map;
   CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
