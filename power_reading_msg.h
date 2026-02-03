@@ -10,8 +10,8 @@ constexpr size_t NUM_FIELDS = 4 + SensorHeaderMsg::NUM_FIELDS;
 struct Data {
   SensorHeaderMsg::Data header;
   uint8_t power_reading_type;
-  double voltage;
-  double current;
+  double voltage_v;
+  double current_ma;
   uint8_t status;
 };
 
