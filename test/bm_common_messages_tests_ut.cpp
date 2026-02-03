@@ -1,3 +1,4 @@
+#include "aanderaa_conductivity_msg.h"
 #include "aanderaa_current_meter_msg.h"
 #include "barometric_pressure_data_msg.h"
 #include "bm_common_pub_sub.h"
@@ -5,13 +6,13 @@
 #include "bm_rbr_pressure_difference_signal_msg.h"
 #include "bm_seapoint_turbidity_data_msg.h"
 #include "bm_soft_data_msg.h"
-#include "aanderaa_conductivity_msg.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
 #include "device_test_svc_request_msg.h"
 #include "pme_dissolved_oxygen_msg.h"
 #include "pme_wipe_msg.h"
+#include "power_reading_msg.h"
 #include "sensor_header_msg.h"
 #include "sys_info_svc_reply_msg.h"
 #include "gtest/gtest.h"
@@ -148,14 +149,12 @@ TEST_F(BmCommonTest, DeviceTestSvcReplyMsgTestData) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(
-      DeviceTestSvcReplyMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
-      CborNoError);
+  EXPECT_EQ(DeviceTestSvcReplyMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
+            CborNoError);
   EXPECT_EQ(len, 30);
 
   DeviceTestSvcReplyMsg::Data decode;
-  EXPECT_EQ(DeviceTestSvcReplyMsg::decode(decode, cbor_buffer, len),
-            CborNoError);
+  EXPECT_EQ(DeviceTestSvcReplyMsg::decode(decode, cbor_buffer, len), CborNoError);
   EXPECT_EQ(decode.success, true);
   EXPECT_EQ(decode.data_len, 4);
   EXPECT_EQ(decode.data[0], 0x01);
@@ -173,14 +172,12 @@ TEST_F(BmCommonTest, DeviceTestSvcReplyMsgTestZeroData) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(
-      DeviceTestSvcReplyMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
-      CborNoError);
+  EXPECT_EQ(DeviceTestSvcReplyMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
+            CborNoError);
   EXPECT_EQ(len, 26);
 
   DeviceTestSvcReplyMsg::Data decode;
-  EXPECT_EQ(DeviceTestSvcReplyMsg::decode(decode, cbor_buffer, len),
-            CborNoError);
+  EXPECT_EQ(DeviceTestSvcReplyMsg::decode(decode, cbor_buffer, len), CborNoError);
   EXPECT_EQ(decode.success, true);
   EXPECT_EQ(decode.data_len, 0);
   EXPECT_TRUE(decode.data == NULL);
@@ -198,14 +195,12 @@ TEST_F(BmCommonTest, DeviceTestSvcRequestMsgTestData) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(DeviceTestSvcRequestMsg::encode(d, cbor_buffer, sizeof(cbor_buffer),
-                                            &len),
+  EXPECT_EQ(DeviceTestSvcRequestMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
             CborNoError);
   EXPECT_EQ(len, 21);
 
   DeviceTestSvcRequestMsg::Data decode;
-  EXPECT_EQ(DeviceTestSvcRequestMsg::decode(decode, cbor_buffer, len),
-            CborNoError);
+  EXPECT_EQ(DeviceTestSvcRequestMsg::decode(decode, cbor_buffer, len), CborNoError);
   EXPECT_EQ(decode.data_len, 4);
   EXPECT_EQ(decode.data[0], 0x01);
   EXPECT_EQ(decode.data[1], 0x02);
@@ -221,14 +216,12 @@ TEST_F(BmCommonTest, DeviceTestSvcRequestMsgTestZeroData) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(DeviceTestSvcRequestMsg::encode(d, cbor_buffer, sizeof(cbor_buffer),
-                                            &len),
+  EXPECT_EQ(DeviceTestSvcRequestMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
             CborNoError);
   EXPECT_EQ(len, 17);
 
   DeviceTestSvcRequestMsg::Data decode;
-  EXPECT_EQ(DeviceTestSvcRequestMsg::decode(decode, cbor_buffer, len),
-            CborNoError);
+  EXPECT_EQ(DeviceTestSvcRequestMsg::decode(decode, cbor_buffer, len), CborNoError);
   EXPECT_EQ(decode.data_len, 0);
   EXPECT_TRUE(decode.data == NULL);
   free(d.data);
@@ -245,14 +238,12 @@ TEST_F(BmCommonTest, bmSeapointTurbidityTest) {
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(BmSeapointTurbidityDataMsg::encode(d, cbor_buffer,
-                                               sizeof(cbor_buffer), &len),
+  EXPECT_EQ(BmSeapointTurbidityDataMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
             CborNoError);
   EXPECT_EQ(len, 126);
 
   BmSeapointTurbidityDataMsg::Data decode;
-  EXPECT_EQ(BmSeapointTurbidityDataMsg::decode(decode, cbor_buffer, len),
-            CborNoError);
+  EXPECT_EQ(BmSeapointTurbidityDataMsg::decode(decode, cbor_buffer, len), CborNoError);
   EXPECT_EQ(decode.header.version, BmSeapointTurbidityDataMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
@@ -272,24 +263,20 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTest) {
   d.num_samples = 10;
   d.residual_0 = 0.1234;
   d.residual_1 = 0.5678;
-  d.difference_signal =
-      static_cast<double *>(malloc(d.num_samples * sizeof(double)));
+  d.difference_signal = static_cast<double *>(malloc(d.num_samples * sizeof(double)));
   for (size_t i = 0; i < d.num_samples; i++) {
     d.difference_signal[i] = i * 0.1;
   }
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
-                                                     sizeof(cbor_buffer), &len),
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
             CborNoError);
   EXPECT_EQ(len, 281);
 
   BmRbrPressureDifferenceSignalMsg::Data decode;
   decode.num_samples = 10;
-  decode.difference_signal =
-      static_cast<double *>(malloc(decode.num_samples * sizeof(double)));
-  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, cbor_buffer, len),
-            CborNoError);
+  decode.difference_signal = static_cast<double *>(malloc(decode.num_samples * sizeof(double)));
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, cbor_buffer, len), CborNoError);
   EXPECT_EQ(decode.header.version, BmRbrPressureDifferenceSignalMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
@@ -317,17 +304,14 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidEncode) {
   }
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
-                                                     sizeof(cbor_buffer), &len),
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
             CborErrorImproperValue);
   d.num_samples = 10;
-  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, NULL,
-                                                     sizeof(cbor_buffer), &len),
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, NULL, sizeof(cbor_buffer), &len),
             CborErrorOutOfMemory);
   free(d.difference_signal);
   d.difference_signal = NULL;
-  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
-                                                     sizeof(cbor_buffer), &len),
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
             CborErrorOutOfMemory);
 }
 
@@ -340,23 +324,20 @@ TEST_F(BmCommonTest, BmRbrPressureDifferenceSignalMsgTestInvalidDecode) {
   d.total_samples = 15;
   d.sequence_num = 22;
   d.num_samples = 10;
-  d.difference_signal =
-      static_cast<double *>(malloc(d.num_samples * sizeof(double)));
+  d.difference_signal = static_cast<double *>(malloc(d.num_samples * sizeof(double)));
   for (size_t i = 0; i < d.num_samples; i++) {
     d.difference_signal[i] = i * 0.1;
   }
   uint8_t cbor_buffer[1024];
   size_t len = 0;
-  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer,
-                                                     sizeof(cbor_buffer), &len),
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len),
             CborNoError);
   EXPECT_EQ(len, 281);
 
   BmRbrPressureDifferenceSignalMsg::Data decode;
   decode.num_samples = 10;
   decode.difference_signal = static_cast<double *>(malloc(10 * sizeof(double)));
-  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, NULL, len),
-            CborErrorOutOfMemory);
+  EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, NULL, len), CborErrorOutOfMemory);
   decode.num_samples = 0;
   EXPECT_EQ(BmRbrPressureDifferenceSignalMsg::decode(decode, cbor_buffer, len),
             CborErrorOutOfMemory);
@@ -452,81 +433,151 @@ TEST_F(BmCommonTest, barometricPressureMsgTest) {
 }
 
 TEST_F(BmCommonTest, AanderaaConductivityTest) {
-    AanderaaConductivityMsg::Data d;
-    d.header.version = AanderaaConductivityMsg::VERSION;
-    d.header.reading_time_utc_ms = 123456789;
-    d.header.reading_uptime_millis = 987654321;
-    d.header.sensor_reading_time_ms = 0xdeadc0de;
-    d.conductivity_ms_cm = 50.123;
-    d.temperature_deg_c = 23.456;
-    d.salinity_psu = 35.123;
-    d.water_density_kg_m3 = 1025.83;
-    d.sound_speed_m_s = 1498.15;
-    d.depth_m = 10.0;
+  AanderaaConductivityMsg::Data d;
+  d.header.version = AanderaaConductivityMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.conductivity_ms_cm = 50.123;
+  d.temperature_deg_c = 23.456;
+  d.salinity_psu = 35.123;
+  d.water_density_kg_m3 = 1025.83;
+  d.sound_speed_m_s = 1498.15;
+  d.depth_m = 10.0;
 
-    uint8_t cbor_buffer[1024];
-    size_t len = 0;
-    AanderaaConductivityMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-    EXPECT_EQ(len, 234);
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  AanderaaConductivityMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 234);
 
-    AanderaaConductivityMsg::Data decode;
-    AanderaaConductivityMsg::decode(decode, cbor_buffer, len);
-    EXPECT_EQ(decode.header.version, AanderaaConductivityMsg::VERSION);
-    EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
-    EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
-    EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
-    EXPECT_EQ(decode.conductivity_ms_cm, 50.123);
-    EXPECT_EQ(decode.temperature_deg_c, 23.456);
-    EXPECT_EQ(decode.salinity_psu, 35.123);
-    EXPECT_EQ(decode.water_density_kg_m3, 1025.83);
-    EXPECT_EQ(decode.sound_speed_m_s, 1498.15);
-    EXPECT_EQ(decode.depth_m, 10.0);
+  AanderaaConductivityMsg::Data decode;
+  AanderaaConductivityMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, AanderaaConductivityMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.conductivity_ms_cm, 50.123);
+  EXPECT_EQ(decode.temperature_deg_c, 23.456);
+  EXPECT_EQ(decode.salinity_psu, 35.123);
+  EXPECT_EQ(decode.water_density_kg_m3, 1025.83);
+  EXPECT_EQ(decode.sound_speed_m_s, 1498.15);
+  EXPECT_EQ(decode.depth_m, 10.0);
 }
 
 TEST_F(BmCommonTest, AanderaaCurrentMeterTest) {
-    AanderaaCurrentMeterMsg::Data d;
-    d.header.version = AanderaaCurrentMeterMsg::VERSION;
-    d.header.reading_time_utc_ms = 123456789;
-    d.header.reading_uptime_millis = 987654321;
-    d.header.sensor_reading_time_ms = 0xdeadc0de;
-    d.abs_speed_cm_s = 10.54;
-    d.direction_deg_m = 109.67;
-    d.north_cm_s = 67.89;
-    d.east_cm_s = 67.88;
-    d.heading_deg_m = 12.34;
-    d.tilt_x_deg = 23.45;
-    d.tilt_y_deg = 34.56;
-    d.single_ping_std_cm_s = 45.67;
-    d.transducer_strength_db = 56.78;
-    d.ping_count = 67.76;
-    d.abs_tilt_deg = 78.87;
-    d.max_tilt_deg = 89.98;
-    d.std_tilt_deg = 90.09;
-    d.temperature_deg_c = 23.456;
+  AanderaaCurrentMeterMsg::Data d;
+  d.header.version = AanderaaCurrentMeterMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.abs_speed_cm_s = 10.54;
+  d.direction_deg_m = 109.67;
+  d.north_cm_s = 67.89;
+  d.east_cm_s = 67.88;
+  d.heading_deg_m = 12.34;
+  d.tilt_x_deg = 23.45;
+  d.tilt_y_deg = 34.56;
+  d.single_ping_std_cm_s = 45.67;
+  d.transducer_strength_db = 56.78;
+  d.ping_count = 67.76;
+  d.abs_tilt_deg = 78.87;
+  d.max_tilt_deg = 89.98;
+  d.std_tilt_deg = 90.09;
+  d.temperature_deg_c = 23.456;
 
-    uint8_t cbor_buffer[1024];
-    size_t len = 0;
-    AanderaaCurrentMeterMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-    EXPECT_EQ(len, 416);
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  AanderaaCurrentMeterMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 416);
 
-    AanderaaCurrentMeterMsg::Data decode;
-    AanderaaCurrentMeterMsg::decode(decode, cbor_buffer, len);
-    EXPECT_EQ(decode.header.version, AanderaaConductivityMsg::VERSION);
-    EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
-    EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
-    EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
-    EXPECT_EQ(decode.abs_speed_cm_s, 10.54);
-    EXPECT_EQ(decode.direction_deg_m, 109.67);
-    EXPECT_EQ(decode.north_cm_s, 67.89);
-    EXPECT_EQ(decode.east_cm_s, 67.88);
-    EXPECT_EQ(decode.heading_deg_m, 12.34);
-    EXPECT_EQ(decode.tilt_x_deg, 23.45);
-    EXPECT_EQ(decode.tilt_y_deg, 34.56);
-    EXPECT_EQ(decode.single_ping_std_cm_s, 45.67);
-    EXPECT_EQ(decode.transducer_strength_db, 56.78);
-    EXPECT_EQ(decode.ping_count, 67.76);
-    EXPECT_EQ(decode.abs_tilt_deg, 78.87);
-    EXPECT_EQ(decode.max_tilt_deg, 89.98);
-    EXPECT_EQ(decode.std_tilt_deg, 90.09);
-    EXPECT_EQ(decode.temperature_deg_c, 23.456);
+  AanderaaCurrentMeterMsg::Data decode;
+  AanderaaCurrentMeterMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, AanderaaConductivityMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.abs_speed_cm_s, 10.54);
+  EXPECT_EQ(decode.direction_deg_m, 109.67);
+  EXPECT_EQ(decode.north_cm_s, 67.89);
+  EXPECT_EQ(decode.east_cm_s, 67.88);
+  EXPECT_EQ(decode.heading_deg_m, 12.34);
+  EXPECT_EQ(decode.tilt_x_deg, 23.45);
+  EXPECT_EQ(decode.tilt_y_deg, 34.56);
+  EXPECT_EQ(decode.single_ping_std_cm_s, 45.67);
+  EXPECT_EQ(decode.transducer_strength_db, 56.78);
+  EXPECT_EQ(decode.ping_count, 67.76);
+  EXPECT_EQ(decode.abs_tilt_deg, 78.87);
+  EXPECT_EQ(decode.max_tilt_deg, 89.98);
+  EXPECT_EQ(decode.std_tilt_deg, 90.09);
+  EXPECT_EQ(decode.temperature_deg_c, 23.456);
+}
+
+TEST_F(BmCommonTest, PowerReadingTest) {
+  PowerReadingMsg::Data d;
+  d.header.version = PowerReadingMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.power_reading_type = PowerReadingMsg::SOURCE;
+  d.voltage_v = 6.79;
+  d.current_ma = 258.36;
+  d.status = 0;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  PowerReadingMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 157);
+
+  PowerReadingMsg::Data decode;
+  PowerReadingMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, PowerReadingMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.power_reading_type, PowerReadingMsg::SOURCE);
+  EXPECT_EQ(decode.voltage_v, 6.79);
+  EXPECT_EQ(decode.current_ma, 258.36);
+  EXPECT_EQ(decode.status, 0);
+
+  printf("second test\n");
+
+  // Test Parsing an incorrect message
+  AanderaaCurrentMeterMsg::Data d2;
+  d2.header.version = AanderaaCurrentMeterMsg::VERSION;
+  d2.header.reading_time_utc_ms = 123456789;
+  d2.header.reading_uptime_millis = 987654321;
+  d2.header.sensor_reading_time_ms = 0xdeadc0de;
+  d2.abs_speed_cm_s = 10.54;
+  d2.direction_deg_m = 109.67;
+  d2.north_cm_s = 67.89;
+  d2.east_cm_s = 67.88;
+  d2.heading_deg_m = 12.34;
+  d2.tilt_x_deg = 23.45;
+  d2.tilt_y_deg = 34.56;
+  d2.single_ping_std_cm_s = 45.67;
+  d2.transducer_strength_db = 56.78;
+  d2.ping_count = 67.76;
+  d2.abs_tilt_deg = 78.87;
+  d2.max_tilt_deg = 89.98;
+  d2.std_tilt_deg = 90.09;
+  d2.temperature_deg_c = 23.456;
+
+  uint8_t cbor_buffer2[1024];
+  size_t len2 = 0;
+  AanderaaCurrentMeterMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
+  EXPECT_EQ(len2, 416);
+
+  PowerReadingMsg::Data decode2 = {.power_reading_type = PowerReadingMsg::SOURCE,
+                                   .voltage_v = 0,
+                                   .current_ma = 0,
+                                   .status = 0};
+  PowerReadingMsg::decode(decode2, cbor_buffer2, len2);
+  EXPECT_EQ(decode2.header.version, PowerReadingMsg::VERSION);
+  EXPECT_EQ(decode2.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode2.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode2.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode2.power_reading_type, PowerReadingMsg::SOURCE);
+  EXPECT_EQ(decode2.voltage_v, 0);
+  EXPECT_EQ(decode2.current_ma, 0);
+  EXPECT_EQ(decode2.status, 0);
 }
