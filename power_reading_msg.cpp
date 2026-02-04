@@ -173,7 +173,6 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
 
       // Get the knwon power reading msg types
       if (strcmp(PowerReadingMsg::POWER_READING_TYPE, key) == 0) {
-        bm_debug("getting power type\n");
         uint64_t power_reading_type;
         err = cbor_value_get_uint64(&value, &power_reading_type);
         if (err != CborNoError) {
@@ -181,19 +180,16 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
         }
         d.power_reading_type = static_cast<PowerReadingType_t>(power_reading_type);
       } else if (strcmp(PowerReadingMsg::VOLTAGE_V, key) == 0) {
-        bm_debug("getting voltage\n");
         err = cbor_value_get_double(&value, &d.voltage_v);
         if (err != CborNoError) {
           break;
         }
       } else if (strcmp(PowerReadingMsg::CURRENT_MA, key) == 0) {
-        bm_debug("getting current\n");
         err = cbor_value_get_double(&value, &d.current_ma);
         if (err != CborNoError) {
           break;
         }
       } else if (strcmp(PowerReadingMsg::STATUS, key) == 0) {
-        bm_debug("getting status\n");
         err = cbor_value_get_uint64(&value, &d.status);
         if (err != CborNoError) {
           break;
