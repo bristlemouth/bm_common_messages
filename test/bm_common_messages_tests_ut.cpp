@@ -519,14 +519,14 @@ TEST_F(BmCommonTest, PowerReadingTest) {
   d.header.reading_uptime_millis = 987654321;
   d.header.sensor_reading_time_ms = 0xdeadc0de;
   d.power_reading_type = PowerReadingMsg::SOURCE;
-  d.voltage_v = 6.79;
-  d.current_ma = 258.36;
-  d.status = 0;
+  d.voltage_v = 3.79;
+  d.current_a = 0.258;
+  d.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   PowerReadingMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-  EXPECT_EQ(len, 157);
+  EXPECT_EQ(len, 156);
 
   PowerReadingMsg::Data decode;
   PowerReadingMsg::decode(decode, cbor_buffer, len);
@@ -535,9 +535,9 @@ TEST_F(BmCommonTest, PowerReadingTest) {
   EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
   EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_EQ(decode.power_reading_type, PowerReadingMsg::SOURCE);
-  EXPECT_EQ(decode.voltage_v, 6.79);
-  EXPECT_EQ(decode.current_ma, 258.36);
-  EXPECT_EQ(decode.status, 0);
+  EXPECT_EQ(decode.voltage_v, 3.79);
+  EXPECT_EQ(decode.current_a, 0.258);
+  EXPECT_EQ(decode.status, PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE);
 
   // Test Parsing an incorrect message
   // We should parse the header correctly
@@ -569,7 +569,7 @@ TEST_F(BmCommonTest, PowerReadingTest) {
 
   PowerReadingMsg::Data bad_decode = {.power_reading_type = PowerReadingMsg::SOURCE,
                                       .voltage_v = 0,
-                                      .current_ma = 0,
+                                      .current_a = 0,
                                       .status = 0};
   CborError err = PowerReadingMsg::decode(bad_decode, bad_cbor_buffer, bad_len);
   EXPECT_EQ(err, CborNoError);
@@ -579,6 +579,6 @@ TEST_F(BmCommonTest, PowerReadingTest) {
   EXPECT_EQ(bad_decode.header.sensor_reading_time_ms, 0xdeadc0de);
   EXPECT_EQ(bad_decode.power_reading_type, PowerReadingMsg::SOURCE);
   EXPECT_EQ(bad_decode.voltage_v, 0);
-  EXPECT_EQ(bad_decode.current_ma, 0);
+  EXPECT_EQ(bad_decode.current_a, 0);
   EXPECT_EQ(bad_decode.status, 0);
 }

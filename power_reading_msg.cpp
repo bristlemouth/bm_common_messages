@@ -59,18 +59,18 @@ CborError PowerReadingMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
       }
     }
 
-    // current_ma
-    err = cbor_encode_text_stringz(&map_encoder, PowerReadingMsg::CURRENT_MA);
+    // current_a
+    err = cbor_encode_text_stringz(&map_encoder, PowerReadingMsg::current_a);
     if (err != CborNoError) {
-      bm_debug("cbor_encode_text_stringz failed for current_ma key: %d\n", err);
+      bm_debug("cbor_encode_text_stringz failed for current_a key: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
     }
 
-    err = cbor_encode_double(&map_encoder, d.current_ma);
+    err = cbor_encode_double(&map_encoder, d.current_a);
     if (err != CborNoError) {
-      bm_debug("cbor_encode_double failed for current_ma value: %d\n", err);
+      bm_debug("cbor_encode_double failed for current_a value: %d\n", err);
       if (err != CborErrorOutOfMemory) {
         break;
       }
@@ -186,8 +186,8 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
         if (err != CborNoError) {
           break;
         }
-      } else if (strcmp(PowerReadingMsg::CURRENT_MA, key) == 0) {
-        err = cbor_value_get_double(&value, &d.current_ma);
+      } else if (strcmp(PowerReadingMsg::current_a, key) == 0) {
+        err = cbor_value_get_double(&value, &d.current_a);
         if (err != CborNoError) {
           break;
         }

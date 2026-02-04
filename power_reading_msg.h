@@ -9,7 +9,7 @@ constexpr size_t NUM_FIELDS = 4 + SensorHeaderMsg::NUM_FIELDS;
 
 static constexpr char POWER_READING_TYPE[] = "power_reading_type";
 static constexpr char VOLTAGE_V[] = "voltage_v";
-static constexpr char CURRENT_MA[] = "current_ma";
+static constexpr char current_a[] = "current_a";
 static constexpr char STATUS[] = "status";
 
 typedef enum PowerReadingType {
@@ -30,7 +30,7 @@ struct Data {
   SensorHeaderMsg::Data header;
   PowerReadingType_t power_reading_type;
   double voltage_v;
-  double current_ma;
+  double current_a;
   uint64_t status;
 };
 
