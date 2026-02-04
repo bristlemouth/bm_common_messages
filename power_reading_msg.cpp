@@ -163,7 +163,9 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
       char key[48];
       size_t key_len = sizeof(key);
       err = cbor_value_copy_text_string(&value, key, &key_len, NULL);
-      // TODO check error return of the copy
+      if (err != CborNoError) {
+        break;
+      }
 
       // Advance over the string key
       err = cbor_value_advance(&value);
