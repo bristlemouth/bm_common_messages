@@ -175,12 +175,12 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
 
       // Get the knwon power reading msg types
       if (strcmp(PowerReadingMsg::POWER_READING_TYPE, key) == 0) {
-        uint64_t power_reading_type;
-        err = cbor_value_get_uint64(&value, &power_reading_type);
+        uint64_t tmp_power_reading_type;
+        err = cbor_value_get_uint64(&value, &tmp_power_reading_type);
         if (err != CborNoError) {
           break;
         }
-        d.power_reading_type = static_cast<PowerReadingType_t>(power_reading_type);
+        d.power_reading_type = static_cast<PowerReadingType_t>(tmp_power_reading_type);
       } else if (strcmp(PowerReadingMsg::VOLTAGE_V, key) == 0) {
         err = cbor_value_get_double(&value, &d.voltage_v);
         if (err != CborNoError) {
@@ -192,10 +192,12 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
           break;
         }
       } else if (strcmp(PowerReadingMsg::STATUS, key) == 0) {
-        err = cbor_value_get_uint64(&value, &d.status);
+        uint64_t tmp_status;
+        err = cbor_value_get_uint64(&value, &tmp_status);
         if (err != CborNoError) {
           break;
         }
+        d.status = static_cast<uint8_t>(tmp_status);
       } else {
         bm_debug("Additional field we cannot parse, ignoring\n");
       }

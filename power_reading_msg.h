@@ -12,7 +12,7 @@ static constexpr char VOLTAGE_V[] = "voltage_v";
 static constexpr char current_a[] = "current_a";
 static constexpr char STATUS[] = "status";
 
-typedef enum PowerReadingType {
+typedef enum PowerReadingType : uint8_t {
   SOURCE,
   LOAD,
   MONITOR,
@@ -31,7 +31,7 @@ struct Data {
   PowerReadingType_t power_reading_type;
   double voltage_v;
   double current_a;
-  uint64_t status;
+  uint8_t status;
 };
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len);
