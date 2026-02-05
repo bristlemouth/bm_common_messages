@@ -198,7 +198,7 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
         break;
       }
 
-      // Get the knwon power reading msg types
+      // Get the known power reading msg types
       if (strcmp(PowerReadingMsg::POWER_READING_TYPE, key) == 0) {
         uint64_t tmp_power_reading_type;
         err = cbor_value_get_uint64(&value, &tmp_power_reading_type);
