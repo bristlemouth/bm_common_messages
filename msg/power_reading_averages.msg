@@ -1,0 +1,16 @@
+import sensor_header
+
+sensor_header header
+uint8 power_reading_type
+uint8 status
+uint32 num_samples
+float64 averaging_window_length_s
+float64 voltage_v
+float64 current_a
+float64 voltage_min
+float64 voltage_max
+float64 voltage_stdev
+float64 current_voltage_min
+float64 current_ax
+float64 current_stdev
+
