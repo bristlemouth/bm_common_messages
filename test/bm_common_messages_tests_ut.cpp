@@ -541,7 +541,7 @@ TEST_F(BmCommonTest, PowerReadingTest) {
 
   // Test Parsing an incorrect message
   // We should parse the header correctly
-  // and return no error
+  // and return CborErrorUnsupportedType
   AanderaaCurrentMeterMsg::Data bad_data;
   bad_data.header.version = AanderaaCurrentMeterMsg::VERSION;
   bad_data.header.reading_time_utc_ms = 123456789;
