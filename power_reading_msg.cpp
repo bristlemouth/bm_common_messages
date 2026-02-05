@@ -1,5 +1,6 @@
 #include "power_reading_msg.h"
 #include "bm_config.h"
+#include "bm_messages_helper.h"
 
 CborError PowerReadingMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
                                   size_t *encoded_len) {
@@ -162,12 +163,34 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
         break;
       }
 
-      char key[48];
-      size_t key_len = sizeof(key);
+      size_t key_len;
+      err = cbor_value_get_string_length(&value, &key_len);
+      if (err != CborNoError) {
+        break;
+      }
+
+      if (key_len > max_key_len - 1) {
+        bm_debug("key too long: %zu\n", key_len);
+        // Advance over the string key
+        err = cbor_value_advance(&value);
+        if (err != CborNoError) {
+          break;
+        }
+        // Advance over the value
+        err = cbor_value_advance(&value);
+        if (err != CborNoError) {
+          break;
+        }
+        // since the key was too long, loop to the next key value pair
+        continue;
+      }
+
+      char key[max_key_len] = {0};
       err = cbor_value_copy_text_string(&value, key, &key_len, NULL);
       if (err != CborNoError) {
         break;
       }
+      key[key_len] = '\0';
 
       // Advance over the string key
       err = cbor_value_advance(&value);
