@@ -113,6 +113,8 @@ CborError PowerReadingMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
 CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
   CborValue map;
+  // used to indicate if the message has additional fields we cannot currently decode
+  bool unsupported_type = false;
   CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
 
   do {
@@ -200,6 +202,7 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
         d.status = static_cast<uint8_t>(tmp_status);
       } else {
         bm_debug("Additional field we cannot parse, ignoring\n");
+        unsupported_type = true;
       }
 
       // Advance over the value
@@ -223,6 +226,10 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
       break;
     }
   } while (0);
+
+  if (unsupported_type) {
+    err = CborErrorUnsupportedType;
+  }
 
   return err;
 }

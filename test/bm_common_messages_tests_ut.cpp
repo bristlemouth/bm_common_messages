@@ -576,7 +576,7 @@ TEST_F(BmCommonTest, PowerReadingTest) {
                                       .current_a = 0,
                                       .status = 0};
   CborError err = PowerReadingMsg::decode(bad_decode, bad_cbor_buffer, bad_len);
-  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(err, CborErrorUnsupportedType);
   EXPECT_EQ(bad_decode.header.version, PowerReadingMsg::VERSION);
   EXPECT_EQ(bad_decode.header.reading_time_utc_ms, 123456789);
   EXPECT_EQ(bad_decode.header.reading_uptime_millis, 987654321);
