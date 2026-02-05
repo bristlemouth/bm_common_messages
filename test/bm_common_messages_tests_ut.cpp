@@ -567,7 +567,11 @@ TEST_F(BmCommonTest, PowerReadingTest) {
   AanderaaCurrentMeterMsg::encode(bad_data, bad_cbor_buffer, sizeof(bad_cbor_buffer), &bad_len);
   EXPECT_EQ(bad_len, 416);
 
-  PowerReadingMsg::Data bad_decode = {.power_reading_type = PowerReadingMsg::SOURCE,
+  PowerReadingMsg::Data bad_decode = {.header = {.version = 0,
+                                                 .reading_time_utc_ms = 0,
+                                                 .reading_uptime_millis = 0,
+                                                 .sensor_reading_time_ms = 0},
+                                      .power_reading_type = PowerReadingMsg::SOURCE,
                                       .voltage_v = 0,
                                       .current_a = 0,
                                       .status = 0};
