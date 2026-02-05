@@ -18,7 +18,7 @@ typedef enum PowerReadingType : uint8_t {
   MONITOR,
 } PowerReadingType_t;
 
-typedef enum StatusFlags {
+typedef enum StatusFlags : uint8_t {
   OKAY = 0,
   UNDERVOLTAGE =  (1 << 0),
   OVERVOLTAGE = (1 << 1),
