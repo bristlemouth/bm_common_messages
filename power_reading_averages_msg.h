@@ -8,7 +8,12 @@ namespace PowerReadingAveragesMsg {
 constexpr uint32_t VERSION = 1;
 constexpr size_t NUMFIELDS = 12 + SensorHeaderMsg::NUM_FIELDS;
 
-// static constexpr char
+static constexpr char VOLTAGE_V_MIN[] = "voltage_v_min";
+static constexpr char VOLTAGE_V_MAX[] = "voltage_v_max";
+static constexpr char VOLTAGE_V_STDEV[] = "voltage_v_stdev";
+static constexpr char CURRENT_A_MIN[] = "current_a_min";
+static constexpr char CURRENT_A_MAX[] = "current_a_max";
+static constexpr char CURRENT_A_STDEV[] = "current_a_stdev";
 
 struct Data {
   SensorHeaderMsg::Data header;
