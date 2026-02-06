@@ -6,7 +6,7 @@
 namespace PowerReadingAveragesMsg {
 
 constexpr uint32_t VERSION = 1;
-constexpr size_t NUMFIELDS = 12 + SensorHeaderMsg::NUM_FIELDS;
+constexpr size_t NUM_FIELDS = 12 + SensorHeaderMsg::NUM_FIELDS;
 
 static constexpr char VOLTAGE_V_AVG[] = "voltage_v_avg";
 static constexpr char VOLTAGE_V_MIN[] = "voltage_v_min";

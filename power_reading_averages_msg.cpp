@@ -5,7 +5,7 @@
 CborError PowerReadingAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
                                           size_t *encoded_len) {
   CborError err;
-  CborEncoder encode, map_encoder;
+  CborEncoder encoder, map_encoder;
   cbor_encoder_init(&encoder, cbor_buffer, size, 0);
 
   do {
@@ -215,8 +215,11 @@ CborError PowerReadingAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
 CborError PowerReadingAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
   CborValue map;
+  (void) d;
+  (void) cbor_buffer;
+  (void) size;
   // used to indicate if the message has additional fields we cannot currently decode
-  bool unsupported_type = false;
+  // bool unsupported_type = false;
 
   CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
 
