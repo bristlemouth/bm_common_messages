@@ -43,9 +43,9 @@ typedef struct {
   const void *value_source;
 } CborEncoderTableEntry_t;
 
-CborError decode_cbor_fields_from_table(CborValue *value, const CbortDecoderTableEntry_t *entries_table, size_t table_size);
+CborError decode_cbor_fields_from_table(CborValue *value, const CborDecoderTableEntry_t *entries_table, size_t table_size);
 
-CborError encode_cbor_fields_from_table(CborEncoder *encoder, const CbortDecoderTableEntry_t *entries_table, size_t table_size);
+CborError encode_cbor_fields_from_table(CborEncoder *encoder, const CborDecoderTableEntry_t *entries_table, size_t table_size);
 
 CborError encoder_message_create(CborEncoder *encoder, CborEncoder *map_encoder,
                                  uint8_t *cbor_buffer, size_t size,

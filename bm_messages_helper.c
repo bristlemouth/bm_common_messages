@@ -326,12 +326,129 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
   return err;
 }
 
-CborError decode_cbor_fields_from_table(CborValue *value, const CbortDecoderTableEntry_t *entries_table, size_t table_size) {
+CborError decode_cbor_fields_from_table(CborValue *value, const CborDecoderTableEntry_t *entries_table, size_t table_size) {
   CborError err = CborNoError;
+  bool has_unknown_key = false;
+
+  // Loop through the known keys, ignoring any unknown keys, or missing keys
+    while (!cbor_value_at_end(value)) {
+      if (!cbor_value_is_text_string(value)) {
+        err = CborErrorIllegalType;
+        bm_debug("expected string key but got something else\n");
+        break;
+      }
+
+      size_t key_len;
+      err = cbor_value_get_string_length(value, &key_len);
+      if (err != CborNoError) {
+        break;
+      }
+
+      if (key_len > max_key_len - 1) {
+        bm_debug("key too long: %zu\n", key_len);
+        // Advance over the string key
+        err = cbor_value_advance(value);
+        if (err != CborNoError) {
+          break;
+        }
+        // Advance over the value
+        err = cbor_value_advance(value);
+        if (err != CborNoError) {
+          break;
+        }
+        // since the key was too long, loop to the next key value pair
+        continue;
+      }
+
+      char key[max_key_len] = {0};
+      err = cbor_value_copy_text_string(value, key, &key_len, NULL);
+      if (err != CborNoError) {
+        break;
+      }
+      key[key_len] = '\0';
+
+      // Advance over the string key
+      err = cbor_value_advance(value);
+      if (err != CborNoError) {
+        break;
+      }
+
+      // Search the look up table for the matching string key
+      size_t index;
+      bool key_in_table = false;
+      for (index = 0; index < table_size; index++) {
+        if (strcmp(entries_table[index].key, key) == 0) {
+          key_in_table = true;
+          switch (entries_table[index].type) {
+            case UINT8: {
+              uint64_t temp_value = 0;
+              err = cbor_value_get_uint64(value, &temp_value);
+              *(uint8_t *)entries_table[index].value_desitination = (uint8_t)temp_value;
+              break;
+            }
+            case UINT16: {
+              uint64_t temp_value = 0;
+              err = cbor_value_get_uint64(value, &temp_value);
+              *(uint16_t *)entries_table[index].value_desitination = (uint16_t)temp_value;
+              break;
+            }
+            case UINT32: {
+              uint64_t temp_value = 0;
+              err = cbor_value_get_uint64(value, &temp_value);
+              *(uint32_t *)entries_table[index].value_desitination = (uint32_t)temp_value;
+              break;
+            }
+            case UINT64: {
+              err = cbor_value_get_uint64(value, (uint64_t *)entries_table[index].value_desitination);
+              break;
+            }
+            case FLOAT: {
+              err = cbor_value_get_float(value, (float *)entries_table[index].value_desitination);
+              break;
+            }
+            case DOUBLE: {
+              err = cbor_value_get_double(value, (double *)entries_table[index].value_desitination);
+              break;
+            }
+            // TODO - this one needs more work
+            // case STRING: {
+            //   err = cbor_value_copy_text_string(&value, (char *)entries_table[index].value_desitination, &key_len, NULL);
+            //   break;
+            // }
+            default: {
+              bm_debug("Failed to decode value for key %s, err: %d", entries_table[index].key, err);
+              err = CborErrorUnsupportedType;
+              break;
+            }
+          }
+          // We have found our key and decoded the value so exit the for loop
+          break;
+        }
+      }
+
+      if (!key_in_table) {
+        bm_debug("Ignoring unknown key-value pair\n");
+        has_unknown_key = true;
+      }
+
+      // Advance over the value to move to next key-value pair
+      err = cbor_value_advance(value);
+      if (err != CborNoError) {
+        break;
+      }
+    }
+
+    if (has_unknown_key && err == CborNoError) {
+      err = CborErrorUnsupportedType;
+    }
+
   return err;
 }
 
-CborError encode_cbor_fields_from_table(CborEncoder *encoder, const CbortDecoderTableEntry_t *entries_table, size_t table_size) {
+CborError encode_cbor_fields_from_table(CborEncoder *encoder, const CborDecoderTableEntry_t *entries_table, size_t table_size) {
+  (void) encoder;
+  (void) entries_table;
+  (void) table_size;
   CborError err = CborNoError;
   return err;
 }
