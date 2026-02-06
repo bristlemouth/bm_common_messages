@@ -7,6 +7,8 @@ extern "C" {
 
 #include "cbor.h"
 
+#define max_key_len (64)
+
 #define check_acceptable_encode_errors(e)                                      \
   (e == CborNoError || e == CborErrorOutOfMemory)
 #define check_and_encode_key(e, f)                                             \
