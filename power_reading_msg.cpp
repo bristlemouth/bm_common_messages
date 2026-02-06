@@ -114,8 +114,6 @@ CborError PowerReadingMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
 CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
   CborValue map;
-  // used to indicate if the message has additional fields we cannot currently decode
-  // bool unsupported_type = false;
   CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
 
   do {
@@ -155,6 +153,7 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
       break;
     }
 
+    // Use look up table to decode the known key-value pairs
     const CborDecoderTableEntry_t power_table_entries[] = {
       {PowerReadingMsg::POWER_READING_TYPE, UINT8, &d.power_reading_type},
       {PowerReadingMsg::VOLTAGE_V, DOUBLE, &d.voltage_v},
@@ -164,87 +163,7 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
 
     err = decode_cbor_fields_from_table(&value, power_table_entries, sizeof(power_table_entries) / sizeof(power_table_entries[0]));
 
-    // Loop through the known keys, ignoring any unknown keys, or missing keys
-    // while (!cbor_value_at_end(&value)) {
-    //   if (!cbor_value_is_text_string(&value)) {
-    //     err = CborErrorIllegalType;
-    //     bm_debug("expected string key but got something else\n");
-    //     break;
-    //   }
-
-    //   size_t key_len;
-    //   err = cbor_value_get_string_length(&value, &key_len);
-    //   if (err != CborNoError) {
-    //     break;
-    //   }
-
-    //   if (key_len > max_key_len - 1) {
-    //     bm_debug("key too long: %zu\n", key_len);
-    //     // Advance over the string key
-    //     err = cbor_value_advance(&value);
-    //     if (err != CborNoError) {
-    //       break;
-    //     }
-    //     // Advance over the value
-    //     err = cbor_value_advance(&value);
-    //     if (err != CborNoError) {
-    //       break;
-    //     }
-    //     // since the key was too long, loop to the next key value pair
-    //     continue;
-    //   }
-
-    //   char key[max_key_len] = {0};
-    //   err = cbor_value_copy_text_string(&value, key, &key_len, NULL);
-    //   if (err != CborNoError) {
-    //     break;
-    //   }
-    //   key[key_len] = '\0';
-
-    //   // Advance over the string key
-    //   err = cbor_value_advance(&value);
-    //   if (err != CborNoError) {
-    //     break;
-    //   }
-
-    //   // Get the known power reading msg types
-    //   if (strcmp(PowerReadingMsg::POWER_READING_TYPE, key) == 0) {
-    //     uint64_t tmp_power_reading_type;
-    //     err = cbor_value_get_uint64(&value, &tmp_power_reading_type);
-    //     if (err != CborNoError) {
-    //       break;
-    //     }
-    //     d.power_reading_type = static_cast<PowerReadingType_t>(tmp_power_reading_type);
-    //   } else if (strcmp(PowerReadingMsg::VOLTAGE_V, key) == 0) {
-    //     err = cbor_value_get_double(&value, &d.voltage_v);
-    //     if (err != CborNoError) {
-    //       break;
-    //     }
-    //   } else if (strcmp(PowerReadingMsg::current_a, key) == 0) {
-    //     err = cbor_value_get_double(&value, &d.current_a);
-    //     if (err != CborNoError) {
-    //       break;
-    //     }
-    //   } else if (strcmp(PowerReadingMsg::STATUS, key) == 0) {
-    //     uint64_t tmp_status;
-    //     err = cbor_value_get_uint64(&value, &tmp_status);
-    //     if (err != CborNoError) {
-    //       break;
-    //     }
-    //     d.status = static_cast<uint8_t>(tmp_status);
-    //   } else {
-    //     bm_debug("Additional field we cannot parse, ignoring\n");
-    //     unsupported_type = true;
-    //   }
-
-    //   // Advance over the value
-    //   err = cbor_value_advance(&value);
-    //   if (err != CborNoError) {
-    //     break;
-    //   }
-    // }
-
-    // // If the loop above failed, then just go straight to the return
+    // If the look up table decoding failed, then just go straight to the return
     if (err != CborNoError) {
       break;
     }
@@ -258,10 +177,6 @@ CborError PowerReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
       break;
     }
   } while (0);
-
-  // if (unsupported_type) {
-  //   err = CborErrorUnsupportedType;
-  // }
 
   return err;
 }
