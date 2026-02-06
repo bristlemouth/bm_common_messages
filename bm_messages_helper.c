@@ -445,11 +445,64 @@ CborError decode_cbor_fields_from_table(CborValue *value, const CborDecoderTable
   return err;
 }
 
-CborError encode_cbor_fields_from_table(CborEncoder *encoder, const CborDecoderTableEntry_t *entries_table, size_t table_size) {
-  (void) encoder;
-  (void) entries_table;
-  (void) table_size;
+CborError encode_cbor_fields_from_table(CborEncoder *map_encoder, const CborEncoderTableEntry_t *entries_table, size_t table_size) {
   CborError err = CborNoError;
+
+  size_t index;
+  for (index = 0; index < table_size; index++) {
+    // Encode the key
+    err = cbor_encode_text_stringz(map_encoder, entries_table[index].key);
+    if (err != CborNoError) {
+      bm_debug("cbor_encode_text_stringz failed for key: %s, err: %d\n", entries_table[index].key, err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+
+    // Encode the value based on the type
+    switch (entries_table[index].type) {
+      case UINT8: {
+        err = cbor_encode_uint(map_encoder, *(const uint8_t *)entries_table[index].value_source);
+        break;
+      }
+      case UINT16: {
+        err = cbor_encode_uint(map_encoder, *(const uint16_t *)entries_table[index].value_source);
+        break;
+      }
+      case UINT32: {
+        err = cbor_encode_uint(map_encoder, *(const uint32_t *)entries_table[index].value_source);
+        break;
+      }
+      case UINT64: {
+        err = cbor_encode_uint(map_encoder, *(const uint64_t *)entries_table[index].value_source);
+        break;
+      }
+
+      case FLOAT: {
+        err = cbor_encode_float(map_encoder, *(const float *)entries_table[index].value_source);
+        break;
+      }
+
+      case DOUBLE: {
+        err = cbor_encode_double(map_encoder, *(const double *)entries_table[index].value_source);
+        break;
+      }
+
+      default: {
+        err = CborErrorUnsupportedType;
+        bm_debug("Unsupported value type for key: %s\n", entries_table[index].key);
+        break;
+      }
+
+      if (err != CborNoError) {
+        bm_debug("Failed to encode value for key: %s\n", entries_table[index].key);
+        if (err != CborErrorOutOfMemory) {
+          // exit the loop and return, out of memory is an acceptable error
+          break;
+        }
+      }
+    }
+  }
   return err;
 }
 
