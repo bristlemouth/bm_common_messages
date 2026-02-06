@@ -325,3 +325,14 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
 
   return err;
 }
+
+CborError decode_cbor_fields_from_table(CborValue *value, const CbortDecoderTableEntry_t *entries_table, size_t table_size) {
+  CborError err = CborNoError;
+  return err;
+}
+
+CborError encode_cbor_fields_from_table(CborEncoder *encoder, const CbortDecoderTableEntry_t *entries_table, size_t table_size) {
+  CborError err = CborNoError;
+  return err;
+}
+
