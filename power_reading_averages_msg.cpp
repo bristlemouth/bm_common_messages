@@ -214,14 +214,43 @@ CborError PowerReadingAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
 
 CborError PowerReadingAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
-  CborValue map;
-  (void) d;
-  (void) cbor_buffer;
-  (void) size;
+  CborValue map, value;
+  CborError err;
+
+  // this does not decode the header?
+  err = decoder_message_enter(&map, &value, &parser, (uint8_t *)cbor_buffer, size, PowerReadingAveragesMsg::NUM_FIELDS);
+
+  // decode header
+  err = SensorHeaderMsg::decode(value, d.header);
+  if (err != CborNoError) {
+    return err;
+  }
+
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t*)&d.power_reading_type, &value, PowerReadingMsg::POWER_READING_TYPE));
+  check_and_decode_key(err, decode_key_value_uint8(&d.status, &value, PowerReadingMsg::STATUS));
+  check_and_decode_key(err, decode_key_value_double(&d.voltage_v_avg, &value, PowerReadingAveragesMsg::VOLTAGE_V_AVG));
+  check_and_decode_key(err, decode_key_value_double(&d.voltage_v_min, &value, PowerReadingAveragesMsg::VOLTAGE_V_MIN));
+  check_and_decode_key(err, decode_key_value_double(&d.voltage_v_max, &value, PowerReadingAveragesMsg::VOLTAGE_V_MAX));
+  check_and_decode_key(err, decode_key_value_double(&d.voltage_v_stdev, &value, PowerReadingAveragesMsg::VOLTAGE_V_STDEV));
+  check_and_decode_key(err, decode_key_value_double(&d.current_a_avg, &value, PowerReadingAveragesMsg::CURRENT_A_AVG));
+  check_and_decode_key(err, decode_key_value_double(&d.current_a_min, &value, PowerReadingAveragesMsg::CURRENT_A_MIN));
+  check_and_decode_key(err, decode_key_value_double(&d.current_a_max, &value, PowerReadingAveragesMsg::CURRENT_A_MAX));
+  check_and_decode_key(err, decode_key_value_double(&d.current_a_stdev, &value, PowerReadingAveragesMsg::CURRENT_A_STDEV));
+
+  if (check_acceptable_decode_errors(err)) {
+    err = decoder_message_leave(&value, &map);
+  }
+
+
+  // older method:
   // used to indicate if the message has additional fields we cannot currently decode
   // bool unsupported_type = false;
 
-  CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
+  // CborError err = cbor_parser_init(cbor_buffer, size, 0, &parser, &map);
+
+  // do {
+
+  // } while (0);
 
   return err;
 }
