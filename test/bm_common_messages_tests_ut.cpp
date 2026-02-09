@@ -12,6 +12,7 @@
 #include "device_test_svc_request_msg.h"
 #include "pme_dissolved_oxygen_msg.h"
 #include "pme_wipe_msg.h"
+#include "power_reading_averages_msg.h"
 #include "power_reading_msg.h"
 #include "sensor_header_msg.h"
 #include "sys_info_svc_reply_msg.h"
@@ -585,4 +586,48 @@ TEST_F(BmCommonTest, PowerReadingTest) {
   EXPECT_EQ(bad_decode.voltage_v, 0);
   EXPECT_EQ(bad_decode.current_a, 0);
   EXPECT_EQ(bad_decode.status, 0);
+}
+
+TEST_F(BmCommonTest, PowerReadingAveragesTest) {
+  PowerReadingAveragesMsg::Data d;
+  d.header.version = PowerReadingAveragesMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.power_reading_type = PowerReadingMsg::SOURCE;
+  d.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
+  d.num_samples = 30;
+  d.averaging_window_length_s = 29.9778;
+  d.voltage_v_avg = 3.79;
+  d.voltage_v_min = 3.65;
+  d.voltage_v_max = 3.84;
+  d.voltage_v_stdev = 0.012;
+  d.current_a_avg = 0.258;
+  d.current_a_min = 0.248;
+  d.current_a_max = 0.270;
+  d.current_a_stdev = 0.016;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  PowerReadingAveragesMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 356);
+
+  PowerReadingAveragesMsg::Data decode;
+  PowerReadingAveragesMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, PowerReadingMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.power_reading_type, PowerReadingMsg::SOURCE);
+  EXPECT_EQ(decode.status, PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE);
+  EXPECT_EQ(decode.num_samples, 30);
+  EXPECT_EQ(decode.averaging_window_length_s, 29.9778);
+  EXPECT_EQ(decode.voltage_v_avg, 3.79);
+  EXPECT_EQ(decode.voltage_v_min, 3.65);
+  EXPECT_EQ(decode.voltage_v_max, 3.84);
+  EXPECT_EQ(decode.voltage_v_stdev, 0.012);
+  EXPECT_EQ(decode.current_a_avg, 0.258);
+  EXPECT_EQ(decode.current_a_min, 0.248);
+  EXPECT_EQ(decode.current_a_max, 0.270);
+  EXPECT_EQ(decode.current_a_stdev, 0.016);
 }

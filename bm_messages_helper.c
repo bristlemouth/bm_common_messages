@@ -47,6 +47,23 @@ CborError encode_key_value_float(CborEncoder *map_encoder, const char *name,
   return err;
 }
 
+CborError encode_key_value_double(CborEncoder *map_encoder, const char *name,
+                                 const double value) {
+  CborError err;
+  if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
+    bm_debug("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n",
+             __func__, name, err);
+    if (err != CborErrorOutOfMemory)
+      return err;
+  }
+
+  if ((err = cbor_encode_double(map_encoder, value)) != CborNoError)
+    bm_debug("error: %s(%s): cbor_encode_double() failed: %d\r\n", __func__,
+             name, err);
+
+  return err;
+}
+
 CborError encode_key_value_uint8(CborEncoder *map_encoder, const char *name,
                                  const uint8_t value) {
   CborError err;
@@ -177,6 +194,29 @@ CborError decode_key_value_float(float *out, CborValue *value,
   if (!cbor_value_is_float(value))
     return CborErrorIllegalType;
   if ((err = cbor_value_get_float(value, out)) != CborNoError)
+    return err;
+  if ((err = cbor_value_advance(value)) != CborNoError)
+    return err;
+
+  return err;
+}
+
+CborError decode_key_value_double(double *out, CborValue *value,
+                                 const char *key_expected) {
+  CborError err;
+
+  if (!cbor_value_is_text_string(value)) {
+    err = CborErrorIllegalType;
+    bm_debug("error: %s(%s): expected string key but got something else\r\n",
+             __func__, key_expected);
+    return err;
+  }
+
+  if ((err = cbor_value_advance(value)) != CborNoError)
+    return err;
+  if (!cbor_value_is_double(value))
+    return CborErrorIllegalType;
+  if ((err = cbor_value_get_double(value, out)) != CborNoError)
     return err;
   if ((err = cbor_value_advance(value)) != CborNoError)
     return err;
