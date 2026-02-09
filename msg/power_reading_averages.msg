@@ -13,4 +13,3 @@ float64 current_a_avg
 float64 current_a_min
 float64 current_a_max
 float64 current_a_stdev
-
