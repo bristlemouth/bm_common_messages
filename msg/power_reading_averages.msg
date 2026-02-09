@@ -5,11 +5,11 @@ uint8 power_reading_type
 uint8 status
 uint32 num_samples
 float64 averaging_window_length_s
-float64 voltage_v
+float64 voltage_v_avg
 float64 voltage_v_min
 float64 voltage_v_max
 float64 voltage_v_stdev
-float64 current_a
+float64 current_a_avg
 float64 current_a_min
 float64 current_a_max
 float64 current_a_stdev
