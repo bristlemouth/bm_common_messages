@@ -75,14 +75,12 @@ CborError PowerReadingAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, s
   err = decoder_message_enter(&map, &value, &parser, (uint8_t *)cbor_buffer, size,
                               PowerReadingAveragesMsg::NUM_FIELDS);
   if (err != CborNoError) {
-    bm_debug("Err entering the message while decoding, err: %d\n", err);
     return err;
   }
 
   // decode header
   err = SensorHeaderMsg::decode(value, d.header);
   if (err != CborNoError) {
-    bm_debug("Err decoding sensor header, err: %d\n", err);
     return err;
   }
 
