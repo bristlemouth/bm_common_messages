@@ -1,5 +1,6 @@
 #pragma once
 #include "cbor.h"
+#include "power_reading_msg.h"
 #include "sensor_header_msg.h"
 
 namespace PowerBatteryMsg {
@@ -11,6 +12,7 @@ static constexpr char CAPACITY_AH[] = "capacity_ah";
 static constexpr char PERCENTAGE[] = "percentage";
 static constexpr char BATTERY_STATUS[] = "battery_status";
 static constexpr char BATTERY_HEALTH[] = "battery_health";
+static constexpr char NUM_CELLS[] = "num_cells";
 static constexpr char CELL_VOLTAGE[] = "cell_voltage";
 static constexpr char CELL_TEMPERATURE[] = "cell_temperature";
 
@@ -24,7 +26,7 @@ typedef enum PowerBatteryHealth: uint8_t {
 
 struct Data {
   SensorHeaderMsg::Data header;
-  PowerReadingType_t power_reading_type;
+  PowerReadingMsg::PowerReadingType_t power_reading_type;
   uint8_t status;
   double voltage_v;
   double current_a;
@@ -33,7 +35,7 @@ struct Data {
   double percentage;
   PowerBatteryStatus_t battery_status;
   PowerBatteryHealth_t battery_health;
-  // TODO - determine best way to deal with these arrays
+  uint8_t num_cells;
   double *cell_voltage;
   double *cell_temperature;
 };
