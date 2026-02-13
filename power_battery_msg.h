@@ -5,7 +5,6 @@
 namespace PowerBatteryMsg {
 
 constexpr uint32_t VERSION = 1;
-// todo - what about the num fields in the arrays of temp/voltage
 constexpr size_t NUM_FIELDS = 11 + SensorHeaderMsg::NUM_FIELDS;
 static constexpr char CHARGE_AH[] = "charge_ah";
 static constexpr char CAPACITY_AH[] = "capacity_ah";
@@ -14,6 +13,14 @@ static constexpr char BATTERY_STATUS[] = "battery_status";
 static constexpr char BATTERY_HEALTH[] = "battery_health";
 static constexpr char CELL_VOLTAGE[] = "cell_voltage";
 static constexpr char CELL_TEMPERATURE[] = "cell_temperature";
+
+typedef enum PowerBatteryStatus: uint8_t {
+
+} PowerBatteryStatus_t;
+
+typedef enum PowerBatteryHealth: uint8_t {
+
+} PowerBatteryHealth_t;
 
 struct Data {
   SensorHeaderMsg::Data header;
@@ -24,10 +31,11 @@ struct Data {
   double charge_ah;
   double capacity_ah;
   double percentage;
-  uint8_t battery_status;
-  uint8_t battery_health;
-  double cell_voltage[];
-  double cell_temperature[];
+  PowerBatteryStatus_t battery_status;
+  PowerBatteryHealth_t battery_health;
+  // TODO - determine best way to deal with these arrays
+  double *cell_voltage;
+  double *cell_temperature;
 };
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len);
