@@ -16,7 +16,7 @@ static constexpr char NUM_CELLS[] = "num_cells";
 static constexpr char CELL_VOLTAGE[] = "cell_voltage";
 static constexpr char CELL_TEMPERATURE[] = "cell_temperature";
 
-typedef enum PowerBatteryStatus: uint8_t {
+typedef enum PowerBatteryStatus : uint8_t {
   STATUS_UNKNOWN = 0,
   CHARGING = 1,
   DISCHARGING = 2,
@@ -24,7 +24,7 @@ typedef enum PowerBatteryStatus: uint8_t {
   FULL = 4,
 } PowerBatteryStatus_t;
 
-typedef enum PowerBatteryHealth: uint8_t {
+typedef enum PowerBatteryHealth : uint8_t {
   HEALTH_UNKNOWN = 0,
   GOOD = 1,
   OVERHEAT = 2,

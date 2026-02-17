@@ -5,11 +5,13 @@
 #include "bm_os.h"
 #endif
 
-CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len) {
+CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
+                                  size_t *encoded_len) {
   CborError err;
   CborEncoder encoder, map_encoder;
 
-  err = encoder_message_create(&encoder, &map_encoder, cbor_buffer, size, PowerBatteryMsg::NUM_FIELDS);
+  err = encoder_message_create(&encoder, &map_encoder, cbor_buffer, size,
+                               PowerBatteryMsg::NUM_FIELDS);
 
   // sensor_header_msg
   err = SensorHeaderMsg::encode(map_encoder, d.header);
@@ -20,16 +22,29 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, si
     }
   }
 
-  check_and_encode_key(err, encode_key_value_uint8(&map_encoder, PowerReadingMsg::POWER_READING_TYPE, d.power_reading_type));
-  check_and_encode_key(err, encode_key_value_uint8(&map_encoder, PowerReadingMsg::STATUS, d.status));
-  check_and_encode_key(err, encode_key_value_double(&map_encoder, PowerReadingMsg::VOLTAGE_V, d.voltage_v));
-  check_and_encode_key(err, encode_key_value_double(&map_encoder, PowerReadingMsg::current_a, d.current_a));
-  check_and_encode_key(err, encode_key_value_double(&map_encoder, PowerBatteryMsg::CHARGE_AH, d.charge_ah));
-  check_and_encode_key(err, encode_key_value_double(&map_encoder, PowerBatteryMsg::CAPACITY_AH, d.capacity_ah));
-  check_and_encode_key(err, encode_key_value_double(&map_encoder, PowerBatteryMsg::PERCENTAGE, d.percentage));
-  check_and_encode_key(err, encode_key_value_uint8(&map_encoder, PowerBatteryMsg::BATTERY_STATUS, d.battery_status));
-  check_and_encode_key(err, encode_key_value_uint8(&map_encoder, PowerBatteryMsg::BATTERY_HEALTH, d.battery_health));
-  check_and_encode_key(err, encode_key_value_uint8(&map_encoder, PowerBatteryMsg::NUM_CELLS, d.num_cells));
+  check_and_encode_key(err,
+                       encode_key_value_uint8(&map_encoder, PowerReadingMsg::POWER_READING_TYPE,
+                                              d.power_reading_type));
+  check_and_encode_key(err,
+                       encode_key_value_uint8(&map_encoder, PowerReadingMsg::STATUS, d.status));
+  check_and_encode_key(
+      err, encode_key_value_double(&map_encoder, PowerReadingMsg::VOLTAGE_V, d.voltage_v));
+  check_and_encode_key(
+      err, encode_key_value_double(&map_encoder, PowerReadingMsg::current_a, d.current_a));
+  check_and_encode_key(
+      err, encode_key_value_double(&map_encoder, PowerBatteryMsg::CHARGE_AH, d.charge_ah));
+  check_and_encode_key(
+      err, encode_key_value_double(&map_encoder, PowerBatteryMsg::CAPACITY_AH, d.capacity_ah));
+  check_and_encode_key(
+      err, encode_key_value_double(&map_encoder, PowerBatteryMsg::PERCENTAGE, d.percentage));
+  check_and_encode_key(
+      err,
+      encode_key_value_uint8(&map_encoder, PowerBatteryMsg::BATTERY_STATUS, d.battery_status));
+  check_and_encode_key(
+      err,
+      encode_key_value_uint8(&map_encoder, PowerBatteryMsg::BATTERY_HEALTH, d.battery_health));
+  check_and_encode_key(
+      err, encode_key_value_uint8(&map_encoder, PowerBatteryMsg::NUM_CELLS, d.num_cells));
   err = cbor_encode_text_stringz(&map_encoder, PowerBatteryMsg::CELL_VOLTAGE);
   if (err != CborNoError) {
     bm_debug("cbor_encode_text_stringz failed for cell_voltage key: %d\n", err);
@@ -47,7 +62,7 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, si
     }
   }
 
-  for (uint8_t i = 0; i  < d.num_cells; i++) {
+  for (uint8_t i = 0; i < d.num_cells; i++) {
     err = cbor_encode_double(&arrayEncoder, d.cell_voltage[i]);
     if (err != CborNoError) {
       bm_debug("cbor_encode_double failed for cell_voltage value: %d\n", err);
@@ -85,7 +100,7 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, si
     }
   }
 
-  for (uint8_t i = 0; i  < d.num_cells; i++) {
+  for (uint8_t i = 0; i < d.num_cells; i++) {
     err = cbor_encode_double(&arrayEncoder_temps, d.cell_temperature[i]);
     if (err != CborNoError) {
       bm_debug("cbor_encode_double failed for cell_temperature value: %d\n", err);
@@ -121,7 +136,8 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
   CborValue map, value;
   CborError err;
 
-  err = decoder_message_enter(&map, &value, &parser, (uint8_t *)cbor_buffer, size, PowerBatteryMsg::NUM_FIELDS);
+  err = decoder_message_enter(&map, &value, &parser, (uint8_t *)cbor_buffer, size,
+                              PowerBatteryMsg::NUM_FIELDS);
   if (err != CborNoError) {
     return err;
   }
@@ -132,16 +148,25 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
     return err;
   }
 
-  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.power_reading_type, &value, PowerReadingMsg::POWER_READING_TYPE));
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.power_reading_type, &value,
+                                                   PowerReadingMsg::POWER_READING_TYPE));
   check_and_decode_key(err, decode_key_value_uint8(&d.status, &value, PowerReadingMsg::STATUS));
-  check_and_decode_key(err, decode_key_value_double(&d.voltage_v, &value, PowerReadingMsg::VOLTAGE_V));
-  check_and_decode_key(err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::current_a));
-  check_and_decode_key(err, decode_key_value_double(&d.charge_ah, &value, PowerBatteryMsg::CHARGE_AH));
-  check_and_decode_key(err, decode_key_value_double(&d.capacity_ah, &value, PowerBatteryMsg::CAPACITY_AH));
-  check_and_decode_key(err, decode_key_value_double(&d.percentage, &value, PowerBatteryMsg::PERCENTAGE));
-  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_status, &value, PowerBatteryMsg::BATTERY_STATUS));
-  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_health, &value, PowerBatteryMsg::BATTERY_HEALTH));
-  check_and_decode_key(err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryMsg::NUM_CELLS));
+  check_and_decode_key(
+      err, decode_key_value_double(&d.voltage_v, &value, PowerReadingMsg::VOLTAGE_V));
+  check_and_decode_key(
+      err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::current_a));
+  check_and_decode_key(
+      err, decode_key_value_double(&d.charge_ah, &value, PowerBatteryMsg::CHARGE_AH));
+  check_and_decode_key(
+      err, decode_key_value_double(&d.capacity_ah, &value, PowerBatteryMsg::CAPACITY_AH));
+  check_and_decode_key(
+      err, decode_key_value_double(&d.percentage, &value, PowerBatteryMsg::PERCENTAGE));
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_status, &value,
+                                                   PowerBatteryMsg::BATTERY_STATUS));
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_health, &value,
+                                                   PowerBatteryMsg::BATTERY_HEALTH));
+  check_and_decode_key(
+      err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryMsg::NUM_CELLS));
 
   // decode the arrays
   // todo - handle what happens when the arrays are empty / not desired by the decoder??
@@ -168,9 +193,9 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
   }
   if (d.cell_voltage == NULL) {
 #ifndef CI_TEST
-    d.cell_voltage = (double*)bm_malloc(sizeof(double) * d.num_cells);
-#else // CI_TEST
-    d.cell_voltage = (double*)malloc(sizeof(double) * d.num_cells);
+    d.cell_voltage = (double *)bm_malloc(sizeof(double) * d.num_cells);
+#else  // CI_TEST
+    d.cell_voltage = (double *)malloc(sizeof(double) * d.num_cells);
 #endif // CI_TEST
   }
 
@@ -216,9 +241,9 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
 
   if (d.cell_temperature == NULL) {
 #ifndef CI_TEST
-    d.cell_temperature = (double*)bm_malloc(sizeof(double) * d.num_cells);
-#else // CI_TEST
-    d.cell_temperature = (double*)malloc(sizeof(double) * d.num_cells);
+    d.cell_temperature = (double *)bm_malloc(sizeof(double) * d.num_cells);
+#else  // CI_TEST
+    d.cell_temperature = (double *)malloc(sizeof(double) * d.num_cells);
 #endif // CI_TEST
   }
 
@@ -241,5 +266,4 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
   }
 
   return err;
-
 }
