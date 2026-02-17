@@ -6,7 +6,7 @@
 namespace PowerBatteryMsg {
 
 constexpr uint32_t VERSION = 1;
-constexpr size_t NUM_FIELDS = 11 + SensorHeaderMsg::NUM_FIELDS;
+constexpr size_t NUM_FIELDS = 12 + SensorHeaderMsg::NUM_FIELDS;
 static constexpr char CHARGE_AH[] = "charge_ah";
 static constexpr char CAPACITY_AH[] = "capacity_ah";
 static constexpr char PERCENTAGE[] = "percentage";
@@ -17,11 +17,20 @@ static constexpr char CELL_VOLTAGE[] = "cell_voltage";
 static constexpr char CELL_TEMPERATURE[] = "cell_temperature";
 
 typedef enum PowerBatteryStatus: uint8_t {
-
+  STATUS_UNKNOWN = 0,
+  CHARGING = 1,
+  DISCHARGING = 2,
+  NOT_CHARGING = 3,
+  FULL = 4,
 } PowerBatteryStatus_t;
 
 typedef enum PowerBatteryHealth: uint8_t {
-
+  HEALTH_UNKNOWN = 0,
+  GOOD = 1,
+  OVERHEAT = 2,
+  DEAD = 3,
+  COLD = 4,
+  UNSPEC_FAILURE = 5,
 } PowerBatteryHealth_t;
 
 struct Data {

@@ -12,6 +12,7 @@
 #include "device_test_svc_request_msg.h"
 #include "pme_dissolved_oxygen_msg.h"
 #include "pme_wipe_msg.h"
+#include "power_battery_msg.h"
 #include "power_reading_averages_msg.h"
 #include "power_reading_msg.h"
 #include "sensor_header_msg.h"
@@ -630,4 +631,58 @@ TEST_F(BmCommonTest, PowerReadingAveragesTest) {
   EXPECT_EQ(decode.current_a_min, 0.248);
   EXPECT_EQ(decode.current_a_max, 0.270);
   EXPECT_EQ(decode.current_a_stdev, 0.016);
+}
+
+TEST_F(BmCommonTest, PowerBatteryTest) {
+  PowerBatteryMsg::Data d;
+  d.header.version = PowerBatteryMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.power_reading_type = PowerReadingMsg::SOURCE;
+  d.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
+  d.voltage_v = 6.79;
+  d.current_a = 0.123;
+  d.charge_ah = 5.6;
+  d.capacity_ah = 7.0;
+  d.percentage = 0.8;
+  d.battery_status = PowerBatteryMsg::DISCHARGING;
+  d.battery_health = PowerBatteryMsg::GOOD;
+  d.num_cells = 1;
+  d.cell_voltage = (double *)malloc(sizeof(double));
+  d.cell_voltage[0] = 6.79;
+  d.cell_temperature = (double *)malloc(sizeof(double));
+  d.cell_temperature[0] = 25.6;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  PowerBatteryMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 309);
+
+  free(d.cell_voltage);
+  free(d.cell_temperature);
+
+  PowerBatteryMsg::Data decode;
+  decode.cell_voltage = (double *)malloc(sizeof(double));
+  decode.cell_temperature = (double *)malloc(sizeof(double));
+  PowerBatteryMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, PowerReadingMsg::VERSION);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode.power_reading_type, PowerReadingMsg::SOURCE);
+  EXPECT_EQ(decode.status, PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE);
+  EXPECT_EQ(decode.voltage_v, 6.79);
+  EXPECT_EQ(decode.current_a, 0.123);
+  EXPECT_EQ(decode.charge_ah, 5.6);
+  EXPECT_EQ(decode.capacity_ah, 7.0);
+  EXPECT_EQ(decode.percentage, 0.8);
+  EXPECT_EQ(decode.battery_status, PowerBatteryMsg::DISCHARGING);
+  EXPECT_EQ(decode.battery_health, PowerBatteryMsg::GOOD);
+  EXPECT_EQ(decode.num_cells, 1);
+  EXPECT_EQ(decode.cell_voltage[0], 6.79);
+  EXPECT_EQ(decode.cell_temperature[0], 25.6);
+
+  free(decode.cell_voltage);
+  free(decode.cell_temperature);
 }

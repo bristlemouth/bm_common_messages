@@ -57,7 +57,7 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, si
     return err;
   }
 
-  err = cbor_encoder_close_container(&encoder, &arrayEncoder);
+  err = cbor_encoder_close_container(&map_encoder, &arrayEncoder);
   if (err != CborNoError) {
     bm_debug("cbor_encoder_close_container failed for cell_voltage array: %d\n", err);
     if (err != CborErrorOutOfMemory) {
@@ -95,7 +95,7 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, si
     return err;
   }
 
-  err = cbor_encoder_close_container(&encoder, &arrayEncoder_temps);
+  err = cbor_encoder_close_container(&map_encoder, &arrayEncoder_temps);
   if (err != CborNoError) {
     bm_debug("cbor_encoder_close_container failed for cell_temperature array: %d\n", err);
     if (err != CborErrorOutOfMemory) {
@@ -114,10 +114,111 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, si
 }
 
 CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
-  (void) d;
-  (void) cbor_buffer;
-  (void) size;
-  CborError err = CborNoError;
+  CborParser parser;
+  CborValue map, value;
+  CborError err;
+
+  err = decoder_message_enter(&map, &value, &parser, (uint8_t *)cbor_buffer, size, PowerBatteryMsg::NUM_FIELDS);
+  if (err != CborNoError) {
+    return err;
+  }
+
+  // decode header
+  err = SensorHeaderMsg::decode(value, d.header);
+  if (err != CborNoError) {
+    return err;
+  }
+
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.power_reading_type, &value, PowerReadingMsg::POWER_READING_TYPE));
+  check_and_decode_key(err, decode_key_value_uint8(&d.status, &value, PowerReadingMsg::STATUS));
+  check_and_decode_key(err, decode_key_value_double(&d.voltage_v, &value, PowerReadingMsg::VOLTAGE_V));
+  check_and_decode_key(err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::current_a));
+  check_and_decode_key(err, decode_key_value_double(&d.charge_ah, &value, PowerBatteryMsg::CHARGE_AH));
+  check_and_decode_key(err, decode_key_value_double(&d.capacity_ah, &value, PowerBatteryMsg::CAPACITY_AH));
+  check_and_decode_key(err, decode_key_value_double(&d.percentage, &value, PowerBatteryMsg::PERCENTAGE));
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_status, &value, PowerBatteryMsg::BATTERY_STATUS));
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_health, &value, PowerBatteryMsg::BATTERY_HEALTH));
+  check_and_decode_key(err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryMsg::NUM_CELLS));
+
+  // decode the arrays
+  // todo - handle what happens when the arrays are empty / not desired by the decoder??
+  if (!cbor_value_is_text_string(&value)) {
+    err = CborErrorIllegalType;
+    bm_debug("expected string key but got something else\n");
+    return err;
+  }
+  err = cbor_value_advance(&value);
+  if (err != CborNoError) {
+    return err;
+  }
+  if (!cbor_value_is_array(&value)) {
+    err = CborErrorIllegalType;
+    bm_debug("expected array key but got something else\n");
+    return err;
+  }
+
+  CborValue array;
+  err = cbor_value_enter_container(&value, &array);
+  if (err != CborNoError) {
+    bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
+    return err;
+  }
+  for (uint8_t i = 0; i < d.num_cells; i++) {
+    err = cbor_value_get_double(&array, &d.cell_voltage[i]);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&array);
+    if (err != CborNoError) {
+      bm_debug("Failed to advance cell_voltage array\n");
+      break;
+    }
+  }
+
+  err = cbor_value_leave_container(&value, &array);
+  if (err != CborNoError) {
+    bm_debug("cbor value_leave_container failed for cell_voltage array: %d\n", err);
+    return err;
+  }
+
+  if (!cbor_value_is_text_string(&value)) {
+    err = CborErrorIllegalType;
+    bm_debug("expected string key but got something else\n");
+    return err;
+  }
+  err = cbor_value_advance(&value);
+  if (err != CborNoError) {
+    return err;
+  }
+  if (!cbor_value_is_array(&value)) {
+    err = CborErrorIllegalType;
+    bm_debug("expected array key but got something else\n");
+    return err;
+  }
+
+  CborValue array_temps;
+  err = cbor_value_enter_container(&value, &array_temps);
+  if (err != CborNoError) {
+    bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
+    return err;
+  }
+  for (uint8_t i = 0; i < d.num_cells; i++) {
+    err = cbor_value_get_double(&array_temps, &d.cell_temperature[i]);
+    if (err != CborNoError) {
+      break;
+    }
+    err = cbor_value_advance(&array_temps);
+    if (err != CborNoError) {
+      bm_debug("Failed to advance cell_voltage array\n");
+      break;
+    }
+  }
+
+  err = cbor_value_leave_container(&value, &array_temps);
+  if (err != CborNoError) {
+    bm_debug("cbor value_leave_container failed for cell_voltage array: %d\n", err);
+    return err;
+  }
 
   return err;
 
