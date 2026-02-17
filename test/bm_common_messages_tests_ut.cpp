@@ -663,8 +663,6 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   free(d.cell_temperature);
 
   PowerBatteryMsg::Data decode;
-  decode.cell_voltage = (double *)malloc(sizeof(double));
-  decode.cell_temperature = (double *)malloc(sizeof(double));
   PowerBatteryMsg::decode(decode, cbor_buffer, len);
   EXPECT_EQ(decode.header.version, PowerReadingMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);

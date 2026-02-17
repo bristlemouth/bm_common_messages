@@ -1,6 +1,9 @@
 #include "power_battery_msg.h"
 #include "bm_config.h"
 #include "bm_messages_helper.h"
+#ifndef CI_TEST
+#include "bm_os.h"
+#endif
 
 CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len) {
   CborError err;
@@ -163,6 +166,14 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
     bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
     return err;
   }
+  if (d.cell_voltage == NULL) {
+#ifndef CI_TEST
+    d.cell_voltage = (double*)bm_malloc(sizeof(double) * d.num_cells);
+#else // CI_TEST
+    d.cell_voltage = (double*)malloc(sizeof(double) * d.num_cells);
+#endif // CI_TEST
+  }
+
   for (uint8_t i = 0; i < d.num_cells; i++) {
     err = cbor_value_get_double(&array, &d.cell_voltage[i]);
     if (err != CborNoError) {
@@ -202,6 +213,15 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
     bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
     return err;
   }
+
+  if (d.cell_temperature == NULL) {
+#ifndef CI_TEST
+    d.cell_temperature = (double*)bm_malloc(sizeof(double) * d.num_cells);
+#else // CI_TEST
+    d.cell_temperature = (double*)malloc(sizeof(double) * d.num_cells);
+#endif // CI_TEST
+  }
+
   for (uint8_t i = 0; i < d.num_cells; i++) {
     err = cbor_value_get_double(&array_temps, &d.cell_temperature[i]);
     if (err != CborNoError) {
