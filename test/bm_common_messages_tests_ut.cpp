@@ -662,7 +662,7 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   free(d.cell_voltage);
   free(d.cell_temperature);
 
-  PowerBatteryMsg::Data decode;
+  PowerBatteryMsg::Data decode = {};
   PowerBatteryMsg::decode(decode, cbor_buffer, len);
   EXPECT_EQ(decode.header.version, PowerReadingMsg::VERSION);
   EXPECT_EQ(decode.header.reading_time_utc_ms, 123456789);
@@ -683,4 +683,42 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
 
   free(decode.cell_voltage);
   free(decode.cell_temperature);
+
+  PowerBatteryMsg::Data d2 = {};
+  d2.header.version = PowerBatteryMsg::VERSION;
+  d2.header.reading_time_utc_ms = 123456789;
+  d2.header.reading_uptime_millis = 987654321;
+  d2.header.sensor_reading_time_ms = 0xdeadc0de;
+  d2.power_reading_type = PowerReadingMsg::SOURCE;
+  d2.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
+  d2.voltage_v = 6.79;
+  d2.current_a = 0.123;
+  d2.charge_ah = 5.6;
+  d2.capacity_ah = 7.0;
+  d2.percentage = 0.8;
+  d2.battery_status = PowerBatteryMsg::DISCHARGING;
+  d2.battery_health = PowerBatteryMsg::GOOD;
+  d2.num_cells = 0;
+
+  uint8_t cbor_buffer2[1024];
+  size_t len2 = 0;
+  PowerBatteryMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
+  EXPECT_EQ(len2, 291);
+
+  PowerBatteryMsg::Data decode2;
+  PowerBatteryMsg::decode(decode2, cbor_buffer2, len2);
+  EXPECT_EQ(decode2.header.version, PowerReadingMsg::VERSION);
+  EXPECT_EQ(decode2.header.reading_time_utc_ms, 123456789);
+  EXPECT_EQ(decode2.header.reading_uptime_millis, 987654321);
+  EXPECT_EQ(decode2.header.sensor_reading_time_ms, 0xdeadc0de);
+  EXPECT_EQ(decode2.power_reading_type, PowerReadingMsg::SOURCE);
+  EXPECT_EQ(decode2.status, PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE);
+  EXPECT_EQ(decode2.voltage_v, 6.79);
+  EXPECT_EQ(decode2.current_a, 0.123);
+  EXPECT_EQ(decode2.charge_ah, 5.6);
+  EXPECT_EQ(decode2.capacity_ah, 7.0);
+  EXPECT_EQ(decode2.percentage, 0.8);
+  EXPECT_EQ(decode2.battery_status, PowerBatteryMsg::DISCHARGING);
+  EXPECT_EQ(decode2.battery_health, PowerBatteryMsg::GOOD);
+  EXPECT_EQ(decode2.num_cells, 0);
 }

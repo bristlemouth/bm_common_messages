@@ -185,37 +185,47 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
     return err;
   }
 
-  CborValue array;
-  err = cbor_value_enter_container(&value, &array);
-  if (err != CborNoError) {
-    bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
-    return err;
-  }
-  if (d.cell_voltage == NULL) {
+  if (d.cell_voltage == NULL && d.num_cells > 0) {
+    CborValue array;
+    err = cbor_value_enter_container(&value, &array);
+    if (err != CborNoError) {
+      bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
+      return err;
+    }
 #ifndef CI_TEST
     d.cell_voltage = (double *)bm_malloc(sizeof(double) * d.num_cells);
 #else  // CI_TEST
     d.cell_voltage = (double *)malloc(sizeof(double) * d.num_cells);
 #endif // CI_TEST
+
+    if (d.cell_voltage == NULL) {
+      return CborErrorOutOfMemory;
+    }
+
+    for (uint8_t i = 0; i < d.num_cells; i++) {
+      err = cbor_value_get_double(&array, &d.cell_voltage[i]);
+      if (err != CborNoError) {
+        break;
+      }
+      err = cbor_value_advance(&array);
+      if (err != CborNoError) {
+        bm_debug("Failed to advance cell_voltage array\n");
+        break;
+      }
+    }
+    err = cbor_value_leave_container(&value, &array);
+    if (err != CborNoError) {
+      bm_debug("cbor value_leave_container failed for cell_voltage array: %d\n", err);
+      return err;
+    }
+  } else {
+    bm_debug("1 num_cells = 0\n");
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      return err;
+    }
   }
 
-  for (uint8_t i = 0; i < d.num_cells; i++) {
-    err = cbor_value_get_double(&array, &d.cell_voltage[i]);
-    if (err != CborNoError) {
-      break;
-    }
-    err = cbor_value_advance(&array);
-    if (err != CborNoError) {
-      bm_debug("Failed to advance cell_voltage array\n");
-      break;
-    }
-  }
-
-  err = cbor_value_leave_container(&value, &array);
-  if (err != CborNoError) {
-    bm_debug("cbor value_leave_container failed for cell_voltage array: %d\n", err);
-    return err;
-  }
 
   if (!cbor_value_is_text_string(&value)) {
     err = CborErrorIllegalType;
@@ -232,38 +242,48 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
     return err;
   }
 
-  CborValue array_temps;
-  err = cbor_value_enter_container(&value, &array_temps);
-  if (err != CborNoError) {
-    bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
-    return err;
-  }
 
-  if (d.cell_temperature == NULL) {
+  if (d.cell_temperature == NULL && d.num_cells > 0) {
+    CborValue array_temps;
+    err = cbor_value_enter_container(&value, &array_temps);
+    if (err != CborNoError) {
+      bm_debug("cbor_value_enter_container failed for cell_voltage array: %d\n", err);
+      return err;
+    }
 #ifndef CI_TEST
     d.cell_temperature = (double *)bm_malloc(sizeof(double) * d.num_cells);
 #else  // CI_TEST
     d.cell_temperature = (double *)malloc(sizeof(double) * d.num_cells);
 #endif // CI_TEST
+
+    if (d.cell_temperature == NULL) {
+      return CborErrorOutOfMemory;
+    }
+
+    for (uint8_t i = 0; i < d.num_cells; i++) {
+      err = cbor_value_get_double(&array_temps, &d.cell_temperature[i]);
+      if (err != CborNoError) {
+        break;
+      }
+      err = cbor_value_advance(&array_temps);
+      if (err != CborNoError) {
+        bm_debug("Failed to advance cell_voltage array\n");
+        break;
+      }
+    }
+    err = cbor_value_leave_container(&value, &array_temps);
+    if (err != CborNoError) {
+      bm_debug("cbor value_leave_container failed for cell_voltage array: %d\n", err);
+      return err;
+    }
+  } else {
+    bm_debug("2 num_cells = 0\n");
+    err = cbor_value_advance(&value);
+    if (err != CborNoError) {
+      return err;
+    }
   }
 
-  for (uint8_t i = 0; i < d.num_cells; i++) {
-    err = cbor_value_get_double(&array_temps, &d.cell_temperature[i]);
-    if (err != CborNoError) {
-      break;
-    }
-    err = cbor_value_advance(&array_temps);
-    if (err != CborNoError) {
-      bm_debug("Failed to advance cell_voltage array\n");
-      break;
-    }
-  }
-
-  err = cbor_value_leave_container(&value, &array_temps);
-  if (err != CborNoError) {
-    bm_debug("cbor value_leave_container failed for cell_voltage array: %d\n", err);
-    return err;
-  }
 
   return err;
 }
