@@ -219,7 +219,6 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
       return err;
     }
   } else {
-    bm_debug("1 num_cells = 0\n");
     err = cbor_value_advance(&value);
     if (err != CborNoError) {
       return err;
@@ -277,7 +276,6 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
       return err;
     }
   } else {
-    bm_debug("2 num_cells = 0\n");
     err = cbor_value_advance(&value);
     if (err != CborNoError) {
       return err;
