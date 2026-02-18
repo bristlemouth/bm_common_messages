@@ -649,18 +649,18 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   d.battery_status = PowerBatteryMsg::DISCHARGING;
   d.battery_health = PowerBatteryMsg::GOOD;
   d.num_cells = 1;
-  d.cell_voltage = (double *)malloc(sizeof(double));
-  d.cell_voltage[0] = 6.79;
-  d.cell_temperature = (double *)malloc(sizeof(double));
-  d.cell_temperature[0] = 25.6;
+  d.cell_voltage_v = (double *)malloc(sizeof(double));
+  d.cell_voltage_v[0] = 6.79;
+  d.cell_temperature_c = (double *)malloc(sizeof(double));
+  d.cell_temperature_c[0] = 25.6;
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   PowerBatteryMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-  EXPECT_EQ(len, 309);
+  EXPECT_EQ(len, 313);
 
-  free(d.cell_voltage);
-  free(d.cell_temperature);
+  free(d.cell_voltage_v);
+  free(d.cell_temperature_c);
 
   PowerBatteryMsg::Data decode = {};
   PowerBatteryMsg::decode(decode, cbor_buffer, len);
@@ -678,11 +678,11 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(decode.battery_status, PowerBatteryMsg::DISCHARGING);
   EXPECT_EQ(decode.battery_health, PowerBatteryMsg::GOOD);
   EXPECT_EQ(decode.num_cells, 1);
-  EXPECT_EQ(decode.cell_voltage[0], 6.79);
-  EXPECT_EQ(decode.cell_temperature[0], 25.6);
+  EXPECT_EQ(decode.cell_voltage_v[0], 6.79);
+  EXPECT_EQ(decode.cell_temperature_c[0], 25.6);
 
-  free(decode.cell_voltage);
-  free(decode.cell_temperature);
+  free(decode.cell_voltage_v);
+  free(decode.cell_temperature_c);
 
   PowerBatteryMsg::Data d2 = {};
   d2.header.version = PowerBatteryMsg::VERSION;
@@ -703,7 +703,7 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   uint8_t cbor_buffer2[1024];
   size_t len2 = 0;
   PowerBatteryMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
-  EXPECT_EQ(len2, 291);
+  EXPECT_EQ(len2, 295);
 
   PowerBatteryMsg::Data decode2;
   PowerBatteryMsg::decode(decode2, cbor_buffer2, len2);

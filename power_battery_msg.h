@@ -13,8 +13,8 @@ static constexpr char PERCENTAGE[] = "percentage";
 static constexpr char BATTERY_STATUS[] = "battery_status";
 static constexpr char BATTERY_HEALTH[] = "battery_health";
 static constexpr char NUM_CELLS[] = "num_cells";
-static constexpr char CELL_VOLTAGE[] = "cell_voltage";
-static constexpr char CELL_TEMPERATURE[] = "cell_temperature";
+static constexpr char CELL_VOLTAGE_V[] = "cell_voltage_v";
+static constexpr char CELL_TEMPERATURE_C[] = "cell_temperature_c";
 
 typedef enum PowerBatteryStatus : uint8_t {
   STATUS_UNKNOWN = 0,
@@ -45,8 +45,8 @@ struct Data {
   PowerBatteryStatus_t battery_status;
   PowerBatteryHealth_t battery_health;
   uint8_t num_cells;
-  double *cell_voltage;
-  double *cell_temperature;
+  double *cell_voltage_v;
+  double *cell_temperature_c;
 };
 
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len);
