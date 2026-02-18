@@ -225,7 +225,6 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
     }
   }
 
-
   if (!cbor_value_is_text_string(&value)) {
     err = CborErrorIllegalType;
     bm_debug("expected string key but got something else\n");
@@ -240,7 +239,6 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
     bm_debug("expected array key but got something else\n");
     return err;
   }
-
 
   if (d.cell_temperature == NULL && d.num_cells > 0) {
     CborValue array_temps;
@@ -281,7 +279,6 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
       return err;
     }
   }
-
 
   return err;
 }
