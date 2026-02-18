@@ -26,6 +26,13 @@ CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
                                               d.power_reading_type));
   check_and_encode_key(err,
                        encode_key_value_uint8(&map_encoder, PowerReadingMsg::STATUS, d.status));
+  check_and_encode_key(err, encode_key_value_uint32(&map_encoder,
+                                                    PowerBatteryAveragesMsg::NUM_SAMPLES,
+                                                    d.num_samples));
+  check_and_encode_key(
+      err,
+      encode_key_value_double(&map_encoder, PowerBatteryAveragesMsg::AVERAGING_WINDOW_LENGTH_S,
+                              d.averaging_window_length_s));
   check_and_encode_key(err, encode_key_value_uint8(
                                 &map_encoder, PowerBatteryAveragesMsg::NUM_CELLS, d.num_cells));
 

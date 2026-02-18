@@ -14,6 +14,7 @@
 #include "device_test_svc_request_msg.h"
 #include "pme_dissolved_oxygen_msg.h"
 #include "pme_wipe_msg.h"
+#include "power_battery_averages_msg.h"
 #include "power_battery_msg.h"
 #include "power_reading_averages_msg.h"
 #include "power_reading_msg.h"
@@ -798,4 +799,65 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   free(d3.cell_temperature_c);
   free(decode3.cell_voltage_v);
   free(decode3.cell_temperature_c);
+}
+
+TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
+  // Test with num_cells == 1
+  PowerBatteryAveragesMsg::Data d;
+  d.header.version = PowerBatteryAveragesMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.power_reading_type = PowerReadingMsg::SOURCE;
+  d.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
+  d.num_samples = 15;
+  d.averaging_window_length_s = 29.98;
+  d.num_cells = 1;
+  d.cell_voltage_v_avg = (double *)malloc(sizeof(double));
+  d.cell_voltage_v_avg[0] = 6.85;
+  d.cell_voltage_v_max = (double *)malloc(sizeof(double));
+  d.cell_voltage_v_max[0] = 7.12;
+  d.cell_voltage_v_min = (double *)malloc(sizeof(double));
+  d.cell_voltage_v_min[0] = 6.58;
+  d.cell_voltage_v_stdev = (double *)malloc(sizeof(double));
+  d.cell_voltage_v_stdev[0] = 0.123;
+  d.cell_temperature_c_avg = (double *)malloc(sizeof(double));
+  d.cell_temperature_c_avg[0] = 24.935;
+  d.cell_temperature_c_max = (double *)malloc(sizeof(double));
+  d.cell_temperature_c_max[0] = 26.49;
+  d.cell_temperature_c_min = (double *)malloc(sizeof(double));
+  d.cell_temperature_c_min[0] = 23.38;
+  d.cell_temperature_c_stdev = (double *)malloc(sizeof(double));
+  d.cell_temperature_c_stdev[0] = 0.126;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  CborError err = PowerBatteryAveragesMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(len, 431);
+
+  // PowerBatteryMsg::Data decode = {};
+  // PowerBatteryMsg::decode(decode, cbor_buffer, len);
+  // EXPECT_EQ(decode.header.version, d.header.version);
+  // EXPECT_EQ(decode.header.reading_time_utc_ms, d.header.reading_time_utc_ms);
+  // EXPECT_EQ(decode.header.reading_uptime_millis, d.header.reading_uptime_millis);
+  // EXPECT_EQ(decode.header.sensor_reading_time_ms, d.header.sensor_reading_time_ms);
+  // EXPECT_EQ(decode.power_reading_type, d.power_reading_type);
+  // EXPECT_EQ(decode.status, d.status);
+  // EXPECT_EQ(decode.num_samples, d.num_samples);
+  // EXPECT_EQ(decode.averaging_window_length_s, d.averaging_window_length_s);
+  // EXPECT_EQ(decode.num_cells, d.num_cells);
+  // EXPECT_EQ(decode.cell_voltage_v[0], d.cell_voltage_v[0]);
+  // EXPECT_EQ(decode.cell_temperature_c[0], d.cell_temperature_c[0]);
+
+  free(d.cell_voltage_v_avg);
+  free(d.cell_voltage_v_max);
+  free(d.cell_voltage_v_min);
+  free(d.cell_voltage_v_stdev);
+  free(d.cell_temperature_c_avg);
+  free(d.cell_temperature_c_max);
+  free(d.cell_temperature_c_min);
+  free(d.cell_temperature_c_stdev);
+  // free(decode.cell_voltage_v);
+  // free(decode.cell_temperature_c);
 }
