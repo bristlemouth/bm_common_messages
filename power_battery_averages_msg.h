@@ -22,7 +22,7 @@ static constexpr char CELL_TEMPERATURE_C_STDEV[] = "cell_temperature_c_stdev";
 
 typedef struct array_encoder_decoder {
   const char* array_name;
-  double *array_pointer;
+  double **array_pointer;
 } array_encoder_decoder_t;
 
 struct Data {

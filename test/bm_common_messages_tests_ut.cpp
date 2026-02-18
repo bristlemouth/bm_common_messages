@@ -836,19 +836,25 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   EXPECT_EQ(err, CborNoError);
   EXPECT_EQ(len, 431);
 
-  // PowerBatteryMsg::Data decode = {};
-  // PowerBatteryMsg::decode(decode, cbor_buffer, len);
-  // EXPECT_EQ(decode.header.version, d.header.version);
-  // EXPECT_EQ(decode.header.reading_time_utc_ms, d.header.reading_time_utc_ms);
-  // EXPECT_EQ(decode.header.reading_uptime_millis, d.header.reading_uptime_millis);
-  // EXPECT_EQ(decode.header.sensor_reading_time_ms, d.header.sensor_reading_time_ms);
-  // EXPECT_EQ(decode.power_reading_type, d.power_reading_type);
-  // EXPECT_EQ(decode.status, d.status);
-  // EXPECT_EQ(decode.num_samples, d.num_samples);
-  // EXPECT_EQ(decode.averaging_window_length_s, d.averaging_window_length_s);
-  // EXPECT_EQ(decode.num_cells, d.num_cells);
-  // EXPECT_EQ(decode.cell_voltage_v[0], d.cell_voltage_v[0]);
-  // EXPECT_EQ(decode.cell_temperature_c[0], d.cell_temperature_c[0]);
+  PowerBatteryAveragesMsg::Data decode = {};
+  PowerBatteryAveragesMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(decode.header.version, d.header.version);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, d.header.reading_time_utc_ms);
+  EXPECT_EQ(decode.header.reading_uptime_millis, d.header.reading_uptime_millis);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, d.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode.power_reading_type, d.power_reading_type);
+  EXPECT_EQ(decode.status, d.status);
+  EXPECT_EQ(decode.num_samples, d.num_samples);
+  EXPECT_EQ(decode.averaging_window_length_s, d.averaging_window_length_s);
+  EXPECT_EQ(decode.num_cells, d.num_cells);
+  EXPECT_EQ(decode.cell_voltage_v_avg[0], d.cell_voltage_v_avg[0]);
+  EXPECT_EQ(decode.cell_voltage_v_max[0], d.cell_voltage_v_max[0]);
+  EXPECT_EQ(decode.cell_voltage_v_min[0], d.cell_voltage_v_min[0]);
+  EXPECT_EQ(decode.cell_voltage_v_stdev[0], d.cell_voltage_v_stdev[0]);
+  EXPECT_EQ(decode.cell_temperature_c_avg[0], d.cell_temperature_c_avg[0]);
+  EXPECT_EQ(decode.cell_temperature_c_max[0], d.cell_temperature_c_max[0]);
+  EXPECT_EQ(decode.cell_temperature_c_min[0], d.cell_temperature_c_min[0]);
+  EXPECT_EQ(decode.cell_temperature_c_stdev[0], d.cell_temperature_c_stdev[0]);
 
   free(d.cell_voltage_v_avg);
   free(d.cell_voltage_v_max);
@@ -858,6 +864,12 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   free(d.cell_temperature_c_max);
   free(d.cell_temperature_c_min);
   free(d.cell_temperature_c_stdev);
-  // free(decode.cell_voltage_v);
-  // free(decode.cell_temperature_c);
+  free(decode.cell_voltage_v_avg);
+  free(decode.cell_voltage_v_max);
+  free(decode.cell_voltage_v_min);
+  free(decode.cell_voltage_v_stdev);
+  free(decode.cell_temperature_c_avg);
+  free(decode.cell_temperature_c_max);
+  free(decode.cell_temperature_c_min);
+  free(decode.cell_temperature_c_stdev);
 }
