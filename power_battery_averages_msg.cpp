@@ -5,7 +5,8 @@
 #include "bm_os.h"
 #endif
 
-CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len) {
+CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
+                                          size_t *encoded_len) {
   CborError err;
   CborEncoder encoder, map_encoder;
 
@@ -37,21 +38,23 @@ CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
                                 &map_encoder, PowerBatteryAveragesMsg::NUM_CELLS, d.num_cells));
 
   if (d.num_cells > 0) {
-    PowerBatteryAveragesMsg::array_encoder_decoder_t array_list[PowerBatteryAveragesMsg::NUM_ARRAYS] = {
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_AVG, &d.cell_voltage_v_avg},
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MAX, &d.cell_voltage_v_max},
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MIN, &d.cell_voltage_v_min},
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_STDEV, &d.cell_voltage_v_stdev},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_AVG, &d.cell_temperature_c_avg},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MAX, &d.cell_temperature_c_max},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MIN, &d.cell_temperature_c_min},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV, &d.cell_temperature_c_stdev},
-    };
+    PowerBatteryAveragesMsg::array_encoder_decoder_t
+        array_list[PowerBatteryAveragesMsg::NUM_ARRAYS] = {
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_AVG, &d.cell_voltage_v_avg},
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MAX, &d.cell_voltage_v_max},
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MIN, &d.cell_voltage_v_min},
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_STDEV, &d.cell_voltage_v_stdev},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_AVG, &d.cell_temperature_c_avg},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MAX, &d.cell_temperature_c_max},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MIN, &d.cell_temperature_c_min},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV, &d.cell_temperature_c_stdev},
+        };
 
     for (size_t i = 0; i < PowerBatteryAveragesMsg::NUM_ARRAYS; i++) {
       err = cbor_encode_text_stringz(&map_encoder, array_list[i].array_name);
       if (err != CborNoError) {
-        bm_debug("cbor_encode_text_stringz failed for %s key: %d\n", array_list[i].array_name, err);
+        bm_debug("cbor_encode_text_stringz failed for %s key: %d\n", array_list[i].array_name,
+                 err);
         if (err != CborErrorOutOfMemory) {
           return err;
         }
@@ -60,7 +63,8 @@ CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
       CborEncoder arrayEncoder;
       err = cbor_encoder_create_array(&map_encoder, &arrayEncoder, d.num_cells);
       if (err != CborNoError) {
-        bm_debug("cbor_encoder_create_array failed for %s array: %d\n", array_list[i].array_name, err);
+        bm_debug("cbor_encoder_create_array failed for %s array: %d\n",
+                 array_list[i].array_name, err);
         if (err != CborErrorOutOfMemory) {
           return err;
         }
@@ -69,7 +73,8 @@ CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
       for (uint8_t j = 0; j < d.num_cells; j++) {
         err = cbor_encode_double(&arrayEncoder, (*array_list[i].array_pointer)[j]);
         if (err != CborNoError) {
-          bm_debug("cbor_encode_double failed for %s value: %d\n", array_list[i].array_name, err);
+          bm_debug("cbor_encode_double failed for %s value: %d\n", array_list[i].array_name,
+                   err);
           if (err != CborErrorOutOfMemory) {
             break;
           }
@@ -81,7 +86,8 @@ CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
 
       err = cbor_encoder_close_container(&map_encoder, &arrayEncoder);
       if (err != CborNoError) {
-        bm_debug("cbor_encoder_close_container failed for %s array: %d\n", array_list[i].array_name, err);
+        bm_debug("cbor_encoder_close_container failed for %s array: %d\n",
+                 array_list[i].array_name, err);
         if (err != CborErrorOutOfMemory) {
           return err;
         }
@@ -119,25 +125,27 @@ CborError PowerBatteryAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, s
   check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.power_reading_type, &value,
                                                    PowerReadingMsg::POWER_READING_TYPE));
   check_and_decode_key(err, decode_key_value_uint8(&d.status, &value, PowerReadingMsg::STATUS));
+  check_and_decode_key(err, decode_key_value_uint32(&d.num_samples, &value,
+                                                    PowerBatteryAveragesMsg::NUM_SAMPLES));
   check_and_decode_key(
-      err, decode_key_value_uint32(&d.num_samples, &value, PowerBatteryAveragesMsg::NUM_SAMPLES));
-  check_and_decode_key(err, decode_key_value_double(&d.averaging_window_length_s, &value,
-                                                     PowerBatteryAveragesMsg::AVERAGING_WINDOW_LENGTH_S));
+      err, decode_key_value_double(&d.averaging_window_length_s, &value,
+                                   PowerBatteryAveragesMsg::AVERAGING_WINDOW_LENGTH_S));
   check_and_decode_key(
       err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryAveragesMsg::NUM_CELLS));
 
   // decode the arrays
   if (d.num_cells > 0) {
-    PowerBatteryAveragesMsg::array_encoder_decoder_t array_list[PowerBatteryAveragesMsg::NUM_ARRAYS] = {
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_AVG, &d.cell_voltage_v_avg},
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MAX, &d.cell_voltage_v_max},
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MIN, &d.cell_voltage_v_min},
-      {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_STDEV, &d.cell_voltage_v_stdev},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_AVG, &d.cell_temperature_c_avg},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MAX, &d.cell_temperature_c_max},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MIN, &d.cell_temperature_c_min},
-      {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV, &d.cell_temperature_c_stdev},
-    };
+    PowerBatteryAveragesMsg::array_encoder_decoder_t
+        array_list[PowerBatteryAveragesMsg::NUM_ARRAYS] = {
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_AVG, &d.cell_voltage_v_avg},
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MAX, &d.cell_voltage_v_max},
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MIN, &d.cell_voltage_v_min},
+            {PowerBatteryAveragesMsg::CELL_VOLTAGE_V_STDEV, &d.cell_voltage_v_stdev},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_AVG, &d.cell_temperature_c_avg},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MAX, &d.cell_temperature_c_max},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MIN, &d.cell_temperature_c_min},
+            {PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV, &d.cell_temperature_c_stdev},
+        };
 
     for (size_t i = 0; i < PowerBatteryAveragesMsg::NUM_ARRAYS; i++) {
       if (!cbor_value_is_text_string(&value)) {
@@ -159,7 +167,8 @@ CborError PowerBatteryAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, s
         CborValue array;
         err = cbor_value_enter_container(&value, &array);
         if (err != CborNoError) {
-          bm_debug("cbor_value_enter_container failed for %s array: %d\n", array_list[i].array_name, err);
+          bm_debug("cbor_value_enter_container failed for %s array: %d\n",
+                   array_list[i].array_name, err);
           return err;
         }
 #ifndef CI_TEST
@@ -185,7 +194,8 @@ CborError PowerBatteryAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, s
         }
         err = cbor_value_leave_container(&value, &array);
         if (err != CborNoError) {
-          bm_debug("cbor_value_leave_container failed for %s array: %d\n", array_list[i].array_name, err);
+          bm_debug("cbor_value_leave_container failed for %s array: %d\n",
+                   array_list[i].array_name, err);
           return err;
         }
       } else {
