@@ -168,116 +168,15 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
   check_and_decode_key(
       err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryMsg::NUM_CELLS));
 
-  // decode the arrays
-  // todo - handle what happens when the arrays are empty / not desired by the decoder??
-  if (!cbor_value_is_text_string(&value)) {
-    err = CborErrorIllegalType;
-    bm_debug("expected string key but got something else\n");
-    return err;
-  }
-  err = cbor_value_advance(&value);
-  if (err != CborNoError) {
-    return err;
-  }
-  if (!cbor_value_is_array(&value)) {
-    err = CborErrorIllegalType;
-    bm_debug("expected array key but got something else\n");
-    return err;
-  }
+  check_and_decode_key(err,
+                       decode_key_value_double_array(&d.cell_voltage_v, d.num_cells, &value,
+                                                     PowerBatteryMsg::CELL_VOLTAGE_V));
+  check_and_decode_key(err,
+                       decode_key_value_double_array(&d.cell_temperature_c, d.num_cells, &value,
+                                                     PowerBatteryMsg::CELL_TEMPERATURE_C));
 
-  if (d.cell_voltage_v == NULL && d.num_cells > 0) {
-    CborValue array;
-    err = cbor_value_enter_container(&value, &array);
-    if (err != CborNoError) {
-      bm_debug("cbor_value_enter_container failed for cell_voltage_v array: %d\n", err);
-      return err;
-    }
-#ifndef CI_TEST
-    d.cell_voltage_v = (double *)bm_malloc(sizeof(double) * d.num_cells);
-#else  // CI_TEST
-    d.cell_voltage_v = (double *)malloc(sizeof(double) * d.num_cells);
-#endif // CI_TEST
-
-    if (d.cell_voltage_v == NULL) {
-      return CborErrorOutOfMemory;
-    }
-
-    for (uint8_t i = 0; i < d.num_cells; i++) {
-      err = cbor_value_get_double(&array, &d.cell_voltage_v[i]);
-      if (err != CborNoError) {
-        break;
-      }
-      err = cbor_value_advance(&array);
-      if (err != CborNoError) {
-        bm_debug("Failed to advance cell_voltage_v array\n");
-        break;
-      }
-    }
-    err = cbor_value_leave_container(&value, &array);
-    if (err != CborNoError) {
-      bm_debug("cbor value_leave_container failed for cell_voltage_v array: %d\n", err);
-      return err;
-    }
-  } else {
-    err = cbor_value_advance(&value);
-    if (err != CborNoError) {
-      return err;
-    }
-  }
-
-  if (!cbor_value_is_text_string(&value)) {
-    err = CborErrorIllegalType;
-    bm_debug("expected string key but got something else\n");
-    return err;
-  }
-  err = cbor_value_advance(&value);
-  if (err != CborNoError) {
-    return err;
-  }
-  if (!cbor_value_is_array(&value)) {
-    err = CborErrorIllegalType;
-    bm_debug("expected array key but got something else\n");
-    return err;
-  }
-
-  if (d.cell_temperature_c == NULL && d.num_cells > 0) {
-    CborValue array_temps;
-    err = cbor_value_enter_container(&value, &array_temps);
-    if (err != CborNoError) {
-      bm_debug("cbor_value_enter_container failed for cell_temperature_c array: %d\n", err);
-      return err;
-    }
-#ifndef CI_TEST
-    d.cell_temperature_c = (double *)bm_malloc(sizeof(double) * d.num_cells);
-#else  // CI_TEST
-    d.cell_temperature_c = (double *)malloc(sizeof(double) * d.num_cells);
-#endif // CI_TEST
-
-    if (d.cell_temperature_c == NULL) {
-      return CborErrorOutOfMemory;
-    }
-
-    for (uint8_t i = 0; i < d.num_cells; i++) {
-      err = cbor_value_get_double(&array_temps, &d.cell_temperature_c[i]);
-      if (err != CborNoError) {
-        break;
-      }
-      err = cbor_value_advance(&array_temps);
-      if (err != CborNoError) {
-        bm_debug("Failed to advance cell_temperature_c array\n");
-        break;
-      }
-    }
-    err = cbor_value_leave_container(&value, &array_temps);
-    if (err != CborNoError) {
-      bm_debug("cbor value_leave_container failed for cell_temperature_c array: %d\n", err);
-      return err;
-    }
-  } else {
-    err = cbor_value_advance(&value);
-    if (err != CborNoError) {
-      return err;
-    }
+  if (check_acceptable_decode_errors(err)) {
+    err = decoder_message_leave(&value, &map);
   }
 
   return err;

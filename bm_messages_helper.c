@@ -365,3 +365,97 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
 
   return err;
 }
+
+/*!
+ @brief Decodes a CBOR array of doubles from a key-value pair
+
+ @details This function decodes a CBOR key-value pair where the value is an array
+ of doubles. It validates the key is a text string, validates the value is an array,
+ allocates memory for the array elements, and populates the array with decoded values.
+
+ **MEMORY ALLOCATION**: This function allocates memory for the array using bm_malloc().
+ The caller is responsible for freeing this memory when no longer needed using bm_free().
+
+ If *array_out is already allocated (non-NULL) or num_elements is 0, the function will
+ skip the array without allocating memory.
+
+ @param array_out Pointer to a double pointer that will receive the allocated array.
+                  Must not be NULL. If *array_out is NULL, memory will be allocated.
+                  If *array_out is non-NULL, the array is skipped.
+ @param num_elements Number of elements expected in the array
+ @param value Pointer to the CBOR value to decode from
+ @param key_expected The expected key name
+
+ @return CborError - CborNoError on success, or appropriate error code:
+         - CborErrorIllegalType if key is not a text string or value is not an array
+         - CborErrorOutOfMemory if memory allocation fails
+         - Other CBOR errors from underlying decode operations
+ */
+CborError decode_key_value_double_array(double **array_out, size_t num_elements,
+                                        CborValue *value,
+                                        const char * key_expected) {
+  CborError err = CborNoError;
+
+  // Check for string text
+  if (!cbor_value_is_text_string(value)) {
+    bm_debug("expected string key but got something else\n");
+    return CborErrorIllegalType;
+  }
+
+  err = cbor_value_advance(value);
+  if (err != CborNoError) {
+    return err;
+  }
+
+  // Check for array value
+  if (!cbor_value_is_array(value)) {
+    bm_debug("expected array but got something else\n");
+    return CborErrorIllegalType;
+  }
+
+  // If array already allocated, just skip it
+  if (*array_out != NULL || num_elements == 0) {
+    return cbor_value_advance(value);
+  }
+
+  // Enter the array container
+  CborValue array;
+  err = cbor_value_enter_container(value, &array);
+  if (err != CborNoError) {
+    bm_debug("cbor_value_enter_container failed for %s array: %d\n", key_expected, err);
+    return err;
+  }
+
+  // Allocate memory
+#ifndef CI_TEST
+  *array_out = (double *)bm_malloc(sizeof(double) * num_elements);
+#else
+  *array_out = (double *)malloc(sizeof(double) * num_elements);
+#endif
+
+  if (*array_out == NULL) {
+    return CborErrorOutOfMemory;
+  }
+
+  // Decode array elements
+  for (size_t j = 0; j < num_elements; j++) {
+    err = cbor_value_get_double(&array, &(*array_out)[j]);
+    if (err != CborNoError) {
+      bm_debug("Failed to get double from %s array at index %zu: %d\n", key_expected, j, err);
+      return err;
+    }
+    err = cbor_value_advance(&array);
+    if (err != CborNoError) {
+      bm_debug("Failed to advance %s array at index %zu: %d\n", key_expected, j, err);
+      return err;
+    }
+  }
+
+  // Leave the array container
+  err = cbor_value_leave_container(value, &array);
+  if (err != CborNoError) {
+    bm_debug("cbor_value_leave_container failed for %s array: %d\n", key_expected, err);
+  }
+
+  return err;
+}

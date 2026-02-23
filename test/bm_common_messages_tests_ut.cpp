@@ -1,3 +1,5 @@
+#include "bm_config.h"
+
 #include "aanderaa_conductivity_msg.h"
 #include "aanderaa_current_meter_msg.h"
 #include "barometric_pressure_data_msg.h"
@@ -634,6 +636,7 @@ TEST_F(BmCommonTest, PowerReadingAveragesTest) {
 }
 
 TEST_F(BmCommonTest, PowerBatteryTest) {
+  CborError err = CborNoError;
   // Test with num_cells == 1
   PowerBatteryMsg::Data d;
   d.header.version = PowerBatteryMsg::VERSION;
@@ -661,7 +664,11 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(len, 313);
 
   PowerBatteryMsg::Data decode = {};
-  PowerBatteryMsg::decode(decode, cbor_buffer, len);
+
+  bm_debug("test here 1\n");
+
+  err = PowerBatteryMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(err, CborNoError);
   EXPECT_EQ(decode.header.version, d.header.version);
   EXPECT_EQ(decode.header.reading_time_utc_ms, d.header.reading_time_utc_ms);
   EXPECT_EQ(decode.header.reading_uptime_millis, d.header.reading_uptime_millis);
@@ -678,6 +685,7 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(decode.num_cells, d.num_cells);
   EXPECT_EQ(decode.cell_voltage_v[0], d.cell_voltage_v[0]);
   EXPECT_EQ(decode.cell_temperature_c[0], d.cell_temperature_c[0]);
+  bm_debug("test here 2\n");
 
   free(d.cell_voltage_v);
   free(d.cell_temperature_c);
@@ -707,7 +715,8 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(len2, 295);
 
   PowerBatteryMsg::Data decode2;
-  PowerBatteryMsg::decode(decode2, cbor_buffer2, len2);
+  err = PowerBatteryMsg::decode(decode2, cbor_buffer2, len2);
+  EXPECT_EQ(err, CborNoError);
   EXPECT_EQ(decode2.header.version, d2.header.version);
   EXPECT_EQ(decode2.header.reading_time_utc_ms, d2.header.reading_time_utc_ms);
   EXPECT_EQ(decode2.header.reading_uptime_millis, d2.header.reading_uptime_millis);
@@ -758,7 +767,8 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(len3, 385);
 
   PowerBatteryMsg::Data decode3 = {};
-  PowerBatteryMsg::decode(decode3, cbor_buffer3, len3);
+  err = PowerBatteryMsg::decode(decode3, cbor_buffer3, len3);
+  EXPECT_EQ(err, CborNoError);
   EXPECT_EQ(decode3.header.version, d3.header.version);
   EXPECT_EQ(decode3.header.reading_time_utc_ms, d3.header.reading_time_utc_ms);
   EXPECT_EQ(decode3.header.reading_uptime_millis, d3.header.reading_uptime_millis);
