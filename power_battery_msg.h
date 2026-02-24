@@ -20,8 +20,8 @@ static constexpr char CELL_TEMPERATURE_C[] = "cell_temperature_c";
 typedef enum PowerBatteryStatus : uint8_t {
   STATUS_UNKNOWN = 0,
   CHARGING = 1,
-  DISCHARGING = 2,
-  NOT_CHARGING = 3,
+  DISCHARGING = 2,  // battery is providing power to the load, current flowing out
+  NOT_CHARGING = 3, // current is not flowing in, could be flowing out or not flowing
   FULL = 4,
 } PowerBatteryStatus_t;
 
