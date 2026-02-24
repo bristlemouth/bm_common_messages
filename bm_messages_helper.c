@@ -132,6 +132,51 @@ CborError encode_key_value_bytes(CborEncoder *map_encoder, const char *name,
   return err;
 }
 
+CborError encode_key_value_double_array(CborEncoder *map_encoder, const char *name,
+                                        const double *array, const size_t len) {
+  CborError err = CborNoError;
+  if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
+    bm_debug("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n",
+             __func__, name, err);
+    if (err != CborErrorOutOfMemory)
+      return err;
+  }
+
+  CborEncoder arrayEncoder;
+  err = cbor_encoder_create_array(map_encoder, &arrayEncoder, len);
+  if (err != CborNoError) {
+    bm_debug("error: %s(%s): cbor_encoder_create_array() failed: %d\r\n",
+             __func__, name, err);
+    if (err != CborErrorOutOfMemory) {
+      return err;
+    }
+  }
+
+  for (uint8_t i = 0; i < len; i++) {
+    err = cbor_encode_double(&arrayEncoder, array[i]);
+    if (err != CborNoError) {
+      bm_debug("error: %s(%s): cbor_encode_double() failed: %d\r\n", __func__,
+             name, err);
+      if (err != CborErrorOutOfMemory) {
+        break;
+      }
+    }
+  }
+  if (err != CborNoError) {
+    return err;
+  }
+
+  err = cbor_encoder_close_container(map_encoder, &arrayEncoder);
+  if (err != CborNoError) {
+    bm_debug("error: %s(%s): cbor_encoder_close_container() failed: %d\r\n",
+             __func__, name, err);
+    if (err != CborErrorOutOfMemory) {
+      return err;
+    }
+  }
+  return err;
+}
+
 CborError encoder_message_finish(CborEncoder *encoder,
                                  CborEncoder *map_encoder) {
   const CborError err = cbor_encoder_close_container(encoder, map_encoder);
@@ -376,13 +421,13 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
  **MEMORY ALLOCATION**: This function allocates memory for the array using bm_malloc().
  The caller is responsible for freeing this memory when no longer needed using bm_free().
 
- If *array_out is already allocated (non-NULL) or num_elements is 0, the function will
+ If *array_out is already allocated (non-NULL) or len is 0, the function will
  skip the array without allocating memory.
 
  @param array_out Pointer to a double pointer that will receive the allocated array.
                   Must not be NULL. If *array_out is NULL, memory will be allocated.
                   If *array_out is non-NULL, the array is skipped.
- @param num_elements Number of elements expected in the array
+ @param len Length of the array
  @param value Pointer to the CBOR value to decode from
  @param key_expected The expected key name
 
@@ -391,7 +436,7 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
          - CborErrorOutOfMemory if memory allocation fails
          - Other CBOR errors from underlying decode operations
  */
-CborError decode_key_value_double_array(double **array_out, size_t num_elements,
+CborError decode_key_value_double_array(double **array_out, size_t len,
                                         CborValue *value,
                                         const char * key_expected) {
   CborError err = CborNoError;
@@ -414,7 +459,7 @@ CborError decode_key_value_double_array(double **array_out, size_t num_elements,
   }
 
   // If array already allocated, just skip it
-  if (*array_out != NULL || num_elements == 0) {
+  if (*array_out != NULL || len == 0) {
     return cbor_value_advance(value);
   }
 
@@ -428,9 +473,9 @@ CborError decode_key_value_double_array(double **array_out, size_t num_elements,
 
   // Allocate memory
 #ifndef CI_TEST
-  *array_out = (double *)bm_malloc(sizeof(double) * num_elements);
+  *array_out = (double *)bm_malloc(sizeof(double) * len);
 #else
-  *array_out = (double *)malloc(sizeof(double) * num_elements);
+  *array_out = (double *)malloc(sizeof(double) * len);
 #endif
 
   if (*array_out == NULL) {
@@ -438,7 +483,7 @@ CborError decode_key_value_double_array(double **array_out, size_t num_elements,
   }
 
   // Decode array elements
-  for (size_t j = 0; j < num_elements; j++) {
+  for (size_t j = 0; j < len; j++) {
     err = cbor_value_get_double(&array, &(*array_out)[j]);
     if (err != CborNoError) {
       bm_debug("Failed to get double from %s array at index %zu: %d\n", key_expected, j, err);

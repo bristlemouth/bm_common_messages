@@ -36,6 +36,8 @@ CborError encode_key_value_string(CborEncoder *map_encoder, const char *name,
                                   const char *value, const size_t len);
 CborError encode_key_value_bytes(CborEncoder *map_encoder, const char *name,
                                  const unsigned char *value, const size_t len);
+CborError encode_key_value_double_array(CborEncoder *map_encoder, const char *name,
+                                        const double *array, const size_t len);
 CborError encoder_message_finish(CborEncoder *encoder,
                                  CborEncoder *map_encoder);
 void encoder_message_check_memory(CborEncoder *encoder, CborError err);
