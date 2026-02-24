@@ -62,6 +62,32 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
   return err;
 }
 
+/*!
+ @brief Decodes a PowerBatteryAveragesMsg from a CBOR buffer
+
+ @details This function decodes a CBOR-encoded PowerBatteryAveragesMsg and populates
+ the provided Data structure. It decodes the sensor header, simple fields, and
+ dynamically sized arrays for cell voltage and temperature statistics.
+
+ **MEMORY ALLOCATION**: This function allocates memory for all array fields in the
+ Data structure (cell_voltage_v, cell_temperature_c) using bm_malloc().
+
+ **REQUIREMENTS**: All array pointer fields in the Data structure MUST be initialized
+ to NULL before calling this function. If an array pointer is already non-NULL, that
+ array will be skipped during decoding.
+
+ **CALLER RESPONSIBILITY**: The caller is responsible for freeing all allocated array
+ memory when no longer needed using bm_free().
+
+ @param d Reference to Data structure to populate. Array pointers must be NULL.
+ @param cbor_buffer Pointer to the CBOR-encoded message buffer
+ @param size Size of the CBOR buffer in bytes
+
+ @return CborError - CborNoError on success, or appropriate error code:
+         - CborErrorIllegalType if unexpected CBOR types are encountered
+         - CborErrorOutOfMemory if memory allocation fails
+         - Other CBOR errors from underlying decode operations
+ */
 CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t size) {
   CborParser parser;
   CborValue map, value;

@@ -16,6 +16,7 @@ static constexpr char NUM_CELLS[] = "num_cells";
 static constexpr char CELL_VOLTAGE_V[] = "cell_voltage_v";
 static constexpr char CELL_TEMPERATURE_C[] = "cell_temperature_c";
 
+// Following the linux power supply enum: https://github.com/torvalds/linux/blob/master/include/linux/power_supply.h
 typedef enum PowerBatteryStatus : uint8_t {
   STATUS_UNKNOWN = 0,
   CHARGING = 1,
