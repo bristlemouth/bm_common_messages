@@ -666,8 +666,6 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
 
   PowerBatteryMsg::Data decode = {};
 
-  bm_debug("test here 1\n");
-
   err = PowerBatteryMsg::decode(decode, cbor_buffer, len);
   EXPECT_EQ(err, CborNoError);
   EXPECT_EQ(decode.header.version, d.header.version);
@@ -686,7 +684,6 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(decode.num_cells, d.num_cells);
   EXPECT_EQ(decode.cell_voltage_v[0], d.cell_voltage_v[0]);
   EXPECT_EQ(decode.cell_temperature_c[0], d.cell_temperature_c[0]);
-  bm_debug("test here 2\n");
 
   free(d.cell_voltage_v);
   free(d.cell_temperature_c);

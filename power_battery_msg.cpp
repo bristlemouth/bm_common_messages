@@ -63,9 +63,9 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
 }
 
 /*!
- @brief Decodes a PowerBatteryAveragesMsg from a CBOR buffer
+ @brief Decodes a PowerBatteryMsg from a CBOR buffer
 
- @details This function decodes a CBOR-encoded PowerBatteryAveragesMsg and populates
+ @details This function decodes a CBOR-encoded PowerBatteryMsg and populates
  the provided Data structure. It decodes the sensor header, simple fields, and
  dynamically sized arrays for cell voltage and temperature statistics.
 
