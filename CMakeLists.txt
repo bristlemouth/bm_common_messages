@@ -54,6 +54,7 @@ set(SOURCES
     pme_dissolved_oxygen_msg.cpp
     pme_wipe_msg.cpp
     power_info_reply_msg.c
+    power_battery_msg.cpp
     power_reading_msg.cpp
     power_reading_averages_msg.cpp
     sensor_header_msg.cpp

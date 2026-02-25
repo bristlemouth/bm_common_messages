@@ -36,6 +36,8 @@ CborError encode_key_value_string(CborEncoder *map_encoder, const char *name,
                                   const char *value, const size_t len);
 CborError encode_key_value_bytes(CborEncoder *map_encoder, const char *name,
                                  const unsigned char *value, const size_t len);
+CborError encode_key_value_double_array(CborEncoder *map_encoder, const char *name,
+                                        const double *array, const size_t len);
 CborError encoder_message_finish(CborEncoder *encoder,
                                  CborEncoder *map_encoder);
 void encoder_message_check_memory(CborEncoder *encoder, CborError err);
@@ -55,6 +57,9 @@ CborError decode_key_value_string(char **out, size_t *len, CborValue *value,
                                   const char *key_expected);
 CborError decode_key_value_bytes(uint8_t **out, size_t *len, CborValue *value,
                                  const char *key_expected);
+CborError decode_key_value_double_array(double **array_out, size_t num_elements,
+                                        CborValue *value,
+                                        const char * key_expected);
 CborError decoder_message_leave(CborValue *value, CborValue *map);
 
 #ifdef __cplusplus

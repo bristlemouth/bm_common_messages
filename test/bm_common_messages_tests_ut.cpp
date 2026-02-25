@@ -1,3 +1,5 @@
+#include "bm_config.h"
+
 #include "aanderaa_conductivity_msg.h"
 #include "aanderaa_current_meter_msg.h"
 #include "barometric_pressure_data_msg.h"
@@ -12,6 +14,7 @@
 #include "device_test_svc_request_msg.h"
 #include "pme_dissolved_oxygen_msg.h"
 #include "pme_wipe_msg.h"
+#include "power_battery_msg.h"
 #include "power_reading_averages_msg.h"
 #include "power_reading_msg.h"
 #include "sensor_header_msg.h"
@@ -630,4 +633,169 @@ TEST_F(BmCommonTest, PowerReadingAveragesTest) {
   EXPECT_EQ(decode.current_a_min, 0.248);
   EXPECT_EQ(decode.current_a_max, 0.270);
   EXPECT_EQ(decode.current_a_stdev, 0.016);
+}
+
+TEST_F(BmCommonTest, PowerBatteryTest) {
+  CborError err = CborNoError;
+  // Test with num_cells == 1
+  PowerBatteryMsg::Data d;
+  d.header.version = PowerBatteryMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.power_reading_type = PowerReadingMsg::SOURCE;
+  d.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
+  d.voltage_v = 6.79;
+  d.current_a = 0.123;
+  d.charge_ah = 5.6;
+  d.capacity_ah = 7.0;
+  d.percentage = 0.8;
+  d.battery_status = PowerBatteryMsg::DISCHARGING;
+  d.battery_health = PowerBatteryMsg::GOOD;
+  d.num_cells = 1;
+  d.cell_voltage_v = (double *)malloc(sizeof(double));
+  d.cell_voltage_v[0] = 6.79;
+  d.cell_temperature_c = (double *)malloc(sizeof(double));
+  d.cell_temperature_c[0] = 25.6;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  PowerBatteryMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 313);
+
+  PowerBatteryMsg::Data decode = {};
+
+  bm_debug("test here 1\n");
+
+  err = PowerBatteryMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(decode.header.version, d.header.version);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, d.header.reading_time_utc_ms);
+  EXPECT_EQ(decode.header.reading_uptime_millis, d.header.reading_uptime_millis);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, d.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode.power_reading_type, d.power_reading_type);
+  EXPECT_EQ(decode.status, d.status);
+  EXPECT_EQ(decode.voltage_v, d.voltage_v);
+  EXPECT_EQ(decode.current_a, d.current_a);
+  EXPECT_EQ(decode.charge_ah, d.charge_ah);
+  EXPECT_EQ(decode.capacity_ah, d.capacity_ah);
+  EXPECT_EQ(decode.percentage, d.percentage);
+  EXPECT_EQ(decode.battery_status, d.battery_status);
+  EXPECT_EQ(decode.battery_health, d.battery_health);
+  EXPECT_EQ(decode.num_cells, d.num_cells);
+  EXPECT_EQ(decode.cell_voltage_v[0], d.cell_voltage_v[0]);
+  EXPECT_EQ(decode.cell_temperature_c[0], d.cell_temperature_c[0]);
+  bm_debug("test here 2\n");
+
+  free(d.cell_voltage_v);
+  free(d.cell_temperature_c);
+  free(decode.cell_voltage_v);
+  free(decode.cell_temperature_c);
+
+  // Test with num_cells == 0
+  PowerBatteryMsg::Data d2 = {};
+  d2.header.version = PowerBatteryMsg::VERSION;
+  d2.header.reading_time_utc_ms = 123456789;
+  d2.header.reading_uptime_millis = 987654321;
+  d2.header.sensor_reading_time_ms = 0xdeadc0de;
+  d2.power_reading_type = PowerReadingMsg::SOURCE;
+  d2.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
+  d2.voltage_v = 6.79;
+  d2.current_a = 0.123;
+  d2.charge_ah = 5.6;
+  d2.capacity_ah = 7.0;
+  d2.percentage = 0.8;
+  d2.battery_status = PowerBatteryMsg::DISCHARGING;
+  d2.battery_health = PowerBatteryMsg::GOOD;
+  d2.num_cells = 0;
+
+  uint8_t cbor_buffer2[1024];
+  size_t len2 = 0;
+  PowerBatteryMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
+  EXPECT_EQ(len2, 295);
+
+  PowerBatteryMsg::Data decode2;
+  err = PowerBatteryMsg::decode(decode2, cbor_buffer2, len2);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(decode2.header.version, d2.header.version);
+  EXPECT_EQ(decode2.header.reading_time_utc_ms, d2.header.reading_time_utc_ms);
+  EXPECT_EQ(decode2.header.reading_uptime_millis, d2.header.reading_uptime_millis);
+  EXPECT_EQ(decode2.header.sensor_reading_time_ms, d2.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode2.power_reading_type, d2.power_reading_type);
+  EXPECT_EQ(decode2.status, d2.status);
+  EXPECT_EQ(decode2.voltage_v, d2.voltage_v);
+  EXPECT_EQ(decode2.current_a, d2.current_a);
+  EXPECT_EQ(decode2.charge_ah, d2.charge_ah);
+  EXPECT_EQ(decode2.capacity_ah, d2.capacity_ah);
+  EXPECT_EQ(decode2.percentage, d2.percentage);
+  EXPECT_EQ(decode2.battery_status, d2.battery_status);
+  EXPECT_EQ(decode2.battery_health, d2.battery_health);
+  EXPECT_EQ(decode2.num_cells, d2.num_cells);
+
+  // Test with num_cells == 5
+  PowerBatteryMsg::Data d3;
+  d3.header.version = PowerBatteryMsg::VERSION;
+  d3.header.reading_time_utc_ms = 123456789;
+  d3.header.reading_uptime_millis = 987654321;
+  d3.header.sensor_reading_time_ms = 0xdeadc0de;
+  d3.power_reading_type = PowerReadingMsg::SOURCE;
+  d3.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
+  d3.voltage_v = 6.79;
+  d3.current_a = 0.123;
+  d3.charge_ah = 5.6;
+  d3.capacity_ah = 7.0;
+  d3.percentage = 0.8;
+  d3.battery_status = PowerBatteryMsg::DISCHARGING;
+  d3.battery_health = PowerBatteryMsg::GOOD;
+  d3.num_cells = 5;
+  d3.cell_voltage_v = (double *)malloc(sizeof(double) * d3.num_cells);
+  d3.cell_voltage_v[0] = 6.79;
+  d3.cell_voltage_v[1] = 5.79;
+  d3.cell_voltage_v[2] = 7.79;
+  d3.cell_voltage_v[3] = 6.54;
+  d3.cell_voltage_v[4] = 6.90;
+  d3.cell_temperature_c = (double *)malloc(sizeof(double) * d3.num_cells);
+  d3.cell_temperature_c[0] = 25.60;
+  d3.cell_temperature_c[1] = 24.63;
+  d3.cell_temperature_c[2] = 23.26;
+  d3.cell_temperature_c[3] = 27.90;
+  d3.cell_temperature_c[4] = 25.49;
+
+  uint8_t cbor_buffer3[1024];
+  size_t len3 = 0;
+  PowerBatteryMsg::encode(d3, cbor_buffer3, sizeof(cbor_buffer3), &len3);
+  EXPECT_EQ(len3, 385);
+
+  PowerBatteryMsg::Data decode3 = {};
+  err = PowerBatteryMsg::decode(decode3, cbor_buffer3, len3);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(decode3.header.version, d3.header.version);
+  EXPECT_EQ(decode3.header.reading_time_utc_ms, d3.header.reading_time_utc_ms);
+  EXPECT_EQ(decode3.header.reading_uptime_millis, d3.header.reading_uptime_millis);
+  EXPECT_EQ(decode3.header.sensor_reading_time_ms, d3.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode3.power_reading_type, d3.power_reading_type);
+  EXPECT_EQ(decode3.status, d3.status);
+  EXPECT_EQ(decode3.voltage_v, d3.voltage_v);
+  EXPECT_EQ(decode3.current_a, d3.current_a);
+  EXPECT_EQ(decode3.charge_ah, d3.charge_ah);
+  EXPECT_EQ(decode3.capacity_ah, d3.capacity_ah);
+  EXPECT_EQ(decode3.percentage, d3.percentage);
+  EXPECT_EQ(decode3.battery_status, d3.battery_status);
+  EXPECT_EQ(decode3.battery_health, d3.battery_health);
+  EXPECT_EQ(decode3.num_cells, d3.num_cells);
+  EXPECT_EQ(decode3.cell_voltage_v[0], d3.cell_voltage_v[0]);
+  EXPECT_EQ(decode3.cell_voltage_v[1], d3.cell_voltage_v[1]);
+  EXPECT_EQ(decode3.cell_voltage_v[2], d3.cell_voltage_v[2]);
+  EXPECT_EQ(decode3.cell_voltage_v[3], d3.cell_voltage_v[3]);
+  EXPECT_EQ(decode3.cell_voltage_v[4], d3.cell_voltage_v[4]);
+  EXPECT_EQ(decode3.cell_temperature_c[0], d3.cell_temperature_c[0]);
+  EXPECT_EQ(decode3.cell_temperature_c[1], d3.cell_temperature_c[1]);
+  EXPECT_EQ(decode3.cell_temperature_c[2], d3.cell_temperature_c[2]);
+  EXPECT_EQ(decode3.cell_temperature_c[3], d3.cell_temperature_c[3]);
+  EXPECT_EQ(decode3.cell_temperature_c[4], d3.cell_temperature_c[4]);
+
+  free(d3.cell_voltage_v);
+  free(d3.cell_temperature_c);
+  free(decode3.cell_voltage_v);
+  free(decode3.cell_temperature_c);
 }
