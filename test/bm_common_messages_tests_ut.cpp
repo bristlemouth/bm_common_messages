@@ -810,22 +810,24 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   d.num_samples = 15;
   d.averaging_window_length_s = 29.98;
   d.num_cells = 1;
-  d.cell_voltage_v_avg = (double *)malloc(sizeof(double));
-  d.cell_voltage_v_avg[0] = 6.85;
-  d.cell_voltage_v_max = (double *)malloc(sizeof(double));
-  d.cell_voltage_v_max[0] = 7.12;
-  d.cell_voltage_v_min = (double *)malloc(sizeof(double));
-  d.cell_voltage_v_min[0] = 6.58;
-  d.cell_voltage_v_stdev = (double *)malloc(sizeof(double));
-  d.cell_voltage_v_stdev[0] = 0.123;
-  d.cell_temperature_c_avg = (double *)malloc(sizeof(double));
-  d.cell_temperature_c_avg[0] = 24.935;
-  d.cell_temperature_c_max = (double *)malloc(sizeof(double));
-  d.cell_temperature_c_max[0] = 26.49;
-  d.cell_temperature_c_min = (double *)malloc(sizeof(double));
-  d.cell_temperature_c_min[0] = 23.38;
-  d.cell_temperature_c_stdev = (double *)malloc(sizeof(double));
-  d.cell_temperature_c_stdev[0] = 0.126;
+  d.cell_voltage_v_avg = (double *)malloc(sizeof(double) * d.num_cells);
+  d.cell_voltage_v_max = (double *)malloc(sizeof(double) * d.num_cells);
+  d.cell_voltage_v_min = (double *)malloc(sizeof(double) * d.num_cells);
+  d.cell_voltage_v_stdev = (double *)malloc(sizeof(double) * d.num_cells);
+  d.cell_temperature_c_avg = (double *)malloc(sizeof(double) * d.num_cells);
+  d.cell_temperature_c_max = (double *)malloc(sizeof(double) * d.num_cells);
+  d.cell_temperature_c_min = (double *)malloc(sizeof(double) * d.num_cells);
+  d.cell_temperature_c_stdev = (double *)malloc(sizeof(double) * d.num_cells);
+  for (size_t i = 0; i < d.num_cells; i++) {
+    d.cell_voltage_v_avg[i] = 6.85;
+    d.cell_voltage_v_max[i] = 7.12;
+    d.cell_voltage_v_min[i] = 6.58;
+    d.cell_voltage_v_stdev[i] = 0.123;
+    d.cell_temperature_c_avg[i] = 24.935;
+    d.cell_temperature_c_max[i] = 26.49;
+    d.cell_temperature_c_min[i] = 23.38;
+    d.cell_temperature_c_stdev[i] = 0.126;
+  }
 
   uint8_t cbor_buffer[1024];
   size_t len = 0;
@@ -844,14 +846,16 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   EXPECT_EQ(decode.num_samples, d.num_samples);
   EXPECT_EQ(decode.averaging_window_length_s, d.averaging_window_length_s);
   EXPECT_EQ(decode.num_cells, d.num_cells);
-  EXPECT_EQ(decode.cell_voltage_v_avg[0], d.cell_voltage_v_avg[0]);
-  EXPECT_EQ(decode.cell_voltage_v_max[0], d.cell_voltage_v_max[0]);
-  EXPECT_EQ(decode.cell_voltage_v_min[0], d.cell_voltage_v_min[0]);
-  EXPECT_EQ(decode.cell_voltage_v_stdev[0], d.cell_voltage_v_stdev[0]);
-  EXPECT_EQ(decode.cell_temperature_c_avg[0], d.cell_temperature_c_avg[0]);
-  EXPECT_EQ(decode.cell_temperature_c_max[0], d.cell_temperature_c_max[0]);
-  EXPECT_EQ(decode.cell_temperature_c_min[0], d.cell_temperature_c_min[0]);
-  EXPECT_EQ(decode.cell_temperature_c_stdev[0], d.cell_temperature_c_stdev[0]);
+  for (size_t i = 0; i < d.num_cells; i++) {
+    EXPECT_EQ(decode.cell_voltage_v_avg[i], d.cell_voltage_v_avg[i]);
+    EXPECT_EQ(decode.cell_voltage_v_max[i], d.cell_voltage_v_max[i]);
+    EXPECT_EQ(decode.cell_voltage_v_min[i], d.cell_voltage_v_min[i]);
+    EXPECT_EQ(decode.cell_voltage_v_stdev[i], d.cell_voltage_v_stdev[i]);
+    EXPECT_EQ(decode.cell_temperature_c_avg[i], d.cell_temperature_c_avg[i]);
+    EXPECT_EQ(decode.cell_temperature_c_max[i], d.cell_temperature_c_max[i]);
+    EXPECT_EQ(decode.cell_temperature_c_min[i], d.cell_temperature_c_min[i]);
+    EXPECT_EQ(decode.cell_temperature_c_stdev[i], d.cell_temperature_c_stdev[i]);
+  }
 
   free(d.cell_voltage_v_avg);
   free(d.cell_voltage_v_max);
@@ -870,6 +874,7 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   free(decode.cell_temperature_c_min);
   free(decode.cell_temperature_c_stdev);
 
+  // Test with num_cells == 5
   PowerBatteryAveragesMsg::Data d2;
   d2.header.version = PowerBatteryAveragesMsg::VERSION;
   d2.header.reading_time_utc_ms = 123456789;
@@ -881,53 +886,23 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   d2.averaging_window_length_s = 29.98;
   d2.num_cells = 5;
   d2.cell_voltage_v_avg = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_voltage_v_avg[0] = 6.85;
-  d2.cell_voltage_v_avg[1] = 6.85;
-  d2.cell_voltage_v_avg[2] = 6.85;
-  d2.cell_voltage_v_avg[3] = 6.85;
-  d2.cell_voltage_v_avg[4] = 6.85;
   d2.cell_voltage_v_max = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_voltage_v_max[0] = 7.12;
-  d2.cell_voltage_v_max[1] = 7.12;
-  d2.cell_voltage_v_max[2] = 7.12;
-  d2.cell_voltage_v_max[3] = 7.12;
-  d2.cell_voltage_v_max[4] = 7.12;
   d2.cell_voltage_v_min = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_voltage_v_min[0] = 6.58;
-  d2.cell_voltage_v_min[1] = 6.58;
-  d2.cell_voltage_v_min[2] = 6.58;
-  d2.cell_voltage_v_min[3] = 6.58;
-  d2.cell_voltage_v_min[4] = 6.58;
   d2.cell_voltage_v_stdev = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_voltage_v_stdev[0] = 0.123;
-  d2.cell_voltage_v_stdev[1] = 0.123;
-  d2.cell_voltage_v_stdev[2] = 0.123;
-  d2.cell_voltage_v_stdev[3] = 0.123;
-  d2.cell_voltage_v_stdev[4] = 0.123;
   d2.cell_temperature_c_avg = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_avg[0] = 24.935;
-  d2.cell_temperature_c_avg[1] = 24.935;
-  d2.cell_temperature_c_avg[2] = 24.935;
-  d2.cell_temperature_c_avg[3] = 24.935;
-  d2.cell_temperature_c_avg[4] = 24.935;
   d2.cell_temperature_c_max = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_max[0] = 26.49;
-  d2.cell_temperature_c_max[1] = 26.49;
-  d2.cell_temperature_c_max[2] = 26.49;
-  d2.cell_temperature_c_max[3] = 26.49;
-  d2.cell_temperature_c_max[4] = 26.49;
   d2.cell_temperature_c_min = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_min[0] = 23.38;
-  d2.cell_temperature_c_min[1] = 23.38;
-  d2.cell_temperature_c_min[2] = 23.38;
-  d2.cell_temperature_c_min[3] = 23.38;
-  d2.cell_temperature_c_min[4] = 23.38;
   d2.cell_temperature_c_stdev = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_stdev[0] = 0.126;
-  d2.cell_temperature_c_stdev[1] = 0.126;
-  d2.cell_temperature_c_stdev[2] = 0.126;
-  d2.cell_temperature_c_stdev[3] = 0.126;
-  d2.cell_temperature_c_stdev[4] = 0.126;
+  for (size_t i = 0; i < d2.num_cells; i++) {
+    d2.cell_voltage_v_avg[i] = 6.85;
+    d2.cell_voltage_v_max[i] = 7.12;
+    d2.cell_voltage_v_min[i] = 6.58;
+    d2.cell_voltage_v_stdev[i] = 0.123;
+    d2.cell_temperature_c_avg[i] = 24.935;
+    d2.cell_temperature_c_max[i] = 26.49;
+    d2.cell_temperature_c_min[i] = 23.38;
+    d2.cell_temperature_c_stdev[i] = 0.126;
+  }
 
   uint8_t cbor_buffer2[1024];
   size_t len2 = 0;
@@ -946,46 +921,16 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   EXPECT_EQ(decode2.num_samples, d2.num_samples);
   EXPECT_EQ(decode2.averaging_window_length_s, d2.averaging_window_length_s);
   EXPECT_EQ(decode2.num_cells, d2.num_cells);
-  EXPECT_EQ(decode2.cell_voltage_v_avg[0], d2.cell_voltage_v_avg[0]);
-  EXPECT_EQ(decode2.cell_voltage_v_max[0], d2.cell_voltage_v_max[0]);
-  EXPECT_EQ(decode2.cell_voltage_v_min[0], d2.cell_voltage_v_min[0]);
-  EXPECT_EQ(decode2.cell_voltage_v_stdev[0], d2.cell_voltage_v_stdev[0]);
-  EXPECT_EQ(decode2.cell_temperature_c_avg[0], d2.cell_temperature_c_avg[0]);
-  EXPECT_EQ(decode2.cell_temperature_c_max[0], d2.cell_temperature_c_max[0]);
-  EXPECT_EQ(decode2.cell_temperature_c_min[0], d2.cell_temperature_c_min[0]);
-  EXPECT_EQ(decode2.cell_temperature_c_stdev[0], d2.cell_temperature_c_stdev[0]);
-  EXPECT_EQ(decode2.cell_voltage_v_avg[1], d2.cell_voltage_v_avg[1]);
-  EXPECT_EQ(decode2.cell_voltage_v_max[1], d2.cell_voltage_v_max[1]);
-  EXPECT_EQ(decode2.cell_voltage_v_min[1], d2.cell_voltage_v_min[1]);
-  EXPECT_EQ(decode2.cell_voltage_v_stdev[1], d2.cell_voltage_v_stdev[1]);
-  EXPECT_EQ(decode2.cell_temperature_c_avg[1], d2.cell_temperature_c_avg[1]);
-  EXPECT_EQ(decode2.cell_temperature_c_max[1], d2.cell_temperature_c_max[1]);
-  EXPECT_EQ(decode2.cell_temperature_c_min[1], d2.cell_temperature_c_min[1]);
-  EXPECT_EQ(decode2.cell_temperature_c_stdev[1], d2.cell_temperature_c_stdev[1]);
-  EXPECT_EQ(decode2.cell_voltage_v_avg[2], d2.cell_voltage_v_avg[2]);
-  EXPECT_EQ(decode2.cell_voltage_v_max[2], d2.cell_voltage_v_max[2]);
-  EXPECT_EQ(decode2.cell_voltage_v_min[2], d2.cell_voltage_v_min[2]);
-  EXPECT_EQ(decode2.cell_voltage_v_stdev[2], d2.cell_voltage_v_stdev[2]);
-  EXPECT_EQ(decode2.cell_temperature_c_avg[2], d2.cell_temperature_c_avg[2]);
-  EXPECT_EQ(decode2.cell_temperature_c_max[2], d2.cell_temperature_c_max[2]);
-  EXPECT_EQ(decode2.cell_temperature_c_min[2], d2.cell_temperature_c_min[2]);
-  EXPECT_EQ(decode2.cell_temperature_c_stdev[2], d2.cell_temperature_c_stdev[2]);
-  EXPECT_EQ(decode2.cell_voltage_v_avg[3], d2.cell_voltage_v_avg[3]);
-  EXPECT_EQ(decode2.cell_voltage_v_max[3], d2.cell_voltage_v_max[3]);
-  EXPECT_EQ(decode2.cell_voltage_v_min[3], d2.cell_voltage_v_min[3]);
-  EXPECT_EQ(decode2.cell_voltage_v_stdev[3], d2.cell_voltage_v_stdev[3]);
-  EXPECT_EQ(decode2.cell_temperature_c_avg[3], d2.cell_temperature_c_avg[3]);
-  EXPECT_EQ(decode2.cell_temperature_c_max[3], d2.cell_temperature_c_max[3]);
-  EXPECT_EQ(decode2.cell_temperature_c_min[3], d2.cell_temperature_c_min[3]);
-  EXPECT_EQ(decode2.cell_temperature_c_stdev[3], d2.cell_temperature_c_stdev[3]);
-  EXPECT_EQ(decode2.cell_voltage_v_avg[4], d2.cell_voltage_v_avg[4]);
-  EXPECT_EQ(decode2.cell_voltage_v_max[4], d2.cell_voltage_v_max[4]);
-  EXPECT_EQ(decode2.cell_voltage_v_min[4], d2.cell_voltage_v_min[4]);
-  EXPECT_EQ(decode2.cell_voltage_v_stdev[4], d2.cell_voltage_v_stdev[4]);
-  EXPECT_EQ(decode2.cell_temperature_c_avg[4], d2.cell_temperature_c_avg[4]);
-  EXPECT_EQ(decode2.cell_temperature_c_max[4], d2.cell_temperature_c_max[4]);
-  EXPECT_EQ(decode2.cell_temperature_c_min[4], d2.cell_temperature_c_min[4]);
-  EXPECT_EQ(decode2.cell_temperature_c_stdev[4], d2.cell_temperature_c_stdev[4]);
+  for (size_t i = 0; i < d2.num_cells; i++) {
+    EXPECT_EQ(decode2.cell_voltage_v_avg[i], d2.cell_voltage_v_avg[i]);
+    EXPECT_EQ(decode2.cell_voltage_v_max[i], d2.cell_voltage_v_max[i]);
+    EXPECT_EQ(decode2.cell_voltage_v_min[i], d2.cell_voltage_v_min[i]);
+    EXPECT_EQ(decode2.cell_voltage_v_stdev[i], d2.cell_voltage_v_stdev[i]);
+    EXPECT_EQ(decode2.cell_temperature_c_avg[i], d2.cell_temperature_c_avg[i]);
+    EXPECT_EQ(decode2.cell_temperature_c_max[i], d2.cell_temperature_c_max[i]);
+    EXPECT_EQ(decode2.cell_temperature_c_min[i], d2.cell_temperature_c_min[i]);
+    EXPECT_EQ(decode2.cell_temperature_c_stdev[i], d2.cell_temperature_c_stdev[i]);
+  }
 
   free(d2.cell_voltage_v_avg);
   free(d2.cell_voltage_v_max);
