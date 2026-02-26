@@ -30,7 +30,7 @@ CborError PowerSolarReadingMsg::encode(Data &d, uint8_t *cbor_buffer, size_t siz
   check_and_encode_key(
       err, encode_key_value_double(&map_encoder, PowerReadingMsg::VOLTAGE_V, d.voltage_v));
   check_and_encode_key(
-      err, encode_key_value_double(&map_encoder, PowerReadingMsg::current_a, d.current_a));
+      err, encode_key_value_double(&map_encoder, PowerReadingMsg::CURRENT_A, d.current_a));
 
   check_and_encode_key(err,
                        encode_key_value_double(&map_encoder, PowerSolarReadingMsg::MPP_POSITION,
@@ -107,7 +107,7 @@ CborError PowerSolarReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size
   check_and_decode_key(
       err, decode_key_value_double(&d.voltage_v, &value, PowerReadingMsg::VOLTAGE_V));
   check_and_decode_key(
-      err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::current_a));
+      err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::CURRENT_A));
   check_and_decode_key(err, decode_key_value_double(&d.mpp_position, &value,
                                                     PowerSolarReadingMsg::MPP_POSITION));
   check_and_decode_key(
