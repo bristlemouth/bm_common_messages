@@ -9,7 +9,7 @@ constexpr size_t NUM_FIELDS = 4 + SensorHeaderMsg::NUM_FIELDS;
 
 static constexpr char POWER_READING_TYPE[] = "power_reading_type";
 static constexpr char VOLTAGE_V[] = "voltage_v";
-static constexpr char current_a[] = "current_a";
+static constexpr char CURRENT_A[] = "current_a";
 static constexpr char STATUS[] = "status";
 
 typedef enum PowerReadingType : uint8_t {
