@@ -20,11 +20,6 @@ static constexpr char CELL_TEMPERATURE_C_MAX[] = "cell_temperature_c_max";
 static constexpr char CELL_TEMPERATURE_C_MIN[] = "cell_temperature_c_min";
 static constexpr char CELL_TEMPERATURE_C_STDEV[] = "cell_temperature_c_stdev";
 
-typedef struct array_encoder_decoder {
-  const char *array_name;
-  double **array_pointer;
-} array_encoder_decoder_t;
-
 struct Data {
   SensorHeaderMsg::Data header;
   PowerReadingMsg::PowerReadingType_t power_reading_type;
