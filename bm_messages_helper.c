@@ -416,7 +416,8 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
 
  @details This function decodes a CBOR key-value pair where the value is an array
  of doubles. It validates the key is a text string, validates the value is an array,
- allocates memory for the array elements, and populates the array with decoded values.
+ gets the length of the array from CBOR, allocates memory for the array elements,
+ and populates the array with decoded values.
 
  **MEMORY ALLOCATION**: This function allocates memory for the array using bm_malloc().
  The caller is responsible for freeing this memory when no longer needed using bm_free().
@@ -427,7 +428,7 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
  @param array_out Pointer to a double pointer that will receive the allocated array.
                   Must not be NULL. If *array_out is NULL, memory will be allocated.
                   If *array_out is non-NULL, the array is skipped.
- @param len Length of the array
+ @param len Pointer to length of the array, extracted from CBOR and returned
  @param value Pointer to the CBOR value to decode from
  @param key_expected The expected key name
 
