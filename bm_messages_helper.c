@@ -436,7 +436,7 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
          - CborErrorOutOfMemory if memory allocation fails
          - Other CBOR errors from underlying decode operations
  */
-CborError decode_key_value_double_array(double **array_out, size_t len,
+CborError decode_key_value_double_array(double **array_out, uint8_t *len,
                                         CborValue *value,
                                         const char * key_expected) {
   CborError err = CborNoError;
@@ -458,6 +458,13 @@ CborError decode_key_value_double_array(double **array_out, size_t len,
     return CborErrorIllegalType;
   }
 
+  size_t array_length;
+  err = cbor_value_get_array_length(value, &array_length);
+  if (err != CborNoError) {
+    return err;
+  }
+  *len = (uint8_t)array_length;
+
   // If array already allocated, just skip it
   if (*array_out != NULL || len == 0) {
     return cbor_value_advance(value);
@@ -473,9 +480,9 @@ CborError decode_key_value_double_array(double **array_out, size_t len,
 
   // Allocate memory
 #ifndef CI_TEST
-  *array_out = (double *)bm_malloc(sizeof(double) * len);
+  *array_out = (double *)bm_malloc(sizeof(double) * array_length);
 #else
-  *array_out = (double *)malloc(sizeof(double) * len);
+  *array_out = (double *)malloc(sizeof(double) * array_length);
 #endif
 
   if (*array_out == NULL) {
@@ -483,7 +490,7 @@ CborError decode_key_value_double_array(double **array_out, size_t len,
   }
 
   // Decode array elements
-  for (size_t j = 0; j < len; j++) {
+  for (size_t j = 0; j < array_length; j++) {
     err = cbor_value_get_double(&array, &(*array_out)[j]);
     if (err != CborNoError) {
       bm_debug("Failed to get double from %s array at index %zu: %d\n", key_expected, j, err);

@@ -34,33 +34,30 @@ CborError PowerBatteryAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t 
       err,
       encode_key_value_double(&map_encoder, PowerBatteryAveragesMsg::AVERAGING_WINDOW_LENGTH_S,
                               d.averaging_window_length_s));
-  check_and_encode_key(err, encode_key_value_uint8(
-                                &map_encoder, PowerBatteryAveragesMsg::NUM_CELLS, d.num_cells));
-
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_VOLTAGE_V_AVG,
-                                d.cell_voltage_v_avg, d.num_cells));
+                                d.cell_voltage_v_avg, d.num_cell_voltages));
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MAX,
-                                d.cell_voltage_v_max, d.num_cells));
+                                d.cell_voltage_v_max, d.num_cell_voltages));
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MIN,
-                                d.cell_voltage_v_min, d.num_cells));
+                                d.cell_voltage_v_min, d.num_cell_voltages));
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_VOLTAGE_V_STDEV,
-                                d.cell_voltage_v_stdev, d.num_cells));
+                                d.cell_voltage_v_stdev, d.num_cell_voltages));
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_AVG,
-                                d.cell_temperature_c_avg, d.num_cells));
+                                d.cell_temperature_c_avg, d.num_temp_sensors));
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MAX,
-                                d.cell_temperature_c_max, d.num_cells));
+                                d.cell_temperature_c_max, d.num_temp_sensors));
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MIN,
-                                d.cell_temperature_c_min, d.num_cells));
+                                d.cell_temperature_c_min, d.num_temp_sensors));
   check_and_encode_key(err, encode_key_value_double_array(
                                 &map_encoder, PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV,
-                                d.cell_temperature_c_stdev, d.num_cells));
+                                d.cell_temperature_c_stdev, d.num_temp_sensors));
 
   if (check_acceptable_encode_errors(err)) {
     err = encoder_message_finish(&encoder, &map_encoder);
@@ -123,33 +120,30 @@ CborError PowerBatteryAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, s
   check_and_decode_key(
       err, decode_key_value_double(&d.averaging_window_length_s, &value,
                                    PowerBatteryAveragesMsg::AVERAGING_WINDOW_LENGTH_S));
-  check_and_decode_key(
-      err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryAveragesMsg::NUM_CELLS));
-
   // decode the arrays
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_voltage_v_avg, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_voltage_v_avg, &d.num_cell_voltages, &value,
                                          PowerBatteryAveragesMsg::CELL_VOLTAGE_V_AVG));
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_voltage_v_max, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_voltage_v_max, &d.num_cell_voltages, &value,
                                          PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MAX));
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_voltage_v_min, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_voltage_v_min, &d.num_cell_voltages, &value,
                                          PowerBatteryAveragesMsg::CELL_VOLTAGE_V_MIN));
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_voltage_v_stdev, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_voltage_v_stdev, &d.num_cell_voltages, &value,
                                          PowerBatteryAveragesMsg::CELL_VOLTAGE_V_STDEV));
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_temperature_c_avg, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_temperature_c_avg, &d.num_temp_sensors, &value,
                                          PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_AVG));
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_temperature_c_max, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_temperature_c_max, &d.num_temp_sensors, &value,
                                          PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MAX));
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_temperature_c_min, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_temperature_c_min, &d.num_temp_sensors, &value,
                                          PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MIN));
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_temperature_c_stdev, d.num_cells, &value,
+      err, decode_key_value_double_array(&d.cell_temperature_c_stdev, &d.num_temp_sensors, &value,
                                          PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV));
 
   if (check_acceptable_decode_errors(err)) {

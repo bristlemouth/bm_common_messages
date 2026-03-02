@@ -6,11 +6,10 @@
 namespace PowerBatteryAveragesMsg {
 
 constexpr uint32_t VERSION = 1;
-constexpr size_t NUM_FIELDS = 13 + SensorHeaderMsg::NUM_FIELDS;
+constexpr size_t NUM_FIELDS = 12 + SensorHeaderMsg::NUM_FIELDS;
 constexpr size_t NUM_ARRAYS = 8;
 static constexpr char NUM_SAMPLES[] = "num_samples";
 static constexpr char AVERAGING_WINDOW_LENGTH_S[] = "averaging_window_length_s";
-static constexpr char NUM_CELLS[] = "num_cells";
 static constexpr char CELL_VOLTAGE_V_AVG[] = "cell_voltage_v_avg";
 static constexpr char CELL_VOLTAGE_V_MAX[] = "cell_voltage_v_max";
 static constexpr char CELL_VOLTAGE_V_MIN[] = "cell_voltage_v_min";
@@ -26,11 +25,12 @@ struct Data {
   uint8_t status;
   uint32_t num_samples;
   double averaging_window_length_s;
-  uint8_t num_cells;
+  uint8_t num_cell_voltages; // Not sent in cbor message
   double *cell_voltage_v_avg;
   double *cell_voltage_v_max;
   double *cell_voltage_v_min;
   double *cell_voltage_v_stdev;
+  uint8_t num_temp_sensors; // Not sent in cbor message
   double *cell_temperature_c_avg;
   double *cell_temperature_c_max;
   double *cell_temperature_c_min;

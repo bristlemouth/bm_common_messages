@@ -57,7 +57,7 @@ CborError decode_key_value_string(char **out, size_t *len, CborValue *value,
                                   const char *key_expected);
 CborError decode_key_value_bytes(uint8_t **out, size_t *len, CborValue *value,
                                  const char *key_expected);
-CborError decode_key_value_double_array(double **array_out, size_t num_elements,
+CborError decode_key_value_double_array(double **array_out, uint8_t *len,
                                         CborValue *value,
                                         const char * key_expected);
 CborError decoder_message_leave(CborValue *value, CborValue *map);

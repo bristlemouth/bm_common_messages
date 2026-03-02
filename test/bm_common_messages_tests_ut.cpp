@@ -638,7 +638,7 @@ TEST_F(BmCommonTest, PowerReadingAveragesTest) {
 
 TEST_F(BmCommonTest, PowerBatteryTest) {
   CborError err = CborNoError;
-  // Test with num_cells == 1
+  // Test with num_cells and num_temp_sensors == 1
   PowerBatteryMsg::Data d;
   d.header.version = PowerBatteryMsg::VERSION;
   d.header.reading_time_utc_ms = 123456789;
@@ -653,7 +653,8 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   d.percentage = 0.8;
   d.battery_status = PowerBatteryMsg::DISCHARGING;
   d.battery_health = PowerBatteryMsg::GOOD;
-  d.num_cells = 1;
+  d.num_cell_voltages = 1;
+  d.num_temp_sensors = 1;
   d.cell_voltage_v = (double *)malloc(sizeof(double));
   d.cell_voltage_v[0] = 6.79;
   d.cell_temperature_c = (double *)malloc(sizeof(double));
@@ -662,7 +663,7 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   PowerBatteryMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-  EXPECT_EQ(len, 313);
+  EXPECT_EQ(len, 302);
 
   PowerBatteryMsg::Data decode = {};
 
@@ -681,7 +682,8 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(decode.percentage, d.percentage);
   EXPECT_EQ(decode.battery_status, d.battery_status);
   EXPECT_EQ(decode.battery_health, d.battery_health);
-  EXPECT_EQ(decode.num_cells, d.num_cells);
+  EXPECT_EQ(decode.num_cell_voltages, d.num_cell_voltages);
+  EXPECT_EQ(decode.num_temp_sensors, d.num_temp_sensors);
   EXPECT_EQ(decode.cell_voltage_v[0], d.cell_voltage_v[0]);
   EXPECT_EQ(decode.cell_temperature_c[0], d.cell_temperature_c[0]);
 
@@ -705,12 +707,13 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   d2.percentage = 0.8;
   d2.battery_status = PowerBatteryMsg::DISCHARGING;
   d2.battery_health = PowerBatteryMsg::GOOD;
-  d2.num_cells = 0;
+  d2.num_cell_voltages = 0;
+  d2.num_temp_sensors = 0;
 
   uint8_t cbor_buffer2[1024];
   size_t len2 = 0;
   PowerBatteryMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
-  EXPECT_EQ(len2, 295);
+  EXPECT_EQ(len2, 284);
 
   PowerBatteryMsg::Data decode2;
   err = PowerBatteryMsg::decode(decode2, cbor_buffer2, len2);
@@ -728,9 +731,10 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(decode2.percentage, d2.percentage);
   EXPECT_EQ(decode2.battery_status, d2.battery_status);
   EXPECT_EQ(decode2.battery_health, d2.battery_health);
-  EXPECT_EQ(decode2.num_cells, d2.num_cells);
+  EXPECT_EQ(decode2.num_cell_voltages, d2.num_cell_voltages);
+  EXPECT_EQ(decode2.num_temp_sensors, d2.num_temp_sensors);
 
-  // Test with num_cells == 5
+  // Test with num_cell_voltages and num_temp_sensors == 5
   PowerBatteryMsg::Data d3;
   d3.header.version = PowerBatteryMsg::VERSION;
   d3.header.reading_time_utc_ms = 123456789;
@@ -745,14 +749,15 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   d3.percentage = 0.8;
   d3.battery_status = PowerBatteryMsg::DISCHARGING;
   d3.battery_health = PowerBatteryMsg::GOOD;
-  d3.num_cells = 5;
-  d3.cell_voltage_v = (double *)malloc(sizeof(double) * d3.num_cells);
+  d3.num_cell_voltages = 5;
+  d3.num_temp_sensors = 5;
+  d3.cell_voltage_v = (double *)malloc(sizeof(double) * d3.num_cell_voltages);
   d3.cell_voltage_v[0] = 6.79;
   d3.cell_voltage_v[1] = 5.79;
   d3.cell_voltage_v[2] = 7.79;
   d3.cell_voltage_v[3] = 6.54;
   d3.cell_voltage_v[4] = 6.90;
-  d3.cell_temperature_c = (double *)malloc(sizeof(double) * d3.num_cells);
+  d3.cell_temperature_c = (double *)malloc(sizeof(double) * d3.num_temp_sensors);
   d3.cell_temperature_c[0] = 25.60;
   d3.cell_temperature_c[1] = 24.63;
   d3.cell_temperature_c[2] = 23.26;
@@ -762,7 +767,7 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   uint8_t cbor_buffer3[1024];
   size_t len3 = 0;
   PowerBatteryMsg::encode(d3, cbor_buffer3, sizeof(cbor_buffer3), &len3);
-  EXPECT_EQ(len3, 385);
+  EXPECT_EQ(len3, 374);
 
   PowerBatteryMsg::Data decode3 = {};
   err = PowerBatteryMsg::decode(decode3, cbor_buffer3, len3);
@@ -780,7 +785,8 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
   EXPECT_EQ(decode3.percentage, d3.percentage);
   EXPECT_EQ(decode3.battery_status, d3.battery_status);
   EXPECT_EQ(decode3.battery_health, d3.battery_health);
-  EXPECT_EQ(decode3.num_cells, d3.num_cells);
+  EXPECT_EQ(decode3.num_cell_voltages, d3.num_cell_voltages);
+  EXPECT_EQ(decode3.num_temp_sensors, d3.num_temp_sensors);
   EXPECT_EQ(decode3.cell_voltage_v[0], d3.cell_voltage_v[0]);
   EXPECT_EQ(decode3.cell_voltage_v[1], d3.cell_voltage_v[1]);
   EXPECT_EQ(decode3.cell_voltage_v[2], d3.cell_voltage_v[2]);
@@ -799,7 +805,7 @@ TEST_F(BmCommonTest, PowerBatteryTest) {
 }
 
 TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
-  // Test with num_cells == 1
+  // Test with num_cell_voltages and num_temp_sensors == 1
   PowerBatteryAveragesMsg::Data d;
   d.header.version = PowerBatteryAveragesMsg::VERSION;
   d.header.reading_time_utc_ms = 123456789;
@@ -809,16 +815,17 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   d.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
   d.num_samples = 15;
   d.averaging_window_length_s = 29.98;
-  d.num_cells = 1;
-  d.cell_voltage_v_avg = (double *)malloc(sizeof(double) * d.num_cells);
-  d.cell_voltage_v_max = (double *)malloc(sizeof(double) * d.num_cells);
-  d.cell_voltage_v_min = (double *)malloc(sizeof(double) * d.num_cells);
-  d.cell_voltage_v_stdev = (double *)malloc(sizeof(double) * d.num_cells);
-  d.cell_temperature_c_avg = (double *)malloc(sizeof(double) * d.num_cells);
-  d.cell_temperature_c_max = (double *)malloc(sizeof(double) * d.num_cells);
-  d.cell_temperature_c_min = (double *)malloc(sizeof(double) * d.num_cells);
-  d.cell_temperature_c_stdev = (double *)malloc(sizeof(double) * d.num_cells);
-  for (size_t i = 0; i < d.num_cells; i++) {
+  d.num_cell_voltages = 1;
+  d.num_temp_sensors = 1;
+  d.cell_voltage_v_avg = (double *)malloc(sizeof(double) * d.num_cell_voltages);
+  d.cell_voltage_v_max = (double *)malloc(sizeof(double) * d.num_cell_voltages);
+  d.cell_voltage_v_min = (double *)malloc(sizeof(double) * d.num_cell_voltages);
+  d.cell_voltage_v_stdev = (double *)malloc(sizeof(double) * d.num_cell_voltages);
+  d.cell_temperature_c_avg = (double *)malloc(sizeof(double) * d.num_temp_sensors);
+  d.cell_temperature_c_max = (double *)malloc(sizeof(double) * d.num_temp_sensors);
+  d.cell_temperature_c_min = (double *)malloc(sizeof(double) * d.num_temp_sensors);
+  d.cell_temperature_c_stdev = (double *)malloc(sizeof(double) * d.num_temp_sensors);
+  for (size_t i = 0; i < d.num_cell_voltages; i++) {
     d.cell_voltage_v_avg[i] = 6.85;
     d.cell_voltage_v_max[i] = 7.12;
     d.cell_voltage_v_min[i] = 6.58;
@@ -833,7 +840,7 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   size_t len = 0;
   CborError err = PowerBatteryAveragesMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
   EXPECT_EQ(err, CborNoError);
-  EXPECT_EQ(len, 431);
+  EXPECT_EQ(len, 420);
 
   PowerBatteryAveragesMsg::Data decode = {};
   PowerBatteryAveragesMsg::decode(decode, cbor_buffer, len);
@@ -845,8 +852,9 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   EXPECT_EQ(decode.status, d.status);
   EXPECT_EQ(decode.num_samples, d.num_samples);
   EXPECT_EQ(decode.averaging_window_length_s, d.averaging_window_length_s);
-  EXPECT_EQ(decode.num_cells, d.num_cells);
-  for (size_t i = 0; i < d.num_cells; i++) {
+  EXPECT_EQ(decode.num_cell_voltages, d.num_cell_voltages);
+  EXPECT_EQ(decode.num_temp_sensors, d.num_temp_sensors);
+  for (size_t i = 0; i < d.num_cell_voltages; i++) {
     EXPECT_EQ(decode.cell_voltage_v_avg[i], d.cell_voltage_v_avg[i]);
     EXPECT_EQ(decode.cell_voltage_v_max[i], d.cell_voltage_v_max[i]);
     EXPECT_EQ(decode.cell_voltage_v_min[i], d.cell_voltage_v_min[i]);
@@ -874,7 +882,7 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   free(decode.cell_temperature_c_min);
   free(decode.cell_temperature_c_stdev);
 
-  // Test with num_cells == 5
+  // Test with num_cell_voltages and num_temp_sensors == 5
   PowerBatteryAveragesMsg::Data d2;
   d2.header.version = PowerBatteryAveragesMsg::VERSION;
   d2.header.reading_time_utc_ms = 123456789;
@@ -884,16 +892,17 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   d2.status = PowerReadingMsg::OVERCURRENT | PowerReadingMsg::UNDERVOLTAGE;
   d2.num_samples = 15;
   d2.averaging_window_length_s = 29.98;
-  d2.num_cells = 5;
-  d2.cell_voltage_v_avg = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_voltage_v_max = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_voltage_v_min = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_voltage_v_stdev = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_avg = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_max = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_min = (double *)malloc(sizeof(double) * d2.num_cells);
-  d2.cell_temperature_c_stdev = (double *)malloc(sizeof(double) * d2.num_cells);
-  for (size_t i = 0; i < d2.num_cells; i++) {
+  d2.num_cell_voltages = 5;
+  d2.num_temp_sensors = 5;
+  d2.cell_voltage_v_avg = (double *)malloc(sizeof(double) * d2.num_cell_voltages);
+  d2.cell_voltage_v_max = (double *)malloc(sizeof(double) * d2.num_cell_voltages);
+  d2.cell_voltage_v_min = (double *)malloc(sizeof(double) * d2.num_cell_voltages);
+  d2.cell_voltage_v_stdev = (double *)malloc(sizeof(double) * d2.num_cell_voltages);
+  d2.cell_temperature_c_avg = (double *)malloc(sizeof(double) * d2.num_temp_sensors);
+  d2.cell_temperature_c_max = (double *)malloc(sizeof(double) * d2.num_temp_sensors);
+  d2.cell_temperature_c_min = (double *)malloc(sizeof(double) * d2.num_temp_sensors);
+  d2.cell_temperature_c_stdev = (double *)malloc(sizeof(double) * d2.num_temp_sensors);
+  for (size_t i = 0; i < d2.num_cell_voltages; i++) {
     d2.cell_voltage_v_avg[i] = 6.85;
     d2.cell_voltage_v_max[i] = 7.12;
     d2.cell_voltage_v_min[i] = 6.58;
@@ -908,7 +917,7 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   size_t len2 = 0;
   err = PowerBatteryAveragesMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
   EXPECT_EQ(err, CborNoError);
-  EXPECT_EQ(len2, 719);
+  EXPECT_EQ(len2, 708);
 
   PowerBatteryAveragesMsg::Data decode2 = {};
   PowerBatteryAveragesMsg::decode(decode2, cbor_buffer2, len2);
@@ -920,8 +929,9 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   EXPECT_EQ(decode2.status, d2.status);
   EXPECT_EQ(decode2.num_samples, d2.num_samples);
   EXPECT_EQ(decode2.averaging_window_length_s, d2.averaging_window_length_s);
-  EXPECT_EQ(decode2.num_cells, d2.num_cells);
-  for (size_t i = 0; i < d2.num_cells; i++) {
+  EXPECT_EQ(decode2.num_cell_voltages, d2.num_cell_voltages);
+  EXPECT_EQ(decode2.num_temp_sensors, d2.num_temp_sensors);
+  for (size_t i = 0; i < d2.num_cell_voltages; i++) {
     EXPECT_EQ(decode2.cell_voltage_v_avg[i], d2.cell_voltage_v_avg[i]);
     EXPECT_EQ(decode2.cell_voltage_v_max[i], d2.cell_voltage_v_max[i]);
     EXPECT_EQ(decode2.cell_voltage_v_min[i], d2.cell_voltage_v_min[i]);
