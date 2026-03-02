@@ -36,17 +36,14 @@ CborError PowerSolarReadingMsg::encode(Data &d, uint8_t *cbor_buffer, size_t siz
                        encode_key_value_double(&map_encoder, PowerSolarReadingMsg::MPP_POSITION,
                                                d.mpp_position));
   check_and_encode_key(
-      err, encode_key_value_uint8(&map_encoder, PowerSolarReadingMsg::NUM_PANLES, d.num_panels));
-
-  check_and_encode_key(
       err, encode_key_value_double_array(&map_encoder, PowerSolarReadingMsg::PANEL_TEMPERATURES,
-                                         d.panel_temperatures, d.num_panels));
+                                         d.panel_temperatures, d.num_temp_sensors));
   check_and_encode_key(err, encode_key_value_double_array(&map_encoder,
                                                           PowerSolarReadingMsg::PANEL_VOLTAGES,
-                                                          d.panel_voltages, d.num_panels));
+                                                          d.panel_voltages, d.num_lines));
   check_and_encode_key(err, encode_key_value_double_array(&map_encoder,
                                                           PowerSolarReadingMsg::PANEL_CURRENTS,
-                                                          d.panel_currents, d.num_panels));
+                                                          d.panel_currents, d.num_lines));
 
   if (check_acceptable_encode_errors(err)) {
     err = encoder_message_finish(&encoder, &map_encoder);
@@ -110,18 +107,15 @@ CborError PowerSolarReadingMsg::decode(Data &d, const uint8_t *cbor_buffer, size
       err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::CURRENT_A));
   check_and_decode_key(err, decode_key_value_double(&d.mpp_position, &value,
                                                     PowerSolarReadingMsg::MPP_POSITION));
-  check_and_decode_key(
-      err, decode_key_value_uint8(&d.num_panels, &value, PowerSolarReadingMsg::NUM_PANLES));
-
   // decode the arrays
   check_and_decode_key(
-      err, decode_key_value_double_array(&d.panel_temperatures, d.num_panels, &value,
+      err, decode_key_value_double_array(&d.panel_temperatures, &d.num_temp_sensors, &value,
                                          PowerSolarReadingMsg::PANEL_TEMPERATURES));
   check_and_decode_key(err,
-                       decode_key_value_double_array(&d.panel_voltages, d.num_panels, &value,
+                       decode_key_value_double_array(&d.panel_voltages, &d.num_lines, &value,
                                                      PowerSolarReadingMsg::PANEL_VOLTAGES));
   check_and_decode_key(err,
-                       decode_key_value_double_array(&d.panel_currents, d.num_panels, &value,
+                       decode_key_value_double_array(&d.panel_currents, &d.num_lines, &value,
                                                      PowerSolarReadingMsg::PANEL_CURRENTS));
 
   if (check_acceptable_decode_errors(err)) {
