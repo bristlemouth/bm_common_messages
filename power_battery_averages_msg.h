@@ -7,7 +7,6 @@ namespace PowerBatteryAveragesMsg {
 
 constexpr uint32_t VERSION = 1;
 constexpr size_t NUM_FIELDS = 12 + SensorHeaderMsg::NUM_FIELDS;
-constexpr size_t NUM_ARRAYS = 8;
 static constexpr char NUM_SAMPLES[] = "num_samples";
 static constexpr char AVERAGING_WINDOW_LENGTH_S[] = "averaging_window_length_s";
 static constexpr char CELL_VOLTAGE_V_AVG[] = "cell_voltage_v_avg";
@@ -40,5 +39,7 @@ struct Data {
 CborError encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len);
 
 CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size);
+
+void free(Data &d);
 
 } // namespace PowerBatteryAveragesMsg

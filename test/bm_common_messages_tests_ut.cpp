@@ -865,22 +865,33 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
     EXPECT_EQ(decode.cell_temperature_c_stdev[i], d.cell_temperature_c_stdev[i]);
   }
 
-  free(d.cell_voltage_v_avg);
-  free(d.cell_voltage_v_max);
-  free(d.cell_voltage_v_min);
-  free(d.cell_voltage_v_stdev);
-  free(d.cell_temperature_c_avg);
-  free(d.cell_temperature_c_max);
-  free(d.cell_temperature_c_min);
-  free(d.cell_temperature_c_stdev);
-  free(decode.cell_voltage_v_avg);
-  free(decode.cell_voltage_v_max);
-  free(decode.cell_voltage_v_min);
-  free(decode.cell_voltage_v_stdev);
-  free(decode.cell_temperature_c_avg);
-  free(decode.cell_temperature_c_max);
-  free(decode.cell_temperature_c_min);
-  free(decode.cell_temperature_c_stdev);
+  PowerBatteryAveragesMsg::free(d);
+  PowerBatteryAveragesMsg::free(decode);
+
+  // Test to make sure the pointers get set to NULL
+  EXPECT_FALSE(d.cell_voltage_v_avg);
+  EXPECT_FALSE(d.cell_voltage_v_max);
+  EXPECT_FALSE(d.cell_voltage_v_min);
+  EXPECT_FALSE(d.cell_voltage_v_stdev);
+  EXPECT_FALSE(d.cell_temperature_c_avg);
+  EXPECT_FALSE(d.cell_temperature_c_max);
+  EXPECT_FALSE(d.cell_temperature_c_min);
+  EXPECT_FALSE(d.cell_temperature_c_stdev);
+
+
+  // Should be safe to call again, i.e. won't crash test
+  PowerBatteryAveragesMsg::free(d);
+  PowerBatteryAveragesMsg::free(decode);
+
+  // Check the pointers are still NULL
+  EXPECT_FALSE(d.cell_voltage_v_avg);
+  EXPECT_FALSE(d.cell_voltage_v_max);
+  EXPECT_FALSE(d.cell_voltage_v_min);
+  EXPECT_FALSE(d.cell_voltage_v_stdev);
+  EXPECT_FALSE(d.cell_temperature_c_avg);
+  EXPECT_FALSE(d.cell_temperature_c_max);
+  EXPECT_FALSE(d.cell_temperature_c_min);
+  EXPECT_FALSE(d.cell_temperature_c_stdev);
 
   // Test with num_cell_voltages and num_temp_sensors == 5
   PowerBatteryAveragesMsg::Data d2;
@@ -942,20 +953,6 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
     EXPECT_EQ(decode2.cell_temperature_c_stdev[i], d2.cell_temperature_c_stdev[i]);
   }
 
-  free(d2.cell_voltage_v_avg);
-  free(d2.cell_voltage_v_max);
-  free(d2.cell_voltage_v_min);
-  free(d2.cell_voltage_v_stdev);
-  free(d2.cell_temperature_c_avg);
-  free(d2.cell_temperature_c_max);
-  free(d2.cell_temperature_c_min);
-  free(d2.cell_temperature_c_stdev);
-  free(decode2.cell_voltage_v_avg);
-  free(decode2.cell_voltage_v_max);
-  free(decode2.cell_voltage_v_min);
-  free(decode2.cell_voltage_v_stdev);
-  free(decode2.cell_temperature_c_avg);
-  free(decode2.cell_temperature_c_max);
-  free(decode2.cell_temperature_c_min);
-  free(decode2.cell_temperature_c_stdev);
+  PowerBatteryAveragesMsg::free(d2);
+  PowerBatteryAveragesMsg::free(decode2);
 }

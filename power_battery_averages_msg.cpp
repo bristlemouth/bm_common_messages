@@ -142,13 +142,71 @@ CborError PowerBatteryAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, s
   check_and_decode_key(
       err, decode_key_value_double_array(&d.cell_temperature_c_min, &d.num_temp_sensors, &value,
                                          PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_MIN));
-  check_and_decode_key(
-      err, decode_key_value_double_array(&d.cell_temperature_c_stdev, &d.num_temp_sensors, &value,
-                                         PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV));
+  check_and_decode_key(err, decode_key_value_double_array(
+                                &d.cell_temperature_c_stdev, &d.num_temp_sensors, &value,
+                                PowerBatteryAveragesMsg::CELL_TEMPERATURE_C_STDEV));
 
   if (check_acceptable_decode_errors(err)) {
     err = decoder_message_leave(&value, &map);
   }
 
   return err;
+}
+
+/*!
+ @brief Helper function to safely free a double pointer and set it to NULL
+
+ @details Checks if the pointer is non-NULL before freeing, then sets it to NULL
+ to prevent double-free errors. Uses platform-appropriate free function.
+
+ @param pointer Pointer to a double pointer to free
+ */
+static inline void freePointer(double **pointer) {
+  if (*pointer) {
+#ifndef CI_TEST
+    bm_free(*pointer);
+#else
+    free(*pointer);
+#endif
+    *pointer = NULL;
+  }
+}
+
+/*!
+ @brief Frees all dynamically allocated memory in a PowerBatteryAveragesMsg Data structure
+
+ @details This function safely deallocates all array fields in the Data structure that
+ were allocated during decode operations. Each pointer is checked for NULL before
+ freeing, and all pointers are set to NULL after deallocation to prevent double-free
+ errors.
+
+ **SAFE TO CALL MULTIPLE TIMES**: This function can be called multiple times on the
+ same Data structure without causing crashes or undefined behavior.
+
+ **SAFE WITH UNINITIALIZED DATA**: This function can be safely called on Data structures
+ where array pointers are already NULL (e.g., freshly initialized or already freed).
+
+ **MEMORY FREED**: The following array fields are deallocated:
+ - cell_voltage_v_avg
+ - cell_voltage_v_max
+ - cell_voltage_v_min
+ - cell_voltage_v_stdev
+ - cell_temperature_c_avg
+ - cell_temperature_c_max
+ - cell_temperature_c_min
+ - cell_temperature_c_stdev
+
+ @param d Reference to Data structure containing arrays to free. After this call,
+          all array pointers will be set to NULL.
+ */
+void PowerBatteryAveragesMsg::free(Data &d) {
+  freePointer(&d.cell_voltage_v_avg);
+  freePointer(&d.cell_voltage_v_max);
+  freePointer(&d.cell_voltage_v_min);
+  freePointer(&d.cell_voltage_v_stdev);
+  freePointer(&d.cell_temperature_c_avg);
+  freePointer(&d.cell_temperature_c_max);
+  freePointer(&d.cell_temperature_c_min);
+  freePointer(&d.cell_temperature_c_stdev);
+  return;
 }
