@@ -878,7 +878,6 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
   EXPECT_FALSE(d.cell_temperature_c_min);
   EXPECT_FALSE(d.cell_temperature_c_stdev);
 
-
   // Should be safe to call again, i.e. won't crash test
   PowerBatteryAveragesMsg::free(d);
   PowerBatteryAveragesMsg::free(decode);
