@@ -30,7 +30,7 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
   check_and_encode_key(
       err, encode_key_value_double(&map_encoder, PowerReadingMsg::VOLTAGE_V, d.voltage_v));
   check_and_encode_key(
-      err, encode_key_value_double(&map_encoder, PowerReadingMsg::current_a, d.current_a));
+      err, encode_key_value_double(&map_encoder, PowerReadingMsg::CURRENT_A, d.current_a));
   check_and_encode_key(
       err, encode_key_value_double(&map_encoder, PowerBatteryMsg::CHARGE_AH, d.charge_ah));
   check_and_encode_key(
@@ -43,14 +43,14 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
   check_and_encode_key(
       err,
       encode_key_value_uint8(&map_encoder, PowerBatteryMsg::BATTERY_HEALTH, d.battery_health));
-  check_and_encode_key(
-      err, encode_key_value_uint8(&map_encoder, PowerBatteryMsg::NUM_CELLS, d.num_cells));
+//   check_and_encode_key(
+//       err, encode_key_value_uint8(&map_encoder, PowerBatteryMsg::NUM_CELLS, d.num_cells));
   check_and_encode_key(err, encode_key_value_double_array(&map_encoder,
                                                           PowerBatteryMsg::CELL_VOLTAGE_V,
-                                                          d.cell_voltage_v, d.num_cells));
+                                                          d.cell_voltage_v, d.num_cell_voltages));
   check_and_encode_key(err, encode_key_value_double_array(&map_encoder,
                                                           PowerBatteryMsg::CELL_TEMPERATURE_C,
-                                                          d.cell_temperature_c, d.num_cells));
+                                                          d.cell_temperature_c, d.num_temp_sensors));
 
   if (check_acceptable_encode_errors(err)) {
     err = encoder_message_finish(&encoder, &map_encoder);
@@ -63,9 +63,9 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
 }
 
 /*!
- @brief Decodes a PowerBatteryAveragesMsg from a CBOR buffer
+ @brief Decodes a PowerBatteryMsg from a CBOR buffer
 
- @details This function decodes a CBOR-encoded PowerBatteryAveragesMsg and populates
+ @details This function decodes a CBOR-encoded PowerBatteryMsg and populates
  the provided Data structure. It decodes the sensor header, simple fields, and
  dynamically sized arrays for cell voltage and temperature statistics.
 
@@ -111,7 +111,7 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
   check_and_decode_key(
       err, decode_key_value_double(&d.voltage_v, &value, PowerReadingMsg::VOLTAGE_V));
   check_and_decode_key(
-      err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::current_a));
+      err, decode_key_value_double(&d.current_a, &value, PowerReadingMsg::CURRENT_A));
   check_and_decode_key(
       err, decode_key_value_double(&d.charge_ah, &value, PowerBatteryMsg::CHARGE_AH));
   check_and_decode_key(
@@ -122,14 +122,14 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
                                                    PowerBatteryMsg::BATTERY_STATUS));
   check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_health, &value,
                                                    PowerBatteryMsg::BATTERY_HEALTH));
-  check_and_decode_key(
-      err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryMsg::NUM_CELLS));
+//   check_and_decode_key(
+//       err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryMsg::NUM_CELLS));
 
   check_and_decode_key(err,
-                       decode_key_value_double_array(&d.cell_voltage_v, d.num_cells, &value,
+                       decode_key_value_double_array(&d.cell_voltage_v, &d.num_cell_voltages, &value,
                                                      PowerBatteryMsg::CELL_VOLTAGE_V));
   check_and_decode_key(err,
-                       decode_key_value_double_array(&d.cell_temperature_c, d.num_cells, &value,
+                       decode_key_value_double_array(&d.cell_temperature_c, &d.num_temp_sensors, &value,
                                                      PowerBatteryMsg::CELL_TEMPERATURE_C));
 
   if (check_acceptable_decode_errors(err)) {

@@ -416,7 +416,8 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
 
  @details This function decodes a CBOR key-value pair where the value is an array
  of doubles. It validates the key is a text string, validates the value is an array,
- allocates memory for the array elements, and populates the array with decoded values.
+ gets the length of the array from CBOR, allocates memory for the array elements,
+ and populates the array with decoded values.
 
  **MEMORY ALLOCATION**: This function allocates memory for the array using bm_malloc().
  The caller is responsible for freeing this memory when no longer needed using bm_free().
@@ -427,7 +428,7 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
  @param array_out Pointer to a double pointer that will receive the allocated array.
                   Must not be NULL. If *array_out is NULL, memory will be allocated.
                   If *array_out is non-NULL, the array is skipped.
- @param len Length of the array
+ @param len Pointer to length of the array, extracted from CBOR and returned
  @param value Pointer to the CBOR value to decode from
  @param key_expected The expected key name
 
@@ -436,7 +437,7 @@ CborError decoder_message_leave(CborValue *value, CborValue *map) {
          - CborErrorOutOfMemory if memory allocation fails
          - Other CBOR errors from underlying decode operations
  */
-CborError decode_key_value_double_array(double **array_out, size_t len,
+CborError decode_key_value_double_array(double **array_out, uint8_t *len,
                                         CborValue *value,
                                         const char * key_expected) {
   CborError err = CborNoError;
@@ -458,6 +459,13 @@ CborError decode_key_value_double_array(double **array_out, size_t len,
     return CborErrorIllegalType;
   }
 
+  size_t array_length;
+  err = cbor_value_get_array_length(value, &array_length);
+  if (err != CborNoError) {
+    return err;
+  }
+  *len = (uint8_t)array_length;
+
   // If array already allocated, just skip it
   if (*array_out != NULL || len == 0) {
     return cbor_value_advance(value);
@@ -473,9 +481,9 @@ CborError decode_key_value_double_array(double **array_out, size_t len,
 
   // Allocate memory
 #ifndef CI_TEST
-  *array_out = (double *)bm_malloc(sizeof(double) * len);
+  *array_out = (double *)bm_malloc(sizeof(double) * array_length);
 #else
-  *array_out = (double *)malloc(sizeof(double) * len);
+  *array_out = (double *)malloc(sizeof(double) * array_length);
 #endif
 
   if (*array_out == NULL) {
@@ -483,7 +491,7 @@ CborError decode_key_value_double_array(double **array_out, size_t len,
   }
 
   // Decode array elements
-  for (size_t j = 0; j < len; j++) {
+  for (size_t j = 0; j < array_length; j++) {
     err = cbor_value_get_double(&array, &(*array_out)[j]);
     if (err != CborNoError) {
       bm_debug("Failed to get double from %s array at index %zu: %d\n", key_expected, j, err);

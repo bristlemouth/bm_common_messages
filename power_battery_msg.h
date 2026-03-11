@@ -6,13 +6,12 @@
 namespace PowerBatteryMsg {
 
 constexpr uint32_t VERSION = 1;
-constexpr size_t NUM_FIELDS = 12 + SensorHeaderMsg::NUM_FIELDS;
+constexpr size_t NUM_FIELDS = 11 + SensorHeaderMsg::NUM_FIELDS;
 static constexpr char CHARGE_AH[] = "charge_ah";
 static constexpr char CAPACITY_AH[] = "capacity_ah";
 static constexpr char PERCENTAGE[] = "percentage";
 static constexpr char BATTERY_STATUS[] = "battery_status";
 static constexpr char BATTERY_HEALTH[] = "battery_health";
-static constexpr char NUM_CELLS[] = "num_cells";
 static constexpr char CELL_VOLTAGE_V[] = "cell_voltage_v";
 static constexpr char CELL_TEMPERATURE_C[] = "cell_temperature_c";
 
@@ -45,8 +44,9 @@ struct Data {
   double percentage;
   PowerBatteryStatus_t battery_status;
   PowerBatteryHealth_t battery_health;
-  uint8_t num_cells;
+  uint8_t num_cell_voltages; // Not sent in cbor
   double *cell_voltage_v;
+  uint8_t num_temp_sensors; // Not sent in cbor
   double *cell_temperature_c;
 };
 
