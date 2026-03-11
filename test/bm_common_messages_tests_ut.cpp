@@ -18,6 +18,7 @@
 #include "power_battery_msg.h"
 #include "power_reading_averages_msg.h"
 #include "power_reading_msg.h"
+#include "power_solar_averages_msg.h"
 #include "power_solar_reading_msg.h"
 #include "power_solar_reading_msg.h"
 #include "sensor_header_msg.h"
