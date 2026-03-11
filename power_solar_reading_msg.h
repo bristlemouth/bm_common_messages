@@ -30,4 +30,6 @@ CborError encode(Data &d, uint8_t *cbor_buffer, size_t size, size_t *encoded_len
 
 CborError decode(Data &d, const uint8_t *cbor_buffer, size_t size);
 
+void free(Data &d);
+
 } // namespace PowerSolarReadingMsg

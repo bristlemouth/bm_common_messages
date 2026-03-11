@@ -1003,12 +1003,22 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   EXPECT_EQ(decode.panel_voltages[0], d.panel_voltages[0]);
   EXPECT_EQ(decode.panel_currents[0], d.panel_currents[0]);
 
-  free(d.panel_temperatures);
-  free(d.panel_voltages);
-  free(d.panel_currents);
-  free(decode.panel_temperatures);
-  free(decode.panel_voltages);
-  free(decode.panel_currents);
+  PowerSolarReadingMsg::free(d);
+  PowerSolarReadingMsg::free(decode);
+
+  // Test to make sure the pointers get set to NULL
+  EXPECT_FALSE(d.panel_temperatures);
+  EXPECT_FALSE(d.panel_voltages);
+  EXPECT_FALSE(d.panel_currents);
+
+  // Should be safe to call again, i.e. won't crash test
+  PowerSolarReadingMsg::free(d);
+  PowerSolarReadingMsg::free(decode);
+
+  // Check the pointers are still NULL
+  EXPECT_FALSE(d.panel_temperatures);
+  EXPECT_FALSE(d.panel_voltages);
+  EXPECT_FALSE(d.panel_currents);
 
   // Test with num_temp_sensors and num_lines == 0
   PowerSolarReadingMsg::Data d2 = {};
@@ -1043,6 +1053,9 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   EXPECT_EQ(decode2.mpp_position, d2.mpp_position);
   EXPECT_EQ(decode2.num_temp_sensors, d2.num_temp_sensors);
   EXPECT_EQ(decode2.num_lines, d2.num_lines);
+
+  PowerSolarReadingMsg::free(d2);
+  PowerSolarReadingMsg::free(decode2);
 
   // Test with num_temp_sensors and num_lines == 5
   PowerSolarReadingMsg::Data d3;
@@ -1091,12 +1104,8 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
     EXPECT_EQ(decode3.panel_currents[i], d3.panel_currents[i]);
   }
 
-  free(d3.panel_temperatures);
-  free(d3.panel_voltages);
-  free(d3.panel_currents);
-  free(decode3.panel_temperatures);
-  free(decode3.panel_voltages);
-  free(decode3.panel_currents);
+  PowerSolarReadingMsg::free(d3);
+  PowerSolarReadingMsg::free(decode3);
 
   // Test with nun_temps_sensors == 1 and num_lines == 6
   PowerSolarReadingMsg::Data d4;
@@ -1155,10 +1164,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
     EXPECT_EQ(decode4.panel_currents[i], d4.panel_currents[i]);
   }
 
-  free(d4.panel_temperatures);
-  free(d4.panel_voltages);
-  free(d4.panel_currents);
-  free(decode4.panel_temperatures);
-  free(decode4.panel_voltages);
-  free(decode4.panel_currents);
+  PowerSolarReadingMsg::free(d4);
+  PowerSolarReadingMsg::free(decode4);
 }
