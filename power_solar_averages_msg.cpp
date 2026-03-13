@@ -21,7 +21,11 @@ CborError PowerSolarAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t si
       return err;
     }
   }
-
+  check_and_encode_key(err,
+                       encode_key_value_uint8(&map_encoder, PowerReadingMsg::POWER_READING_TYPE,
+                                              d.power_reading_type));
+  check_and_encode_key(err,
+                       encode_key_value_uint8(&map_encoder, PowerReadingMsg::STATUS, d.status));
   check_and_encode_key(err, encode_key_value_uint32(&map_encoder,
                                                     PowerSolarAveragesMsg::NUM_SAMPLES,
                                                     d.num_samples));
@@ -118,7 +122,9 @@ CborError PowerSolarAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, siz
   if (err != CborNoError) {
     return err;
   }
-
+  check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.power_reading_type, &value,
+                                                   PowerReadingMsg::POWER_READING_TYPE));
+  check_and_decode_key(err, decode_key_value_uint8(&d.status, &value, PowerReadingMsg::STATUS));
   check_and_decode_key(err, decode_key_value_uint32(&d.num_samples, &value,
                                                     PowerSolarAveragesMsg::NUM_SAMPLES));
   check_and_decode_key(
@@ -168,4 +174,61 @@ CborError PowerSolarAveragesMsg::decode(Data &d, const uint8_t *cbor_buffer, siz
   }
 
   return err;
+}
+
+/*!
+ @brief Helper function to safely free a double pointer and set it to NULL
+
+ @details Checks if the pointer is non-NULL before freeing, then sets it to NULL
+ to prevent double-free errors. Uses platform-appropriate free function.
+
+ @param pointer Pointer to a double pointer to free
+ */
+static inline void freePointer(double **pointer) {
+  if (*pointer) {
+#ifndef CI_TEST
+    bm_free(*pointer);
+#else
+    free(*pointer);
+#endif
+    *pointer = NULL;
+  }
+}
+
+/*!
+ @brief Frees all dynamically allocated memory in a PowerSolarReadingMsg Data structure
+
+ @details This function safely deallocates all array fields in the Data structure that
+ were allocated during decode operations. Each pointer is checked for NULL before
+ freeing, and all pointers are set to NULL after deallocation to prevent double-free
+ errors.
+
+ **SAFE TO CALL MULTIPLE TIMES**: This function can be called multiple times on the
+ same Data structure without causing crashes or undefined behavior.
+
+ **SAFE WITH UNINITIALIZED DATA**: This function can be safely called on Data structures
+ where array pointers are already NULL (e.g., freshly initialized or already freed).
+
+ **MEMORY FREED**: The following array fields are deallocated:
+ - panel_temparatures
+ - panel_voltages
+ - panel_currents
+
+ @param d Reference to Data structure containing arrays to free. After this call,
+          all array pointers will be set to NULL.
+ */
+void PowerSolarAveragesMsg::free(Data &d) {
+  freePointer(&d.panel_temperatures_average);
+  freePointer(&d.panel_temperatures_max);
+  freePointer(&d.panel_temperatures_min);
+  freePointer(&d.panel_temperatures_stdev);
+  freePointer(&d.panel_voltages_average);
+  freePointer(&d.panel_voltages_max);
+  freePointer(&d.panel_voltages_min);
+  freePointer(&d.panel_voltages_stdev);
+  freePointer(&d.panel_currents_average);
+  freePointer(&d.panel_currents_max);
+  freePointer(&d.panel_currents_min);
+  freePointer(&d.panel_currents_stdev);
+  return;
 }

@@ -20,7 +20,6 @@
 #include "power_reading_msg.h"
 #include "power_solar_averages_msg.h"
 #include "power_solar_reading_msg.h"
-#include "power_solar_reading_msg.h"
 #include "sensor_header_msg.h"
 #include "sys_info_svc_reply_msg.h"
 #include "gtest/gtest.h"
@@ -1167,4 +1166,292 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
 
   PowerSolarReadingMsg::free(d4);
   PowerSolarReadingMsg::free(decode4);
+}
+
+TEST_F(BmCommonTest, PowerSolarAveragesTest) {
+  CborError err = CborNoError;
+  // Test with nun_temps_sensors and num_lines == 1
+  PowerSolarAveragesMsg::Data d;
+  d.header.version = PowerSolarAveragesMsg::VERSION;
+  d.header.reading_time_utc_ms = 123456789;
+  d.header.reading_uptime_millis = 987654321;
+  d.header.sensor_reading_time_ms = 0xdeadc0de;
+  d.power_reading_type = PowerReadingMsg::SOURCE;
+  d.status = PowerReadingMsg::OKAY;
+  // d.mpp_position = 95.5;
+  d.num_temp_sensors = 1;
+  d.num_lines = 1;
+  d.panel_temperatures_average = (double *)malloc(sizeof(double));
+  d.panel_temperatures_average[0] = 45.2;
+  d.panel_temperatures_max = (double *)malloc(sizeof(double));
+  d.panel_temperatures_max[0] = 45.2;
+  d.panel_temperatures_min = (double *)malloc(sizeof(double));
+  d.panel_temperatures_min[0] = 45.2;
+  d.panel_temperatures_stdev = (double *)malloc(sizeof(double));
+  d.panel_temperatures_stdev[0] = 45.2;
+  d.panel_voltages_average = (double *)malloc(sizeof(double));
+  d.panel_voltages_average[0] = 24.5;
+  d.panel_voltages_max = (double *)malloc(sizeof(double));
+  d.panel_voltages_max[0] = 24.5;
+  d.panel_voltages_min = (double *)malloc(sizeof(double));
+  d.panel_voltages_min[0] = 24.5;
+  d.panel_voltages_stdev = (double *)malloc(sizeof(double));
+  d.panel_voltages_stdev[0] = 24.5;
+  d.panel_currents_average = (double *)malloc(sizeof(double));
+  d.panel_currents_average[0] = 8.3;
+  d.panel_currents_max = (double *)malloc(sizeof(double));
+  d.panel_currents_max[0] = 8.3;
+  d.panel_currents_min = (double *)malloc(sizeof(double));
+  d.panel_currents_min[0] = 8.3;
+  d.panel_currents_stdev = (double *)malloc(sizeof(double));
+  d.panel_currents_stdev[0] = 8.3;
+
+  uint8_t cbor_buffer[1024];
+  size_t len = 0;
+  PowerSolarAveragesMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
+  EXPECT_EQ(len, 551);
+
+  PowerSolarAveragesMsg::Data decode = {};
+  err = PowerSolarAveragesMsg::decode(decode, cbor_buffer, len);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(decode.header.version, d.header.version);
+  EXPECT_EQ(decode.header.reading_time_utc_ms, d.header.reading_time_utc_ms);
+  EXPECT_EQ(decode.header.reading_uptime_millis, d.header.reading_uptime_millis);
+  EXPECT_EQ(decode.header.sensor_reading_time_ms, d.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode.power_reading_type, d.power_reading_type);
+  EXPECT_EQ(decode.status, d.status);
+  // EXPECT_EQ(decode.mpp_position, d.mpp_position);
+  EXPECT_EQ(decode.num_temp_sensors, d.num_temp_sensors);
+  EXPECT_EQ(decode.num_lines, d.num_lines);
+  EXPECT_EQ(decode.panel_temperatures_average[0], d.panel_temperatures_average[0]);
+  EXPECT_EQ(decode.panel_temperatures_max[0], d.panel_temperatures_max[0]);
+  EXPECT_EQ(decode.panel_temperatures_min[0], d.panel_temperatures_min[0]);
+  EXPECT_EQ(decode.panel_temperatures_stdev[0], d.panel_temperatures_stdev[0]);
+  EXPECT_EQ(decode.panel_voltages_average[0], d.panel_voltages_average[0]);
+  EXPECT_EQ(decode.panel_voltages_max[0], d.panel_voltages_max[0]);
+  EXPECT_EQ(decode.panel_voltages_min[0], d.panel_voltages_min[0]);
+  EXPECT_EQ(decode.panel_voltages_stdev[0], d.panel_voltages_stdev[0]);
+  EXPECT_EQ(decode.panel_currents_average[0], d.panel_currents_average[0]);
+  EXPECT_EQ(decode.panel_currents_max[0], d.panel_currents_max[0]);
+  EXPECT_EQ(decode.panel_currents_min[0], d.panel_currents_min[0]);
+  EXPECT_EQ(decode.panel_currents_stdev[0], d.panel_currents_stdev[0]);
+
+  PowerSolarAveragesMsg::free(d);
+  PowerSolarAveragesMsg::free(decode);
+
+  // Test to make sure the pointers get set to NULL
+  EXPECT_FALSE(d.panel_temperatures_average);
+  EXPECT_FALSE(d.panel_temperatures_max);
+  EXPECT_FALSE(d.panel_temperatures_min);
+  EXPECT_FALSE(d.panel_temperatures_stdev);
+  EXPECT_FALSE(d.panel_voltages_average);
+  EXPECT_FALSE(d.panel_voltages_max);
+  EXPECT_FALSE(d.panel_voltages_min);
+  EXPECT_FALSE(d.panel_voltages_stdev);
+  EXPECT_FALSE(d.panel_currents_average);
+  EXPECT_FALSE(d.panel_currents_max);
+  EXPECT_FALSE(d.panel_currents_min);
+  EXPECT_FALSE(d.panel_currents_stdev);
+
+  // Should be safe to call again, i.e. won't crash test
+  PowerSolarAveragesMsg::free(d);
+  PowerSolarAveragesMsg::free(decode);
+
+  // Check the pointers are still NULL
+  EXPECT_FALSE(d.panel_temperatures_average);
+  EXPECT_FALSE(d.panel_temperatures_max);
+  EXPECT_FALSE(d.panel_temperatures_min);
+  EXPECT_FALSE(d.panel_temperatures_stdev);
+  EXPECT_FALSE(d.panel_voltages_average);
+  EXPECT_FALSE(d.panel_voltages_max);
+  EXPECT_FALSE(d.panel_voltages_min);
+  EXPECT_FALSE(d.panel_voltages_stdev);
+  EXPECT_FALSE(d.panel_currents_average);
+  EXPECT_FALSE(d.panel_currents_max);
+  EXPECT_FALSE(d.panel_currents_min);
+  EXPECT_FALSE(d.panel_currents_stdev);
+
+  // Test with num_temp_sensors and num_lines == 0
+  PowerSolarAveragesMsg::Data d2 = {};
+  d2.header.version = PowerSolarReadingMsg::VERSION;
+  d2.header.reading_time_utc_ms = 123456789;
+  d2.header.reading_uptime_millis = 987654321;
+  d2.header.sensor_reading_time_ms = 0xdeadc0de;
+  d2.power_reading_type = PowerReadingMsg::SOURCE;
+  d2.status = PowerReadingMsg::OKAY;
+  // d2.mpp_position = 95.5;
+  d2.num_temp_sensors = 0;
+  d2.num_lines = 0;
+
+  uint8_t cbor_buffer2[1024];
+  size_t len2 = 0;
+  PowerSolarAveragesMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
+  EXPECT_EQ(len2, 443);
+
+  PowerSolarAveragesMsg::Data decode2 = {};
+  err = PowerSolarAveragesMsg::decode(decode2, cbor_buffer2, len2);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(decode2.header.version, d2.header.version);
+  EXPECT_EQ(decode2.header.reading_time_utc_ms, d2.header.reading_time_utc_ms);
+  EXPECT_EQ(decode2.header.reading_uptime_millis, d2.header.reading_uptime_millis);
+  EXPECT_EQ(decode2.header.sensor_reading_time_ms, d2.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode2.power_reading_type, d2.power_reading_type);
+  EXPECT_EQ(decode2.status, d2.status);
+  // EXPECT_EQ(decode2.mpp_position, d2.mpp_position);
+  EXPECT_EQ(decode2.num_temp_sensors, d2.num_temp_sensors);
+  EXPECT_EQ(decode2.num_lines, d2.num_lines);
+
+  PowerSolarAveragesMsg::free(d2);
+  PowerSolarAveragesMsg::free(decode2);
+
+  // Test with num_temp_sensors and num_lines == 5
+  PowerSolarAveragesMsg::Data d3;
+  d3.header.version = PowerSolarAveragesMsg::VERSION;
+  d3.header.reading_time_utc_ms = 123456789;
+  d3.header.reading_uptime_millis = 987654321;
+  d3.header.sensor_reading_time_ms = 0xdeadc0de;
+  d3.power_reading_type = PowerReadingMsg::SOURCE;
+  d3.status = PowerReadingMsg::OKAY;
+  // d3.mpp_position = 98.3;
+  d3.num_temp_sensors = 5;
+  d3.num_lines = 5;
+  d3.panel_temperatures_average = (double *)malloc(sizeof(double) * d3.num_temp_sensors);
+  d3.panel_temperatures_max = (double *)malloc(sizeof(double) * d3.num_temp_sensors);
+  d3.panel_temperatures_min = (double *)malloc(sizeof(double) * d3.num_temp_sensors);
+  d3.panel_temperatures_stdev = (double *)malloc(sizeof(double) * d3.num_temp_sensors);
+  d3.panel_voltages_average = (double *)malloc(sizeof(double) * d3.num_lines);
+  d3.panel_voltages_max = (double *)malloc(sizeof(double) * d3.num_lines);
+  d3.panel_voltages_min = (double *)malloc(sizeof(double) * d3.num_lines);
+  d3.panel_voltages_stdev = (double *)malloc(sizeof(double) * d3.num_lines);
+  d3.panel_currents_average = (double *)malloc(sizeof(double) * d3.num_lines);
+  d3.panel_currents_max = (double *)malloc(sizeof(double) * d3.num_lines);
+  d3.panel_currents_min = (double *)malloc(sizeof(double) * d3.num_lines);
+  d3.panel_currents_stdev = (double *)malloc(sizeof(double) * d3.num_lines);
+  for (size_t i = 0; i < d3.num_temp_sensors; i++) {
+    d3.panel_temperatures_average[i] = 45.0 + i * 0.5;
+    d3.panel_temperatures_max[i] = 45.0 + i * 0.5;
+    d3.panel_temperatures_min[i] = 45.0 + i * 0.5;
+    d3.panel_temperatures_stdev[i] = 45.0 + i * 0.5;
+    d3.panel_voltages_average[i] = 24.0 + i * 0.1;
+    d3.panel_voltages_max[i] = 24.0 + i * 0.1;
+    d3.panel_voltages_min[i] = 24.0 + i * 0.1;
+    d3.panel_voltages_stdev[i] = 24.0 + i * 0.1;
+    d3.panel_currents_average[i] = 8.0 + i * 0.05;
+    d3.panel_currents_max[i] = 8.0 + i * 0.05;
+    d3.panel_currents_min[i] = 8.0 + i * 0.05;
+    d3.panel_currents_stdev[i] = 8.0 + i * 0.05;
+  }
+
+  uint8_t cbor_buffer3[1024];
+  size_t len3 = 0;
+  PowerSolarAveragesMsg::encode(d3, cbor_buffer3, sizeof(cbor_buffer3), &len3);
+  EXPECT_EQ(len3, 983);
+
+  PowerSolarAveragesMsg::Data decode3 = {};
+  err = PowerSolarAveragesMsg::decode(decode3, cbor_buffer3, len3);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(decode3.header.version, d3.header.version);
+  EXPECT_EQ(decode3.header.reading_time_utc_ms, d3.header.reading_time_utc_ms);
+  EXPECT_EQ(decode3.header.reading_uptime_millis, d3.header.reading_uptime_millis);
+  EXPECT_EQ(decode3.header.sensor_reading_time_ms, d3.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode3.power_reading_type, d3.power_reading_type);
+  EXPECT_EQ(decode3.status, d3.status);
+  // EXPECT_EQ(decode3.mpp_position, d3.mpp_position);
+  EXPECT_EQ(decode3.num_temp_sensors, d3.num_temp_sensors);
+  EXPECT_EQ(decode3.num_lines, d3.num_lines);
+  for (size_t i = 0; i < d3.num_temp_sensors; i++) {
+    EXPECT_EQ(decode3.panel_temperatures_average[i], d3.panel_temperatures_average[i]);
+    EXPECT_EQ(decode3.panel_temperatures_max[i], d3.panel_temperatures_max[i]);
+    EXPECT_EQ(decode3.panel_temperatures_min[i], d3.panel_temperatures_min[i]);
+    EXPECT_EQ(decode3.panel_temperatures_stdev[i], d3.panel_temperatures_stdev[i]);
+  }
+  for (size_t i = 0; i < d3.num_lines; i++) {
+    EXPECT_EQ(decode3.panel_voltages_average[i], d3.panel_voltages_average[i]);
+    EXPECT_EQ(decode3.panel_voltages_max[i], d3.panel_voltages_max[i]);
+    EXPECT_EQ(decode3.panel_voltages_min[i], d3.panel_voltages_min[i]);
+    EXPECT_EQ(decode3.panel_voltages_stdev[i], d3.panel_voltages_stdev[i]);
+    EXPECT_EQ(decode3.panel_currents_average[i], d3.panel_currents_average[i]);
+    EXPECT_EQ(decode3.panel_currents_max[i], d3.panel_currents_max[i]);
+    EXPECT_EQ(decode3.panel_currents_min[i], d3.panel_currents_min[i]);
+    EXPECT_EQ(decode3.panel_currents_stdev[i], d3.panel_currents_stdev[i]);
+  }
+
+  PowerSolarAveragesMsg::free(d3);
+  PowerSolarAveragesMsg::free(decode3);
+
+  // Test with nun_temps_sensors == 1 and num_lines == 6
+  PowerSolarAveragesMsg::Data d4;
+  d4.header.version = PowerSolarAveragesMsg::VERSION;
+  d4.header.reading_time_utc_ms = 123456789;
+  d4.header.reading_uptime_millis = 987654321;
+  d4.header.sensor_reading_time_ms = 0xdeadc0de;
+  d4.power_reading_type = PowerReadingMsg::SOURCE;
+  d4.status = PowerReadingMsg::OKAY;
+  // d4.mpp_position = 95.5;
+  d4.num_temp_sensors = 1;
+  d4.num_lines = 6;
+  d4.panel_temperatures_average = (double *)malloc(sizeof(double) * d4.num_temp_sensors);
+  d4.panel_temperatures_max = (double *)malloc(sizeof(double) * d4.num_temp_sensors);
+  d4.panel_temperatures_min = (double *)malloc(sizeof(double) * d4.num_temp_sensors);
+  d4.panel_temperatures_stdev = (double *)malloc(sizeof(double) * d4.num_temp_sensors);
+  d4.panel_temperatures_average[0] = 45.2;
+  d4.panel_temperatures_max[0] = 45.2;
+  d4.panel_temperatures_min[0] = 45.2;
+  d4.panel_temperatures_stdev[0] = 45.2;
+  d4.panel_voltages_average = (double *)malloc(sizeof(double) * d4.num_lines);
+  d4.panel_voltages_max = (double *)malloc(sizeof(double) * d4.num_lines);
+  d4.panel_voltages_min = (double *)malloc(sizeof(double) * d4.num_lines);
+  d4.panel_voltages_stdev = (double *)malloc(sizeof(double) * d4.num_lines);
+  d4.panel_currents_average = (double *)malloc(sizeof(double)* d4.num_lines);
+  d4.panel_currents_max = (double *)malloc(sizeof(double)* d4.num_lines);
+  d4.panel_currents_min = (double *)malloc(sizeof(double)* d4.num_lines);
+  d4.panel_currents_stdev = (double *)malloc(sizeof(double)* d4.num_lines);
+
+  for (uint8_t i = 0; i < d4.num_lines; i++) {
+    d4.panel_voltages_average[i] = 24.5;
+    d4.panel_voltages_max[i] = 25.68;
+    d4.panel_voltages_min[i] = 22.09;
+    d4.panel_voltages_stdev[i] = 0.123;
+    d4.panel_currents_average[i] = 8.5;
+    d4.panel_currents_max[i] = 9.68;
+    d4.panel_currents_min[i] = 4.59;
+    d4.panel_currents_stdev[i] = 0.123;
+  }
+
+  uint8_t cbor_buffer4[1024];
+  size_t len4 = 0;
+  PowerSolarAveragesMsg::encode(d4, cbor_buffer4, sizeof(cbor_buffer4), &len4);
+  EXPECT_EQ(len4, 911);
+
+  PowerSolarAveragesMsg::Data decode4 = {};
+  err = PowerSolarAveragesMsg::decode(decode4, cbor_buffer4, len4);
+  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(decode4.header.version, d4.header.version);
+  EXPECT_EQ(decode4.header.reading_time_utc_ms, d4.header.reading_time_utc_ms);
+  EXPECT_EQ(decode4.header.reading_uptime_millis, d4.header.reading_uptime_millis);
+  EXPECT_EQ(decode4.header.sensor_reading_time_ms, d4.header.sensor_reading_time_ms);
+  EXPECT_EQ(decode4.power_reading_type, d4.power_reading_type);
+  EXPECT_EQ(decode4.status, d4.status);
+  // EXPECT_EQ(decode4.mpp_position, d4.mpp_position);
+  EXPECT_EQ(decode4.num_temp_sensors, d4.num_temp_sensors);
+  EXPECT_EQ(decode4.num_lines, d4.num_lines);
+  for (size_t i = 0; i < d4.num_temp_sensors; i++) {
+    EXPECT_EQ(decode4.panel_temperatures_average[i], d4.panel_temperatures_average[i]);
+    EXPECT_EQ(decode4.panel_temperatures_max[i], d4.panel_temperatures_max[i]);
+    EXPECT_EQ(decode4.panel_temperatures_min[i], d4.panel_temperatures_min[i]);
+    EXPECT_EQ(decode4.panel_temperatures_stdev[i], d4.panel_temperatures_stdev[i]);
+  }
+  for (size_t i = 0; i < d4.num_lines; i++) {
+    EXPECT_EQ(decode4.panel_voltages_average[i], d4.panel_voltages_average[i]);
+    EXPECT_EQ(decode4.panel_voltages_max[i], d4.panel_voltages_max[i]);
+    EXPECT_EQ(decode4.panel_voltages_min[i], d4.panel_voltages_min[i]);
+    EXPECT_EQ(decode4.panel_voltages_stdev[i], d4.panel_voltages_stdev[i]);
+    EXPECT_EQ(decode4.panel_currents_average[i], d4.panel_currents_average[i]);
+    EXPECT_EQ(decode4.panel_currents_max[i], d4.panel_currents_max[i]);
+    EXPECT_EQ(decode4.panel_currents_min[i], d4.panel_currents_min[i]);
+    EXPECT_EQ(decode4.panel_currents_stdev[i], d4.panel_currents_stdev[i]);
+  }
+
+  PowerSolarAveragesMsg::free(d4);
+  PowerSolarAveragesMsg::free(decode4);
 }
