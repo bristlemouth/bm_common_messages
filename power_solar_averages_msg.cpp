@@ -210,9 +210,18 @@ static inline void freePointer(double **pointer) {
  where array pointers are already NULL (e.g., freshly initialized or already freed).
 
  **MEMORY FREED**: The following array fields are deallocated:
- - panel_temparatures
- - panel_voltages
- - panel_currents
+ - panel_temparatures_average
+ - panel_temparatures_max
+ - panel_temparatures_min
+ - panel_temparatures_stdev
+ - panel_voltages_average
+ - panel_voltages_max
+ - panel_voltages_min
+ - panel_voltages_stdev
+ - panel_currents_average
+ - panel_currents_max
+ - panel_currents_min
+ - panel_currents_stdev
 
  @param d Reference to Data structure containing arrays to free. After this call,
           all array pointers will be set to NULL.
