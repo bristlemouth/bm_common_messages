@@ -1,6 +1,8 @@
 import sensor_header
 
 sensor_header header
+uint8 power_reading_type
+uint8 status
 uint32 num_samples
 float64 averaging_window_length_s
 float64 panel_temperatures_average[]    # Array of averaged temperatures, one for each temp sensor in the panel/cell array

@@ -970,7 +970,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   d.status = PowerReadingMsg::OKAY;
   d.voltage_v = 24.5;
   d.current_a = 8.3;
-  d.mpp_position = 95.5;
   d.num_temp_sensors = 1;
   d.num_lines = 1;
   d.panel_temperatures = (double *)malloc(sizeof(double));
@@ -996,7 +995,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   EXPECT_EQ(decode.status, d.status);
   EXPECT_EQ(decode.voltage_v, d.voltage_v);
   EXPECT_EQ(decode.current_a, d.current_a);
-  EXPECT_EQ(decode.mpp_position, d.mpp_position);
   EXPECT_EQ(decode.num_temp_sensors, d.num_temp_sensors);
   EXPECT_EQ(decode.num_lines, d.num_lines);
   EXPECT_EQ(decode.panel_temperatures[0], d.panel_temperatures[0]);
@@ -1030,7 +1028,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   d2.status = PowerReadingMsg::OKAY;
   d2.voltage_v = 24.5;
   d2.current_a = 8.3;
-  d2.mpp_position = 95.5;
   d2.num_temp_sensors = 0;
   d2.num_lines = 0;
 
@@ -1050,7 +1047,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   EXPECT_EQ(decode2.status, d2.status);
   EXPECT_EQ(decode2.voltage_v, d2.voltage_v);
   EXPECT_EQ(decode2.current_a, d2.current_a);
-  EXPECT_EQ(decode2.mpp_position, d2.mpp_position);
   EXPECT_EQ(decode2.num_temp_sensors, d2.num_temp_sensors);
   EXPECT_EQ(decode2.num_lines, d2.num_lines);
 
@@ -1067,7 +1063,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   d3.status = PowerReadingMsg::OKAY;
   d3.voltage_v = 120.0;
   d3.current_a = 40.5;
-  d3.mpp_position = 98.3;
   d3.num_temp_sensors = 5;
   d3.num_lines = 5;
   d3.panel_temperatures = (double *)malloc(sizeof(double) * d3.num_temp_sensors);
@@ -1095,7 +1090,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   EXPECT_EQ(decode3.status, d3.status);
   EXPECT_EQ(decode3.voltage_v, d3.voltage_v);
   EXPECT_EQ(decode3.current_a, d3.current_a);
-  EXPECT_EQ(decode3.mpp_position, d3.mpp_position);
   EXPECT_EQ(decode3.num_temp_sensors, d3.num_temp_sensors);
   EXPECT_EQ(decode3.num_lines, d3.num_lines);
   for (size_t i = 0; i < d3.num_temp_sensors; i++) {
@@ -1117,7 +1111,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   d4.status = PowerReadingMsg::OKAY;
   d4.voltage_v = 24.5;
   d4.current_a = 8.3;
-  d4.mpp_position = 95.5;
   d4.num_temp_sensors = 1;
   d4.num_lines = 6;
   d4.panel_temperatures = (double *)malloc(sizeof(double) * d4.num_temp_sensors);
@@ -1153,7 +1146,6 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   EXPECT_EQ(decode4.status, d4.status);
   EXPECT_EQ(decode4.voltage_v, d4.voltage_v);
   EXPECT_EQ(decode4.current_a, d4.current_a);
-  EXPECT_EQ(decode4.mpp_position, d4.mpp_position);
   EXPECT_EQ(decode4.num_temp_sensors, d4.num_temp_sensors);
   EXPECT_EQ(decode4.num_lines, d4.num_lines);
   for (size_t i = 0; i < d4.num_temp_sensors; i++) {
@@ -1178,7 +1170,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   d.header.sensor_reading_time_ms = 0xdeadc0de;
   d.power_reading_type = PowerReadingMsg::SOURCE;
   d.status = PowerReadingMsg::OKAY;
-  // d.mpp_position = 95.5;
   d.num_temp_sensors = 1;
   d.num_lines = 1;
   d.panel_temperatures_average = (double *)malloc(sizeof(double));
@@ -1220,7 +1211,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   EXPECT_EQ(decode.header.sensor_reading_time_ms, d.header.sensor_reading_time_ms);
   EXPECT_EQ(decode.power_reading_type, d.power_reading_type);
   EXPECT_EQ(decode.status, d.status);
-  // EXPECT_EQ(decode.mpp_position, d.mpp_position);
   EXPECT_EQ(decode.num_temp_sensors, d.num_temp_sensors);
   EXPECT_EQ(decode.num_lines, d.num_lines);
   EXPECT_EQ(decode.panel_temperatures_average[0], d.panel_temperatures_average[0]);
@@ -1279,7 +1269,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   d2.header.sensor_reading_time_ms = 0xdeadc0de;
   d2.power_reading_type = PowerReadingMsg::SOURCE;
   d2.status = PowerReadingMsg::OKAY;
-  // d2.mpp_position = 95.5;
   d2.num_temp_sensors = 0;
   d2.num_lines = 0;
 
@@ -1297,7 +1286,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   EXPECT_EQ(decode2.header.sensor_reading_time_ms, d2.header.sensor_reading_time_ms);
   EXPECT_EQ(decode2.power_reading_type, d2.power_reading_type);
   EXPECT_EQ(decode2.status, d2.status);
-  // EXPECT_EQ(decode2.mpp_position, d2.mpp_position);
   EXPECT_EQ(decode2.num_temp_sensors, d2.num_temp_sensors);
   EXPECT_EQ(decode2.num_lines, d2.num_lines);
 
@@ -1312,7 +1300,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   d3.header.sensor_reading_time_ms = 0xdeadc0de;
   d3.power_reading_type = PowerReadingMsg::SOURCE;
   d3.status = PowerReadingMsg::OKAY;
-  // d3.mpp_position = 98.3;
   d3.num_temp_sensors = 5;
   d3.num_lines = 5;
   d3.panel_temperatures_average = (double *)malloc(sizeof(double) * d3.num_temp_sensors);
@@ -1356,7 +1343,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   EXPECT_EQ(decode3.header.sensor_reading_time_ms, d3.header.sensor_reading_time_ms);
   EXPECT_EQ(decode3.power_reading_type, d3.power_reading_type);
   EXPECT_EQ(decode3.status, d3.status);
-  // EXPECT_EQ(decode3.mpp_position, d3.mpp_position);
   EXPECT_EQ(decode3.num_temp_sensors, d3.num_temp_sensors);
   EXPECT_EQ(decode3.num_lines, d3.num_lines);
   for (size_t i = 0; i < d3.num_temp_sensors; i++) {
@@ -1387,7 +1373,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   d4.header.sensor_reading_time_ms = 0xdeadc0de;
   d4.power_reading_type = PowerReadingMsg::SOURCE;
   d4.status = PowerReadingMsg::OKAY;
-  // d4.mpp_position = 95.5;
   d4.num_temp_sensors = 1;
   d4.num_lines = 6;
   d4.panel_temperatures_average = (double *)malloc(sizeof(double) * d4.num_temp_sensors);
@@ -1432,7 +1417,6 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   EXPECT_EQ(decode4.header.sensor_reading_time_ms, d4.header.sensor_reading_time_ms);
   EXPECT_EQ(decode4.power_reading_type, d4.power_reading_type);
   EXPECT_EQ(decode4.status, d4.status);
-  // EXPECT_EQ(decode4.mpp_position, d4.mpp_position);
   EXPECT_EQ(decode4.num_temp_sensors, d4.num_temp_sensors);
   EXPECT_EQ(decode4.num_lines, d4.num_lines);
   for (size_t i = 0; i < d4.num_temp_sensors; i++) {
