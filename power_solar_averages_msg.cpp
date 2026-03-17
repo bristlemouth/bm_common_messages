@@ -196,7 +196,7 @@ static inline void freePointer(double **pointer) {
 }
 
 /*!
- @brief Frees all dynamically allocated memory in a PowerSolarReadingMsg Data structure
+ @brief Frees all dynamically allocated memory in a PowerSolarAveragesMsg Data structure
 
  @details This function safely deallocates all array fields in the Data structure that
  were allocated during decode operations. Each pointer is checked for NULL before
