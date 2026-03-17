@@ -982,7 +982,7 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   uint8_t cbor_buffer[1024];
   size_t len = 0;
   PowerSolarReadingMsg::encode(d, cbor_buffer, sizeof(cbor_buffer), &len);
-  EXPECT_EQ(len, 257);
+  EXPECT_EQ(len, 235);
 
   PowerSolarReadingMsg::Data decode = {};
   err = PowerSolarReadingMsg::decode(decode, cbor_buffer, len);
@@ -1034,7 +1034,7 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   uint8_t cbor_buffer2[1024];
   size_t len2 = 0;
   PowerSolarReadingMsg::encode(d2, cbor_buffer2, sizeof(cbor_buffer2), &len2);
-  EXPECT_EQ(len2, 230);
+  EXPECT_EQ(len2, 208);
 
   PowerSolarReadingMsg::Data decode2 = {};
   err = PowerSolarReadingMsg::decode(decode2, cbor_buffer2, len2);
@@ -1077,7 +1077,7 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   uint8_t cbor_buffer3[1024];
   size_t len3 = 0;
   PowerSolarReadingMsg::encode(d3, cbor_buffer3, sizeof(cbor_buffer3), &len3);
-  EXPECT_EQ(len3, 365);
+  EXPECT_EQ(len3, 343);
 
   PowerSolarReadingMsg::Data decode3 = {};
   err = PowerSolarReadingMsg::decode(decode3, cbor_buffer3, len3);
@@ -1133,7 +1133,7 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   uint8_t cbor_buffer4[1024];
   size_t len4 = 0;
   PowerSolarReadingMsg::encode(d4, cbor_buffer4, sizeof(cbor_buffer4), &len4);
-  EXPECT_EQ(len4, 347);
+  EXPECT_EQ(len4, 325);
 
   PowerSolarReadingMsg::Data decode4 = {};
   err = PowerSolarReadingMsg::decode(decode4, cbor_buffer4, len4);
