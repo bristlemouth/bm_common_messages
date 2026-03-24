@@ -95,7 +95,7 @@ CborError PowerSolarAveragesMsg::encode(Data &d, uint8_t *cbor_buffer, size_t si
  array will be skipped during decoding.
 
  **CALLER RESPONSIBILITY**: The caller is responsible for freeing all allocated array
- memory when no longer needed using bm_free().
+ memory when no longer needed using bm_free() or the provided PowerSolarAveragesMsg::free.
 
  @param d Reference to Data structure to populate. Array pointers must be NULL.
  @param cbor_buffer Pointer to the CBOR-encoded message buffer

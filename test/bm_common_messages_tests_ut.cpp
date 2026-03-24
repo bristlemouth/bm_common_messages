@@ -960,7 +960,7 @@ TEST_F(BmCommonTest, PowerBatteryAveragesTest) {
 
 TEST_F(BmCommonTest, PowerSolarReadingTest) {
   CborError err = CborNoError;
-  // Test with nun_temps_sensors and num_lines == 1
+  // Test with nun_temp_sensors and num_lines == 1
   PowerSolarReadingMsg::Data d;
   d.header.version = PowerSolarReadingMsg::VERSION;
   d.header.reading_time_utc_ms = 123456789;
@@ -1101,7 +1101,7 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
   PowerSolarReadingMsg::free(d3);
   PowerSolarReadingMsg::free(decode3);
 
-  // Test with nun_temps_sensors == 1 and num_lines == 6
+  // Test with nun_temp_sensors == 1 and num_lines == 6
   PowerSolarReadingMsg::Data d4;
   d4.header.version = PowerSolarReadingMsg::VERSION;
   d4.header.reading_time_utc_ms = 123456789;
@@ -1162,7 +1162,7 @@ TEST_F(BmCommonTest, PowerSolarReadingTest) {
 
 TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   CborError err = CborNoError;
-  // Test with nun_temps_sensors and num_lines == 1
+  // Test with nun_temp_sensors and num_lines == 1
   PowerSolarAveragesMsg::Data d;
   d.header.version = PowerSolarAveragesMsg::VERSION;
   d.header.reading_time_utc_ms = 123456789;
@@ -1365,7 +1365,7 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
   PowerSolarAveragesMsg::free(d3);
   PowerSolarAveragesMsg::free(decode3);
 
-  // Test with nun_temps_sensors == 1 and num_lines == 6
+  // Test with nun_temp_sensors == 1 and num_lines == 6
   PowerSolarAveragesMsg::Data d4;
   d4.header.version = PowerSolarAveragesMsg::VERSION;
   d4.header.reading_time_utc_ms = 123456789;
