@@ -59,6 +59,7 @@ set(SOURCES
     power_reading_msg.cpp
     power_reading_averages_msg.cpp
     power_solar_reading_msg.cpp
+    power_solar_averages_msg.cpp
     sensor_header_msg.cpp
     sensor_header_msg.c
     sys_info_svc_reply_msg.c
