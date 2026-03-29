@@ -1,9 +1,7 @@
 #include "device_test_svc_reply_msg.h"
 #include "bm_config.h"
-#if !defined(CI_TEST) && !defined(BM_HOSTED)
-#include "FreeRTOS.h"
-#else
-#include <cstdlib>
+#ifndef CI_TEST
+#include "bm_os.h"
 #endif
 
 CborError DeviceTestSvcReplyMsg::encode(Data &d, uint8_t *cbor_buffer,
@@ -177,9 +175,8 @@ CborError DeviceTestSvcReplyMsg::decode(Data &d, const uint8_t *cbor_buffer,
     }
     if (d.data_len) {
       size_t buflen = d.data_len;
-#if !defined(CI_TEST) && !defined(BM_HOSTED)
-      uint8_t *buf = static_cast<uint8_t *>(pvPortMalloc(buflen));
-      configASSERT(buf);
+#ifndef CI_TEST
+      uint8_t *buf = static_cast<uint8_t *>(bm_malloc(buflen));
 #else
       uint8_t *buf = static_cast<uint8_t *>(malloc(buflen));
 #endif
