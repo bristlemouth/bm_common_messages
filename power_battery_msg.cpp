@@ -43,8 +43,6 @@ CborError PowerBatteryMsg::encode(Data &d, uint8_t *cbor_buffer, size_t size,
   check_and_encode_key(
       err,
       encode_key_value_uint8(&map_encoder, PowerBatteryMsg::BATTERY_HEALTH, d.battery_health));
-//   check_and_encode_key(
-//       err, encode_key_value_uint8(&map_encoder, PowerBatteryMsg::NUM_CELLS, d.num_cells));
   check_and_encode_key(err, encode_key_value_double_array(&map_encoder,
                                                           PowerBatteryMsg::CELL_VOLTAGE_V,
                                                           d.cell_voltage_v, d.num_cell_voltages));
@@ -122,9 +120,6 @@ CborError PowerBatteryMsg::decode(Data &d, const uint8_t *cbor_buffer, size_t si
                                                    PowerBatteryMsg::BATTERY_STATUS));
   check_and_decode_key(err, decode_key_value_uint8((uint8_t *)&d.battery_health, &value,
                                                    PowerBatteryMsg::BATTERY_HEALTH));
-//   check_and_decode_key(
-//       err, decode_key_value_uint8(&d.num_cells, &value, PowerBatteryMsg::NUM_CELLS));
-
   check_and_decode_key(err,
                        decode_key_value_double_array(&d.cell_voltage_v, &d.num_cell_voltages, &value,
                                                      PowerBatteryMsg::CELL_VOLTAGE_V));
