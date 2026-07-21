@@ -513,7 +513,7 @@ CborError decode_key_value_double_array(double **array_out, uint8_t *len,
   return err;
 }
 
-CborError decode_cbor_fields_from_table(CborValue *value, const CborDecoderTableEntry_t *entries_table, size_t table_size) {
+CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry_t *entries_table, size_t table_size) {
   CborError err = CborNoError;
   bool has_unknown_key = false;
 
@@ -632,7 +632,7 @@ CborError decode_cbor_fields_from_table(CborValue *value, const CborDecoderTable
   return err;
 }
 
-CborError encode_cbor_fields_from_table(CborEncoder *map_encoder, const CborEncoderTableEntry_t *entries_table, size_t table_size) {
+CborError bm_encode_fields_from_table(CborEncoder *map_encoder, const BmEncoderTableEntry_t *entries_table, size_t table_size) {
   CborError err = CborNoError;
 
   size_t index;
