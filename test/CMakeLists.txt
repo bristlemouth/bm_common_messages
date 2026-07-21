@@ -61,7 +61,12 @@ set(BM_COMMON_MESSAGES_SRCS
     ${SRC_DIR}/bm_rbr_pressure_difference_signal_msg.cpp
     ${SRC_DIR}/pme_dissolved_oxygen_msg.cpp
     ${SRC_DIR}/pme_wipe_msg.cpp
+    ${SRC_DIR}/power_battery_msg.cpp
+    ${SRC_DIR}/power_battery_averages_msg.cpp
     ${SRC_DIR}/power_reading_msg.cpp
+    ${SRC_DIR}/power_reading_averages_msg.cpp
+    ${SRC_DIR}/power_solar_reading_msg.cpp
+    ${SRC_DIR}/power_solar_averages_msg.cpp
     ${SRC_DIR}/aanderaa_conductivity_msg.cpp
     ${SRC_DIR}/aanderaa_current_meter_msg.cpp
 
