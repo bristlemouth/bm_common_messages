@@ -513,7 +513,7 @@ CborError decode_key_value_double_array(double **array_out, uint8_t *len,
   return err;
 }
 
-CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry_t *entries_table, size_t table_size) {
+CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry_t *entries_table, size_t table_len) {
   CborError err = CborNoError;
   bool has_unknown_key = false;
 
@@ -563,7 +563,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
       // Search the look up table for the matching string key
       size_t index;
       bool key_in_table = false;
-      for (index = 0; index < table_size; index++) {
+      for (index = 0; index < table_len; index++) {
         if (strcmp(entries_table[index].key, key) == 0) {
           key_in_table = true;
           switch (entries_table[index].type) {
@@ -632,11 +632,11 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
   return err;
 }
 
-CborError bm_encode_fields_from_table(CborEncoder *map_encoder, const BmEncoderTableEntry_t *entries_table, size_t table_size) {
+CborError bm_encode_fields_from_table(CborEncoder *map_encoder, const BmEncoderTableEntry_t *entries_table, size_t table_len) {
   CborError err = CborNoError;
 
   size_t index;
-  for (index = 0; index < table_size; index++) {
+  for (index = 0; index < table_len; index++) {
     // Encode the key
     err = cbor_encode_text_stringz(map_encoder, entries_table[index].key);
     if (err != CborNoError) {
