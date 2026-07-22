@@ -29,23 +29,23 @@ typedef enum {
   BM_FIELD_FLOAT,
   BM_FIELD_DOUBLE,
   BM_FIELD_STRING,
-} BmField_t;
+} BmField;
 
 typedef struct {
   const char* key;
-  BmField_t type;
+  BmField type;
   void *value_desitination;
-} BmDecodeTableEntry_t;
+} BmDecodeTableEntry;
 
 typedef struct {
   const char* key;
-  BmField_t type;
+  BmField type;
   const void *value_source;
-} BmEncoderTableEntry_t;
+} BmEncoderTableEntry;
 
-CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry_t *entries_table, size_t table_len);
+CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry *entries_table, size_t table_len);
 
-CborError bm_encode_fields_from_table(CborEncoder *map_encoder, const BmEncoderTableEntry_t *entries_table, size_t table_len);
+CborError bm_encode_fields_from_table(CborEncoder *map_encoder, const BmEncoderTableEntry *entries_table, size_t table_len);
 
 CborError encoder_message_create(CborEncoder *encoder, CborEncoder *map_encoder,
                                  uint8_t *cbor_buffer, size_t size,
