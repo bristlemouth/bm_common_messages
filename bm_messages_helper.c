@@ -568,32 +568,56 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
           key_in_table = true;
           switch (entries_table[index].type) {
             case UINT8: {
+              if (!cbor_value_is_unsigned_integer(value)) {
+                bm_debug("table expected int but got something else\n");
+                break;
+              }
               uint64_t temp_value = 0;
               err = cbor_value_get_uint64(value, &temp_value);
               *(uint8_t *)entries_table[index].value_desitination = (uint8_t)temp_value;
               break;
             }
             case UINT16: {
+              if (!cbor_value_is_unsigned_integer(value)) {
+                bm_debug("table expected int but got something else\n");
+                break;
+              }
               uint64_t temp_value = 0;
               err = cbor_value_get_uint64(value, &temp_value);
               *(uint16_t *)entries_table[index].value_desitination = (uint16_t)temp_value;
               break;
             }
             case UINT32: {
+              if (!cbor_value_is_unsigned_integer(value)) {
+                bm_debug("table expected int but got something else\n");
+                break;
+              }
               uint64_t temp_value = 0;
               err = cbor_value_get_uint64(value, &temp_value);
               *(uint32_t *)entries_table[index].value_desitination = (uint32_t)temp_value;
               break;
             }
             case UINT64: {
+              if (!cbor_value_is_unsigned_integer(value)) {
+                bm_debug("table expected int but got something else\n");
+                break;
+              }
               err = cbor_value_get_uint64(value, (uint64_t *)entries_table[index].value_desitination);
               break;
             }
             case FLOAT: {
+              if (!cbor_value_is_float(value)) {
+                bm_debug("table expected float but got something else\n");
+                break;
+              }
               err = cbor_value_get_float(value, (float *)entries_table[index].value_desitination);
               break;
             }
             case DOUBLE: {
+              if (!cbor_value_is_double(value)) {
+                bm_debug("table expected double but got something else\n");
+                break;
+              }
               err = cbor_value_get_double(value, (double *)entries_table[index].value_desitination);
               break;
             }
