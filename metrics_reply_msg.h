@@ -1,33 +1,47 @@
 #pragma once
-#include "cbor.h"
+#include "bm_messages_helper.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 #define METRICS_REPLY_VERSION 1
-#define METRICS_MAX_PORTS 2          /* ADIN2111 has 2 ports */
-#define METRICS_REPLY_NUM_FIELDS 4   /* v, node, up, p */
-#define METRICS_PORT_NUM_FIELDS 5    /* mse, sqi, lq, rxe, sye */
+#define METRICS_REPLY_NUM_FIELDS 4 // mv, node, up, data
 
 typedef struct {
-  uint16_t mse_val;          /* raw MSE_VAL register */
-  uint8_t  sqi;              /* signal quality indicator */
-  uint8_t  link_quality;     /* adi_phy_LinkQuality_e: 0 poor / 1 marginal / 2 good */
-  uint16_t rx_err_count;     /* frame_check_rx_error_count */
-  uint16_t symbol_err_count; /* frame_check_error_counters.SYMB_ERR_CNT */
-} MetricsPortStats;
+  const char *key;
+  const BmEncoderTableEntry_t *fields; // filled LUT of flat metric fields
+  size_t num_fields; // number of valid entries in fields
+} MetricsComponent;
 
 typedef struct {
-  uint8_t  version;
+  uint8_t version;
   uint64_t node_id;
   uint32_t uptime_ms;
-  uint8_t  num_ports;
-  MetricsPortStats ports[METRICS_MAX_PORTS];
+  const MetricsComponent *components;
+  size_t num_components;
 } MetricsReplyData;
+
+typedef struct {
+  const char *key;
+  const BmDecodeTableEntry_t *fields;
+  size_t num_fields;
+} MetricsComponentDecode;
+
+typedef struct {
+  uint8_t *version;
+  uint64_t *node_id;
+  uint32_t *uptime_ms;
+  const MetricsComponentDecode *components;
+  size_t num_components;
+} MetricsReplyDecode;
 
 CborError metrics_reply_encode(const MetricsReplyData *d, uint8_t *cbor_buffer,
                                size_t size, size_t *encoded_len);
+
+CborError metrics_reply_decode(const uint8_t *cbor_buffer, size_t size,
+                               const MetricsReplyDecode *out);
 
 #ifdef __cplusplus
 }
