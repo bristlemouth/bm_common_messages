@@ -58,6 +58,8 @@ CborError encode_key_value_uint8(CborEncoder *map_encoder, const char *name,
                                  const uint8_t value);
 CborError encode_key_value_uint32(CborEncoder *map_encoder, const char *name,
                                   const uint32_t value);
+CborError encode_key_value_uint64(CborEncoder *map_encoder, const char *name,
+                                  const uint64_t value);
 CborError encode_key_value_string(CborEncoder *map_encoder, const char *name,
                                   const char *value, const size_t len);
 CborError encode_key_value_bytes(CborEncoder *map_encoder, const char *name,
@@ -78,6 +80,8 @@ CborError decode_key_value_double(double *out, CborValue *value,
 CborError decode_key_value_uint8(uint8_t *out, CborValue *value,
                                  const char *key_expected);
 CborError decode_key_value_uint32(uint32_t *out, CborValue *value,
+                                  const char *key_expected);
+CborError decode_key_value_uint64(uint64_t *out, CborValue *value,
                                   const char *key_expected);
 CborError decode_key_value_string(char **out, size_t *len, CborValue *value,
                                   const char *key_expected);
