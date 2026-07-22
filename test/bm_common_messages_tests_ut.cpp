@@ -1450,12 +1450,12 @@ TEST_F(BmCommonTest, BmEncodeDecodeFieldsFromTableRoundTripTest) {
   const double expected_f64 = 98.125;
 
   BmEncoderTableEntry_t encode_table[] = {
-      {"u8", UINT8, &expected_u8},
-      {"u16", UINT16, &expected_u16},
-      {"u32", UINT32, &expected_u32},
-      {"u64", UINT64, &expected_u64},
-      {"f32", FLOAT, &expected_f32},
-      {"f64", DOUBLE, &expected_f64},
+      {"u8", BM_FIELD_UINT8, &expected_u8},
+      {"u16", BM_FIELD_UINT16, &expected_u16},
+      {"u32", BM_FIELD_UINT32, &expected_u32},
+      {"u64", BM_FIELD_UINT64, &expected_u64},
+      {"f32", BM_FIELD_FLOAT, &expected_f32},
+      {"f64", BM_FIELD_DOUBLE, &expected_f64},
   };
 
   uint8_t cbor_buffer[1024] = {0};
@@ -1491,9 +1491,9 @@ TEST_F(BmCommonTest, BmEncodeDecodeFieldsFromTableRoundTripTest) {
   double decoded_f64 = 0.0;
 
   BmDecodeTableEntry_t decode_table[] = {
-      {"u8", UINT8, &decoded_u8},   {"u16", UINT16, &decoded_u16},
-      {"u32", UINT32, &decoded_u32}, {"u64", UINT64, &decoded_u64},
-      {"f32", FLOAT, &decoded_f32}, {"f64", DOUBLE, &decoded_f64},
+      {"u8", BM_FIELD_UINT8, &decoded_u8},   {"u16", BM_FIELD_UINT16, &decoded_u16},
+      {"u32", BM_FIELD_UINT32, &decoded_u32}, {"u64", BM_FIELD_UINT64, &decoded_u64},
+      {"f32", BM_FIELD_FLOAT, &decoded_f32}, {"f64", BM_FIELD_DOUBLE, &decoded_f64},
   };
 
   err = bm_decode_fields_from_table(
@@ -1542,7 +1542,7 @@ TEST_F(BmCommonTest, BmDecodeFieldsFromTableUnknownKeyTest) {
   EXPECT_EQ(err, CborNoError);
 
   uint32_t decoded_known = 0;
-  BmDecodeTableEntry_t decode_table[] = {{"known", UINT32, &decoded_known}};
+  BmDecodeTableEntry_t decode_table[] = {{"known", BM_FIELD_UINT32, &decoded_known}};
 
   err = bm_decode_fields_from_table(&value, decode_table,
                                     sizeof(decode_table) / sizeof(decode_table[0]));
@@ -1579,7 +1579,7 @@ TEST_F(BmCommonTest, BmDecodeFieldsFromTableTypeMismatchTest) {
   EXPECT_EQ(err, CborNoError);
 
   uint32_t decoded_number = 0xdeadbeef;
-  BmDecodeTableEntry_t decode_table[] = {{"number", UINT32, &decoded_number}};
+  BmDecodeTableEntry_t decode_table[] = {{"number", BM_FIELD_UINT32, &decoded_number}};
 
   err = bm_decode_fields_from_table(&value, decode_table,
                                     sizeof(decode_table) / sizeof(decode_table[0]));
@@ -1594,7 +1594,7 @@ TEST_F(BmCommonTest, BmDecodeFieldsFromTableTypeMismatchTest) {
 
 TEST_F(BmCommonTest, BmEncodeFieldsFromTableUnsupportedTypeTest) {
   const char *text = "hello";
-  BmEncoderTableEntry_t encode_table[] = {{"text", STRING, text}};
+  BmEncoderTableEntry_t encode_table[] = {{"text", BM_FIELD_STRING, text}};
 
   uint8_t cbor_buffer[128] = {0};
   CborEncoder encoder;

@@ -22,13 +22,13 @@ extern "C" {
   }
 
 typedef enum {
-  UINT8,
-  UINT16,
-  UINT32,
-  UINT64,
-  FLOAT,
-  DOUBLE,
-  STRING,
+  BM_FIELD_UINT8,
+  BM_FIELD_UINT16,
+  BM_FIELD_UINT32,
+  BM_FIELD_UINT64,
+  BM_FIELD_FLOAT,
+  BM_FIELD_DOUBLE,
+  BM_FIELD_STRING,
 } BmField_t;
 
 typedef struct {

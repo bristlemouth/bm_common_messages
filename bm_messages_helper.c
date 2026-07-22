@@ -568,7 +568,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
         if (strcmp(entries_table[index].key, key) == 0) {
           key_in_table = true;
           switch (entries_table[index].type) {
-            case UINT8: {
+            case BM_FIELD_UINT8: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
                 type_mismatch = true;
@@ -579,7 +579,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
               *(uint8_t *)entries_table[index].value_desitination = (uint8_t)temp_value;
               break;
             }
-            case UINT16: {
+            case BM_FIELD_UINT16: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
                 type_mismatch = true;
@@ -590,7 +590,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
               *(uint16_t *)entries_table[index].value_desitination = (uint16_t)temp_value;
               break;
             }
-            case UINT32: {
+            case BM_FIELD_UINT32: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
                 type_mismatch = true;
@@ -601,7 +601,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
               *(uint32_t *)entries_table[index].value_desitination = (uint32_t)temp_value;
               break;
             }
-            case UINT64: {
+            case BM_FIELD_UINT64: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
                 type_mismatch = true;
@@ -610,7 +610,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
               err = cbor_value_get_uint64(value, (uint64_t *)entries_table[index].value_desitination);
               break;
             }
-            case FLOAT: {
+            case BM_FIELD_FLOAT: {
               if (!cbor_value_is_float(value)) {
                 bm_debug("table expected float but got something else\n");
                 type_mismatch = true;
@@ -619,7 +619,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
               err = cbor_value_get_float(value, (float *)entries_table[index].value_desitination);
               break;
             }
-            case DOUBLE: {
+            case BM_FIELD_DOUBLE: {
               if (!cbor_value_is_double(value)) {
                 bm_debug("table expected double but got something else\n");
                 type_mismatch = true;
@@ -629,7 +629,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
               break;
             }
             // TODO - this one needs more work
-            // case STRING: {
+            // case BM_FIELD_STRING: {
             //   err = cbor_value_copy_text_string(&value, (char *)entries_table[index].value_desitination, &key_len, NULL);
             //   break;
             // }
@@ -683,29 +683,29 @@ CborError bm_encode_fields_from_table(CborEncoder *map_encoder, const BmEncoderT
 
     // Encode the value based on the type
     switch (entries_table[index].type) {
-      case UINT8: {
+      case BM_FIELD_UINT8: {
         err = cbor_encode_uint(map_encoder, *(const uint8_t *)entries_table[index].value_source);
         break;
       }
-      case UINT16: {
+      case BM_FIELD_UINT16: {
         err = cbor_encode_uint(map_encoder, *(const uint16_t *)entries_table[index].value_source);
         break;
       }
-      case UINT32: {
+      case BM_FIELD_UINT32: {
         err = cbor_encode_uint(map_encoder, *(const uint32_t *)entries_table[index].value_source);
         break;
       }
-      case UINT64: {
+      case BM_FIELD_UINT64: {
         err = cbor_encode_uint(map_encoder, *(const uint64_t *)entries_table[index].value_source);
         break;
       }
 
-      case FLOAT: {
+      case BM_FIELD_FLOAT: {
         err = cbor_encode_float(map_encoder, *(const float *)entries_table[index].value_source);
         break;
       }
 
-      case DOUBLE: {
+      case BM_FIELD_DOUBLE: {
         err = cbor_encode_double(map_encoder, *(const double *)entries_table[index].value_source);
         break;
       }
