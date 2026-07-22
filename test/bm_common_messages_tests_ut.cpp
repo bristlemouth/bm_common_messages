@@ -1585,7 +1585,7 @@ TEST_F(BmCommonTest, BmDecodeFieldsFromTableTypeMismatchTest) {
                                     sizeof(decode_table) / sizeof(decode_table[0]));
   // The helper should not assert/abort on mismatched types and should not
   // overwrite destination when the value type does not match the table type.
-  EXPECT_EQ(err, CborNoError);
+  EXPECT_EQ(err, CborErrorImproperValue);
   EXPECT_EQ(decoded_number, 0xdeadbeefU);
 
   err = decoder_message_leave(&value, &map);

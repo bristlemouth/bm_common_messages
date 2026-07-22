@@ -516,6 +516,7 @@ CborError decode_key_value_double_array(double **array_out, uint8_t *len,
 CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry_t *entries_table, size_t table_len) {
   CborError err = CborNoError;
   bool has_unknown_key = false;
+  bool type_mismatch = false;
 
   // Loop through the known keys, ignoring any unknown keys, or missing keys
     while (!cbor_value_at_end(value)) {
@@ -570,6 +571,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
             case UINT8: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
+                type_mismatch = true;
                 break;
               }
               uint64_t temp_value = 0;
@@ -580,6 +582,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
             case UINT16: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
+                type_mismatch = true;
                 break;
               }
               uint64_t temp_value = 0;
@@ -590,6 +593,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
             case UINT32: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
+                type_mismatch = true;
                 break;
               }
               uint64_t temp_value = 0;
@@ -600,6 +604,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
             case UINT64: {
               if (!cbor_value_is_unsigned_integer(value)) {
                 bm_debug("table expected int but got something else\n");
+                type_mismatch = true;
                 break;
               }
               err = cbor_value_get_uint64(value, (uint64_t *)entries_table[index].value_desitination);
@@ -608,6 +613,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
             case FLOAT: {
               if (!cbor_value_is_float(value)) {
                 bm_debug("table expected float but got something else\n");
+                type_mismatch = true;
                 break;
               }
               err = cbor_value_get_float(value, (float *)entries_table[index].value_desitination);
@@ -616,6 +622,7 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
             case DOUBLE: {
               if (!cbor_value_is_double(value)) {
                 bm_debug("table expected double but got something else\n");
+                type_mismatch = true;
                 break;
               }
               err = cbor_value_get_double(value, (double *)entries_table[index].value_desitination);
@@ -647,6 +654,10 @@ CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry
       if (err != CborNoError) {
         break;
       }
+    }
+
+    if (type_mismatch && err == CborNoError) {
+      err = CborErrorImproperValue;
     }
 
     if (has_unknown_key && err == CborNoError) {
