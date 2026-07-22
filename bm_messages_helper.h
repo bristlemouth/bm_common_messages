@@ -21,6 +21,32 @@ extern "C" {
     e = f;                                                                     \
   }
 
+typedef enum {
+  BM_FIELD_UINT8,
+  BM_FIELD_UINT16,
+  BM_FIELD_UINT32,
+  BM_FIELD_UINT64,
+  BM_FIELD_FLOAT,
+  BM_FIELD_DOUBLE,
+  BM_FIELD_STRING,
+} BmField;
+
+typedef struct {
+  const char* key;
+  BmField type;
+  void *value_desitination;
+} BmDecodeTableEntry;
+
+typedef struct {
+  const char* key;
+  BmField type;
+  const void *value_source;
+} BmEncoderTableEntry;
+
+CborError bm_decode_fields_from_table(CborValue *value, const BmDecodeTableEntry *entries_table, size_t table_len);
+
+CborError bm_encode_fields_from_table(CborEncoder *map_encoder, const BmEncoderTableEntry *entries_table, size_t table_len);
+
 CborError encoder_message_create(CborEncoder *encoder, CborEncoder *map_encoder,
                                  uint8_t *cbor_buffer, size_t size,
                                  size_t num_fields);

@@ -8,6 +8,7 @@
 #include "bm_rbr_pressure_difference_signal_msg.h"
 #include "bm_seapoint_turbidity_data_msg.h"
 #include "bm_soft_data_msg.h"
+#include "bm_messages_helper.h"
 #include "config_cbor_map_srv_reply_msg.h"
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
@@ -1438,4 +1439,172 @@ TEST_F(BmCommonTest, PowerSolarAveragesTest) {
 
   PowerSolarAveragesMsg::free(d4);
   PowerSolarAveragesMsg::free(decode4);
+}
+
+TEST_F(BmCommonTest, BmEncodeDecodeFieldsFromTableRoundTripTest) {
+  const uint8_t expected_u8 = 7;
+  const uint16_t expected_u16 = 65000;
+  const uint32_t expected_u32 = 1234567890U;
+  const uint64_t expected_u64 = 9876543210123ULL;
+  const float expected_f32 = 12.25f;
+  const double expected_f64 = 98.125;
+
+  BmEncoderTableEntry encode_table[] = {
+      {"u8", BM_FIELD_UINT8, &expected_u8},
+      {"u16", BM_FIELD_UINT16, &expected_u16},
+      {"u32", BM_FIELD_UINT32, &expected_u32},
+      {"u64", BM_FIELD_UINT64, &expected_u64},
+      {"f32", BM_FIELD_FLOAT, &expected_f32},
+      {"f64", BM_FIELD_DOUBLE, &expected_f64},
+  };
+
+  uint8_t cbor_buffer[1024] = {0};
+  CborEncoder encoder;
+  CborEncoder map_encoder;
+  CborError err =
+      encoder_message_create(&encoder, &map_encoder, cbor_buffer,
+                             sizeof(cbor_buffer),
+                             sizeof(encode_table) / sizeof(encode_table[0]));
+  EXPECT_EQ(err, CborNoError);
+
+  err = bm_encode_fields_from_table(
+      &map_encoder, encode_table, sizeof(encode_table) / sizeof(encode_table[0]));
+  EXPECT_EQ(err, CborNoError);
+
+  err = encoder_message_finish(&encoder, &map_encoder);
+  EXPECT_EQ(err, CborNoError);
+
+  const size_t encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
+
+  CborParser parser;
+  CborValue map;
+  CborValue value;
+  err = decoder_message_enter(&map, &value, &parser, cbor_buffer, encoded_len,
+                              sizeof(encode_table) / sizeof(encode_table[0]));
+  EXPECT_EQ(err, CborNoError);
+
+  uint8_t decoded_u8 = 0;
+  uint16_t decoded_u16 = 0;
+  uint32_t decoded_u32 = 0;
+  uint64_t decoded_u64 = 0;
+  float decoded_f32 = 0.0f;
+  double decoded_f64 = 0.0;
+
+  BmDecodeTableEntry decode_table[] = {
+      {"u8", BM_FIELD_UINT8, &decoded_u8},   {"u16", BM_FIELD_UINT16, &decoded_u16},
+      {"u32", BM_FIELD_UINT32, &decoded_u32}, {"u64", BM_FIELD_UINT64, &decoded_u64},
+      {"f32", BM_FIELD_FLOAT, &decoded_f32}, {"f64", BM_FIELD_DOUBLE, &decoded_f64},
+  };
+
+  err = bm_decode_fields_from_table(
+      &value, decode_table, sizeof(decode_table) / sizeof(decode_table[0]));
+  EXPECT_EQ(err, CborNoError);
+
+  err = decoder_message_leave(&value, &map);
+  EXPECT_EQ(err, CborNoError);
+
+  EXPECT_EQ(decoded_u8, expected_u8);
+  EXPECT_EQ(decoded_u16, expected_u16);
+  EXPECT_EQ(decoded_u32, expected_u32);
+  EXPECT_EQ(decoded_u64, expected_u64);
+  EXPECT_FLOAT_EQ(decoded_f32, expected_f32);
+  EXPECT_DOUBLE_EQ(decoded_f64, expected_f64);
+}
+
+TEST_F(BmCommonTest, BmDecodeFieldsFromTableUnknownKeyTest) {
+  uint8_t cbor_buffer[256] = {0};
+  CborEncoder encoder;
+  CborEncoder map_encoder;
+  CborError err =
+      encoder_message_create(&encoder, &map_encoder, cbor_buffer,
+                             sizeof(cbor_buffer), 2);
+  EXPECT_EQ(err, CborNoError);
+
+  err = cbor_encode_text_stringz(&map_encoder, "known");
+  EXPECT_EQ(err, CborNoError);
+  err = cbor_encode_uint(&map_encoder, 42);
+  EXPECT_EQ(err, CborNoError);
+
+  err = cbor_encode_text_stringz(&map_encoder, "unknown");
+  EXPECT_EQ(err, CborNoError);
+  err = cbor_encode_uint(&map_encoder, 99);
+  EXPECT_EQ(err, CborNoError);
+
+  err = encoder_message_finish(&encoder, &map_encoder);
+  EXPECT_EQ(err, CborNoError);
+
+  const size_t encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
+
+  CborParser parser;
+  CborValue map;
+  CborValue value;
+  err = decoder_message_enter(&map, &value, &parser, cbor_buffer, encoded_len, 2);
+  EXPECT_EQ(err, CborNoError);
+
+  uint32_t decoded_known = 0;
+  BmDecodeTableEntry decode_table[] = {{"known", BM_FIELD_UINT32, &decoded_known}};
+
+  err = bm_decode_fields_from_table(&value, decode_table,
+                                    sizeof(decode_table) / sizeof(decode_table[0]));
+  EXPECT_EQ(err, CborErrorUnsupportedType);
+  EXPECT_EQ(decoded_known, 42U);
+
+  err = decoder_message_leave(&value, &map);
+  EXPECT_EQ(err, CborNoError);
+}
+
+TEST_F(BmCommonTest, BmDecodeFieldsFromTableTypeMismatchTest) {
+  uint8_t cbor_buffer[256] = {0};
+  CborEncoder encoder;
+  CborEncoder map_encoder;
+  CborError err =
+      encoder_message_create(&encoder, &map_encoder, cbor_buffer,
+                             sizeof(cbor_buffer), 1);
+  EXPECT_EQ(err, CborNoError);
+
+  err = cbor_encode_text_stringz(&map_encoder, "number");
+  EXPECT_EQ(err, CborNoError);
+  err = cbor_encode_text_stringz(&map_encoder, "not-a-number");
+  EXPECT_EQ(err, CborNoError);
+
+  err = encoder_message_finish(&encoder, &map_encoder);
+  EXPECT_EQ(err, CborNoError);
+
+  const size_t encoded_len = cbor_encoder_get_buffer_size(&encoder, cbor_buffer);
+
+  CborParser parser;
+  CborValue map;
+  CborValue value;
+  err = decoder_message_enter(&map, &value, &parser, cbor_buffer, encoded_len, 1);
+  EXPECT_EQ(err, CborNoError);
+
+  uint32_t decoded_number = 0xdeadbeef;
+  BmDecodeTableEntry decode_table[] = {{"number", BM_FIELD_UINT32, &decoded_number}};
+
+  err = bm_decode_fields_from_table(&value, decode_table,
+                                    sizeof(decode_table) / sizeof(decode_table[0]));
+  // The helper should not assert/abort on mismatched types and should not
+  // overwrite destination when the value type does not match the table type.
+  EXPECT_EQ(err, CborErrorImproperValue);
+  EXPECT_EQ(decoded_number, 0xdeadbeefU);
+
+  err = decoder_message_leave(&value, &map);
+  EXPECT_EQ(err, CborNoError);
+}
+
+TEST_F(BmCommonTest, BmEncodeFieldsFromTableUnsupportedTypeTest) {
+  const char *text = "hello";
+  BmEncoderTableEntry encode_table[] = {{"text", BM_FIELD_STRING, text}};
+
+  uint8_t cbor_buffer[128] = {0};
+  CborEncoder encoder;
+  CborEncoder map_encoder;
+  CborError err =
+      encoder_message_create(&encoder, &map_encoder, cbor_buffer,
+                             sizeof(cbor_buffer), 1);
+  EXPECT_EQ(err, CborNoError);
+
+  err = bm_encode_fields_from_table(
+      &map_encoder, encode_table, sizeof(encode_table) / sizeof(encode_table[0]));
+  EXPECT_EQ(err, CborErrorUnsupportedType);
 }
