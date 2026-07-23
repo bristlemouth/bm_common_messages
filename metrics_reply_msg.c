@@ -45,18 +45,12 @@ CborError metrics_reply_decode(const uint8_t *cbor_buffer, size_t size,
   
   err = decoder_message_enter(&map, &value, &parser, (uint8_t *)cbor_buffer,
                               size, METRICS_REPLY_NUM_FIELDS);
-  if (err != CborNoError) {
-    return err;
-  }
 
   /* metadata, decoded in wire order */
-  if ((err = decode_key_value_uint8(&out->version, &value, "version")) != CborNoError) {
-    return err;
-  }
-  if ((err = decode_key_value_uint64(&out->node_id, &value, "node_id")) != CborNoError) {
-    return err;
-  }
-  if ((err = decode_key_value_uint32(&out->uptime_ms, &value, "uptime_ms")) != CborNoError) {
+  check_and_decode_key(err, decode_key_value_uint8(&out->version, &value, "version"));
+  check_and_decode_key(err, decode_key_value_uint64(&out->node_id, &value, "node_id"));
+  check_and_decode_key(err, decode_key_value_uint32(&out->uptime_ms, &value, "uptime_ms"));
+  if (!check_acceptable_decode_errors(err)) {
     return err;
   }
 
