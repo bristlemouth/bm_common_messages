@@ -63,6 +63,7 @@ set(SOURCES
     sensor_header_msg.cpp
     sensor_header_msg.c
     sys_info_svc_reply_msg.c
+    metrics_reply_msg.c 
 )
 
 add_library(bmmessages ${SOURCES})

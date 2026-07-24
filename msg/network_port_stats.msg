@@ -1,0 +1,9 @@
+uint8 num_ports
+uint8 sqi[]
+uint16 mse[]
+uint8 lq[]
+uint16 rxe[]
+uint16 sye[]
+uint16 fc[]
+uint16 len[]
+uint16 algn[]

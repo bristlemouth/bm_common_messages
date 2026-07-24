@@ -100,6 +100,21 @@ CborError encode_key_value_uint32(CborEncoder *map_encoder, const char *name,
   return err;
 }
 
+CborError encode_key_value_uint64(CborEncoder *map_encoder, const char *name,
+                                  const uint64_t value) {
+  CborError err;
+  if ((err = cbor_encode_text_stringz(map_encoder, name)) != CborNoError) {
+    bm_debug("error: %s(%s): cbor_encode_text_stringz() failed: %d\r\n",
+             __func__, name, err);
+    if (err != CborErrorOutOfMemory)
+      return err;
+  }
+  if ((err = cbor_encode_uint(map_encoder, value)) != CborNoError)
+    bm_debug("error: %s(%s): cbor_encode_uint() failed: %d\r\n", __func__, name,
+             err);
+  return err;
+}
+
 CborError encode_key_value_string(CborEncoder *map_encoder, const char *name,
                                   const char *value, const size_t len) {
   CborError err;
@@ -319,6 +334,24 @@ CborError decode_key_value_uint32(uint32_t *out, CborValue *value,
   *out = (uint32_t)tmp;
 
   return err;
+}
+
+
+CborError decode_key_value_uint64(uint64_t *out, CborValue *value,
+                                  const char *key_expected) {
+  CborError err;
+  if (!cbor_value_is_text_string(value)) {
+    bm_debug("error: %s(%s): expected string key but got something else\r\n",
+             __func__, key_expected);
+    return CborErrorIllegalType;
+  }
+  if ((err = cbor_value_advance(value)) != CborNoError)
+    return err;
+  if (!cbor_value_is_unsigned_integer(value))
+    return CborErrorIllegalType;
+  if ((err = cbor_value_get_uint64(value, out)) != CborNoError)
+    return err;
+  return cbor_value_advance(value);
 }
 
 static CborError decode_key_value_string_bytes(void **out, size_t *len,

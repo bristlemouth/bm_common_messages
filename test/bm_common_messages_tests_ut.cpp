@@ -13,6 +13,7 @@
 #include "config_cbor_map_srv_request_msg.h"
 #include "device_test_svc_reply_msg.h"
 #include "device_test_svc_request_msg.h"
+#include "metrics_reply_msg.h"
 #include "pme_dissolved_oxygen_msg.h"
 #include "pme_wipe_msg.h"
 #include "power_battery_averages_msg.h"
@@ -1607,4 +1608,208 @@ TEST_F(BmCommonTest, BmEncodeFieldsFromTableUnsupportedTypeTest) {
   err = bm_encode_fields_from_table(
       &map_encoder, encode_table, sizeof(encode_table) / sizeof(encode_table[0]));
   EXPECT_EQ(err, CborErrorUnsupportedType);
+}
+
+TEST_F(BmCommonTest, MetricsReplyEncodeDecodeEnvelope) {
+  uint8_t num_ports = 1;
+  uint8_t sqi_1 = 5;
+  uint16_t mse_1 = 1234;
+
+  BmEncoderTableEntry enc_fields[3];
+  enc_fields[0] = {"num_ports", BM_FIELD_UINT8, &num_ports};
+  enc_fields[1] = {"sqi_1", BM_FIELD_UINT8, &sqi_1};
+  enc_fields[2] = {"mse_1", BM_FIELD_UINT16, &mse_1};
+
+  MetricsComponent comp = {};
+  comp.key = "network_port_stats";
+  comp.fields = enc_fields;
+  comp.num_fields = 3;
+
+  MetricsReplyData d = {};
+  d.version = METRICS_REPLY_VERSION;
+  d.node_id = 0x0123456789abcdefULL;
+  d.uptime_ms = 42000;
+  d.components = &comp;
+  d.num_components = 1;
+
+  uint8_t cbor_buffer[256];
+  size_t len = 0;
+  EXPECT_EQ(metrics_reply_encode(&d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+  EXPECT_EQ(len, 93);
+
+  uint8_t got_num_ports = 0;
+  uint8_t got_sqi = 0;
+  uint16_t got_mse = 0;
+
+  BmDecodeTableEntry dec_fields[3];
+  dec_fields[0] = {"num_ports", BM_FIELD_UINT8, &got_num_ports};
+  dec_fields[1] = {"sqi_1", BM_FIELD_UINT8, &got_sqi};
+  dec_fields[2] = {"mse_1", BM_FIELD_UINT16, &got_mse};
+
+  MetricsComponentDecode dcomp = {};
+  dcomp.key = "network_port_stats";
+  dcomp.fields = dec_fields;
+  dcomp.num_fields = 3;
+
+  MetricsReplyDecode out = {};
+  out.components = &dcomp;
+  out.num_components = 1;
+
+  EXPECT_EQ(metrics_reply_decode(cbor_buffer, len, &out), CborNoError);
+  EXPECT_EQ(out.version, (uint8_t)METRICS_REPLY_VERSION);
+  EXPECT_EQ(out.node_id, d.node_id);
+  EXPECT_EQ(out.uptime_ms, d.uptime_ms);
+  EXPECT_EQ(got_num_ports, num_ports);
+  EXPECT_EQ(got_sqi, sqi_1);
+  EXPECT_EQ(got_mse, mse_1);
+}
+
+TEST_F(BmCommonTest, MetricsReplyDecodeSkipsAbsentComponent) {
+  MetricsReplyData d = {};
+  d.version = METRICS_REPLY_VERSION;
+  d.node_id = 1;
+  d.uptime_ms = 0;
+  d.components = NULL;
+  d.num_components = 0;
+
+  uint8_t cbor_buffer[64];
+  size_t len = 0;
+  EXPECT_EQ(metrics_reply_encode(&d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+
+  uint8_t got_num_ports = 0xAA;
+  BmDecodeTableEntry dec_fields[1];
+  dec_fields[0] = {"num_ports", BM_FIELD_UINT8, &got_num_ports};
+
+  MetricsComponentDecode dcomp = {};
+  dcomp.key = "network_port_stats";
+  dcomp.fields = dec_fields;
+  dcomp.num_fields = 1;
+
+  MetricsReplyDecode out = {};
+  out.components = &dcomp;
+  out.num_components = 1;
+
+  EXPECT_EQ(metrics_reply_decode(cbor_buffer, len, &out), CborNoError);
+  EXPECT_EQ(out.version, (uint8_t)METRICS_REPLY_VERSION);
+  EXPECT_EQ(out.node_id, 1u);
+  EXPECT_EQ(got_num_ports, 0xAA); // untouched: component absent
+}
+
+TEST_F(BmCommonTest, MetricsReplyMultipleComponentsAndPorts) {
+  uint8_t num_ports = 2;
+  uint8_t sqi_1 = 7, sqi_2 = 6;
+  uint16_t mse_1 = 100, mse_2 = 200;
+
+  BmEncoderTableEntry net_fields[5];
+  net_fields[0] = {"num_ports", BM_FIELD_UINT8, &num_ports};
+  net_fields[1] = {"sqi_1", BM_FIELD_UINT8, &sqi_1};
+  net_fields[2] = {"mse_1", BM_FIELD_UINT16, &mse_1};
+  net_fields[3] = {"sqi_2", BM_FIELD_UINT8, &sqi_2};
+  net_fields[4] = {"mse_2", BM_FIELD_UINT16, &mse_2};
+
+  // Second component is synthetic (no such producer exists)
+  uint32_t heap_free = 54321;
+  BmEncoderTableEntry sys_fields[1];
+  sys_fields[0] = {"heap_free", BM_FIELD_UINT32, &heap_free};
+
+  MetricsComponent comps[2] = {};
+  comps[0].key = "network_port_stats";
+  comps[0].fields = net_fields;
+  comps[0].num_fields = 5;
+  comps[1].key = "sys_stats";
+  comps[1].fields = sys_fields;
+  comps[1].num_fields = 1;
+
+  MetricsReplyData d = {};
+  d.version = METRICS_REPLY_VERSION;
+  d.node_id = 0xdeadbeefcafef00dULL;
+  d.uptime_ms = 7;
+  d.components = comps;
+  d.num_components = 2;
+
+  uint8_t cbor_buffer[512];
+  size_t len = 0;
+  EXPECT_EQ(metrics_reply_encode(&d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+  EXPECT_EQ(len, 129);
+
+  uint8_t got_num_ports = 0, got_sqi_1 = 0, got_sqi_2 = 0;
+  uint16_t got_mse_1 = 0, got_mse_2 = 0;
+  uint32_t got_heap = 0;
+
+  BmDecodeTableEntry net_dec[5];
+  net_dec[0] = {"num_ports", BM_FIELD_UINT8, &got_num_ports};
+  net_dec[1] = {"sqi_1", BM_FIELD_UINT8, &got_sqi_1};
+  net_dec[2] = {"mse_1", BM_FIELD_UINT16, &got_mse_1};
+  net_dec[3] = {"sqi_2", BM_FIELD_UINT8, &got_sqi_2};
+  net_dec[4] = {"mse_2", BM_FIELD_UINT16, &got_mse_2};
+
+  BmDecodeTableEntry sys_dec[1];
+  sys_dec[0] = {"heap_free", BM_FIELD_UINT32, &got_heap};
+
+  MetricsComponentDecode dcomps[2] = {};
+  dcomps[0].key = "sys_stats";
+  dcomps[0].fields = sys_dec;
+  dcomps[0].num_fields = 1;
+  dcomps[1].key = "network_port_stats";
+  dcomps[1].fields = net_dec;
+  dcomps[1].num_fields = 5;
+
+  MetricsReplyDecode out = {};
+  out.components = dcomps;
+  out.num_components = 2;
+
+  EXPECT_EQ(metrics_reply_decode(cbor_buffer, len, &out), CborNoError);
+  EXPECT_EQ(out.node_id, d.node_id);
+  EXPECT_EQ(got_num_ports, 2);
+  EXPECT_EQ(got_sqi_1, 7);
+  EXPECT_EQ(got_sqi_2, 6);
+  EXPECT_EQ(got_mse_1, 100);
+  EXPECT_EQ(got_mse_2, 200);
+  EXPECT_EQ(got_heap, 54321u);
+}
+
+TEST_F(BmCommonTest, MetricsReplyDecodeToleratesExtraComponentFields) {
+  uint8_t num_ports = 1;
+  uint8_t sqi_1 = 9;
+  uint16_t mse_1 = 4321;
+
+  BmEncoderTableEntry enc_fields[3];
+  enc_fields[0] = {"num_ports", BM_FIELD_UINT8, &num_ports};
+  enc_fields[1] = {"sqi_1", BM_FIELD_UINT8, &sqi_1};
+  enc_fields[2] = {"mse_1", BM_FIELD_UINT16, &mse_1};
+
+  MetricsComponent comp = {};
+  comp.key = "network_port_stats";
+  comp.fields = enc_fields;
+  comp.num_fields = 3;
+
+  MetricsReplyData d = {};
+  d.version = METRICS_REPLY_VERSION;
+  d.node_id = 2;
+  d.uptime_ms = 5;
+  d.components = &comp;
+  d.num_components = 1;
+
+  uint8_t cbor_buffer[256];
+  size_t len = 0;
+  EXPECT_EQ(metrics_reply_encode(&d, cbor_buffer, sizeof(cbor_buffer), &len), CborNoError);
+
+  // Decoder only knows about num_ports and sqi_1; mse_1 is "new".
+  uint8_t got_num_ports = 0, got_sqi = 0;
+  BmDecodeTableEntry dec_fields[2];
+  dec_fields[0] = {"num_ports", BM_FIELD_UINT8, &got_num_ports};
+  dec_fields[1] = {"sqi_1", BM_FIELD_UINT8, &got_sqi};
+
+  MetricsComponentDecode dcomp = {};
+  dcomp.key = "network_port_stats";
+  dcomp.fields = dec_fields;
+  dcomp.num_fields = 2;
+
+  MetricsReplyDecode out = {};
+  out.components = &dcomp;
+  out.num_components = 1;
+
+  EXPECT_EQ(metrics_reply_decode(cbor_buffer, len, &out), CborNoError);
+  EXPECT_EQ(got_num_ports, num_ports);
+  EXPECT_EQ(got_sqi, sqi_1);
 }

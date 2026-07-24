@@ -69,6 +69,7 @@ set(BM_COMMON_MESSAGES_SRCS
     ${SRC_DIR}/power_solar_averages_msg.cpp
     ${SRC_DIR}/aanderaa_conductivity_msg.cpp
     ${SRC_DIR}/aanderaa_current_meter_msg.cpp
+    ${SRC_DIR}/metrics_reply_msg.c 
 
     # support files
     ${SRC_DIR}/third_party/tinycbor/src/cborparser.c
